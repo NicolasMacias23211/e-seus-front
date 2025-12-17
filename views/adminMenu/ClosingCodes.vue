@@ -45,13 +45,13 @@
               class="hover:bg-blue-50 transition-colors"
             >
               <td class="px-6 py-4 text-sm text-slate-700 font-mono">
-                {{ code.idClosingCode }}
+                {{ code.id_closing_code }}
               </td>
               <td class="px-6 py-4 text-sm text-slate-700 font-medium">
-                {{ code.closingCodeName }}
+                {{ code.closing_code_name }}
               </td>
               <td class="px-6 py-4 text-sm text-slate-600">
-                {{ code.closingCodeDescription }}
+                {{ code.closing_code_description }}
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center justify-center gap-2">
@@ -180,30 +180,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { CheckCircle, Plus, Edit2, Trash2 } from "lucide-vue-next";
 import { useNotification } from "../../utils/useNotification";
-import type { ClosingCode } from "../../models/ClosingCode";
+import { ClosingCodeService } from "../../services/closingCode";
+import { ClosingCode } from "../../models/ClosingCode";
 
 const notification = useNotification();
+const closingCodeService = new ClosingCodeService()
 
-const closingCodes = ref<ClosingCode[]>([
-  {
-    idClosingCode: 1,
-    closingCodeName: "Resuelto",
-    closingCodeDescription: "Ticket resuelto satisfactoriamente",
-  },
-  {
-    idClosingCode: 2,
-    closingCodeName: "Cancelado",
-    closingCodeDescription: "Ticket cancelado por el usuario",
-  },
-  {
-    idClosingCode: 3,
-    closingCodeName: "No Procede",
-    closingCodeDescription: "El ticket no procede",
-  },
-]);
+const closingCodes = ref<ClosingCode[]>([]);
 
 const showModal = ref(false);
 const isEditing = ref(false);
@@ -226,11 +212,11 @@ const openCreateModal = () => {
 const openEditModal = (code: ClosingCode) => {
   isEditing.value = true;
   editingIndex.value = closingCodes.value.findIndex(
-    (c) => c.idClosingCode === code.idClosingCode
+    (c) => c.id_closing_code === code.id_closing_code
   );
-  form.idClosingCode = code.idClosingCode;
-  form.closingCodeName = code.closingCodeName ?? "";
-  form.closingCodeDescription = code.closingCodeDescription ?? "";
+  form.idClosingCode = code.id_closing_code;
+  form.closingCodeName = code.closing_code_name ?? "";
+  form.closingCodeDescription = code.closing_code_description ?? "";
   showModal.value = true;
 };
 
@@ -246,9 +232,9 @@ const closeModal = () => {
 const handleSubmit = () => {
   if (isEditing.value) {
     closingCodes.value[editingIndex.value] = {
-      idClosingCode: form.idClosingCode,
-      closingCodeName: form.closingCodeName,
-      closingCodeDescription: form.closingCodeDescription,
+      id_closing_code: form.idClosingCode,
+      closing_code_name: form.closingCodeName,
+      closing_code_description: form.closingCodeDescription,
     };
     notification.success(
       "¡Actualizado!",
@@ -256,9 +242,9 @@ const handleSubmit = () => {
     );
   } else {
     closingCodes.value.push({
-      idClosingCode: form.idClosingCode,
-      closingCodeName: form.closingCodeName,
-      closingCodeDescription: form.closingCodeDescription,
+      id_closing_code: form.idClosingCode,
+      closing_code_name: form.closingCodeName,
+      closing_code_description: form.closingCodeDescription,
     });
     notification.success(
       "¡Creado!",
@@ -270,10 +256,10 @@ const handleSubmit = () => {
 
 const confirmDelete = (code: ClosingCode) => {
   if (
-    confirm(`¿Está seguro de eliminar el código "${code.closingCodeName}"?`)
+    confirm(`¿Está seguro de eliminar el código "${code.closing_code_name}"?`)
   ) {
     const index = closingCodes.value.findIndex(
-      (c) => c.idClosingCode === code.idClosingCode
+      (c) => c.id_closing_code === code.id_closing_code
     );
     closingCodes.value.splice(index, 1);
     notification.success(
@@ -282,6 +268,24 @@ const confirmDelete = (code: ClosingCode) => {
     );
   }
 };
+
+const loadClosingCodes = async () => {
+  try {
+    const response = await closingCodeService.getAll()
+    if (response.data && response.data.results) {
+      closingCodes.value = response.data.results
+    }
+  } catch (error){
+    console.error("Error al cargar los codigos de cierre: ", error)
+    notification.error("Error", "No se pudieron cargar los codigos de cierre")
+  }
+}
+
+onMounted(()=>{
+  loadClosingCodes();
+})
+
+
 </script>
 
 <style scoped>
