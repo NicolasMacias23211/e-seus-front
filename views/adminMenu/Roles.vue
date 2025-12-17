@@ -44,7 +44,7 @@
               class="hover:bg-blue-50 transition-colors"
             >
               <td class="px-6 py-4 text-sm text-slate-700 font-medium">
-                {{ role.rolName }}
+                {{ role.rol_name }}
               </td>
               <td class="px-6 py-4 text-sm text-slate-600">
                 {{ role.description }}
@@ -154,20 +154,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { Shield, Plus, Edit2, Trash2 } from "lucide-vue-next";
 import { useNotification } from "../../utils/useNotification";
 import type { Role } from "../../models/Role";
+import { RolesService } from "../../services/rolesService";
 
 const notification = useNotification();
+const rolesService = new RolesService();
 
-// Estado
-const roles = ref<Role[]>([
-  { rolName: "Administrador", description: "Acceso total al sistema" },
-  { rolName: "Supervisor", description: "Supervisión y gestión de equipos" },
-  { rolName: "Agente", description: "Gestión de tickets asignados" },
-  { rolName: "Usuario", description: "Acceso básico al sistema" },
-]);
+// primero se crea el array basico para luego llenarlo con el ref para que se dinamico
+const roles = ref<Role[]>([]);
 
 const showModal = ref(false);
 const isEditing = ref(false);
@@ -178,7 +175,6 @@ const form = reactive({
   description: "",
 });
 
-// Métodos
 const openCreateModal = () => {
   isEditing.value = false;
   form.rolName = "";
@@ -188,8 +184,8 @@ const openCreateModal = () => {
 
 const openEditModal = (role: Role) => {
   isEditing.value = true;
-  editingIndex.value = roles.value.findIndex((r) => r.rolName === role.rolName);
-  form.rolName = role.rolName;
+  editingIndex.value = roles.value.findIndex((r) => r.rol_name === role.rol_name);
+  form.rolName = role.rol_name;
   form.description = role.description || "";
   showModal.value = true;
 };
@@ -205,7 +201,7 @@ const closeModal = () => {
 const handleSubmit = () => {
   if (isEditing.value) {
     roles.value[editingIndex.value] = {
-      rolName: form.rolName,
+      rol_name: form.rolName,
       description: form.description,
     };
     notification.success(
@@ -214,7 +210,7 @@ const handleSubmit = () => {
     );
   } else {
     roles.value.push({
-      rolName: form.rolName,
+      rol_name: form.rolName,
       description: form.description,
     });
     notification.success("¡Creado!", "El rol ha sido creado correctamente");
@@ -223,8 +219,8 @@ const handleSubmit = () => {
 };
 
 const confirmDelete = (role: Role) => {
-  if (confirm(`¿Está seguro de eliminar el rol "${role.rolName}"?`)) {
-    const index = roles.value.findIndex((r) => r.rolName === role.rolName);
+  if (confirm(`¿Está seguro de eliminar el rol "${role.rol_name}"?`)) {
+    const index = roles.value.findIndex((r) => r.rol_name === role.rol_name);
     roles.value.splice(index, 1);
     notification.success(
       "¡Eliminado!",
@@ -232,6 +228,22 @@ const confirmDelete = (role: Role) => {
     );
   }
 };
+//con esta funcion mas en Onmute se cargan los roles cuando se carga la pantalla
+const loadRoles = async () => {
+  try {
+    const response = await rolesService.getAll();
+    if (response.data && response.data.results) {
+      roles.value = response.data.results;
+    }
+  } catch (error) {
+    console.error("Error al cargar roles:", error);
+    notification.error("Error", "No se pudieron cargar los roles");
+  }
+};
+
+onMounted(() => {
+  loadRoles();
+});
 </script>
 
 <style scoped>

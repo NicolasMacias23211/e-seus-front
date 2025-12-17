@@ -1,4 +1,5 @@
 import { env } from "../config/env";
+import {SessionStorageService} from "./SessionStorageService";
 
 interface RequestOptions extends RequestInit {
   timeout?: number;
@@ -11,7 +12,14 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
-class HttpService {
+export interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+
+export class HttpService {
   private baseUrl: string;
   private defaultTimeout: number;
 
@@ -25,7 +33,8 @@ class HttpService {
       "Content-Type": "application/json",
     };
     //este ejemplo es copn Bearer definir que vamos a usar en la aplciacion real JWT? Bearer, Basic, etc.
-    const token = localStorage.getItem(env.authTokenKey);
+    const sessionStorageService = new SessionStorageService();
+    const token = sessionStorageService.getAccessToken();
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
     }
@@ -35,7 +44,7 @@ class HttpService {
   /**
    * Realiza una petición HTTP con timeout
    */
-  private async fetchWithTimeout(
+  protected async fetchWithTimeout(
     url: string,
     options: RequestOptions = {}
   ): Promise<Response> {
