@@ -1,5 +1,6 @@
 export interface ClosingCode {
-  idClosingCode: number;
-  closingCodeName: string | null;
-  closingCodeDescription: string | null;
+  id_closing_code?: number;
+  closing_code_name: string | null;
+  closing_code_description: string | null;
 }
+
