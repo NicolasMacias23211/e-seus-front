@@ -61,14 +61,14 @@
             >
               <button
                 @click="handleCancel"
-                class="flex-1 px-4 py-3 bg-white border-2 border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold rounded-xl transition-all"
+                class="flex-1 px-4 py-3 bg-white border-2 border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold rounded-xl transition-all cursor-pointer"
               >
                 {{ cancelText }}
               </button>
               <button
                 @click="handleConfirm"
                 :class="[
-                  'flex-1 px-4 py-3 font-semibold rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]',
+                  'flex-1 px-4 py-3 font-semibold rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] cursor-pointer',
                   confirmButtonClass,
                 ]"
               >

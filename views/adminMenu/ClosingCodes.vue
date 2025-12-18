@@ -25,7 +25,6 @@
         <table class="w-full">
           <thead class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white">
             <tr>
-              <th class="px-6 py-4 text-left text-sm font-bold">ID</th>
               <th class="px-6 py-4 text-left text-sm font-bold">Nombre</th>
               <th class="px-6 py-4 text-left text-sm font-bold">Descripción</th>
               <th class="px-6 py-4 text-center text-sm font-bold">Acciones</th>
@@ -33,9 +32,6 @@
           </thead>
           <tbody class="divide-y divide-slate-200">
             <tr v-for="(code, index) in closingCodes" :key="index" class="hover:bg-blue-50 transition-colors">
-              <td class="px-6 py-4 text-sm text-slate-700 font-mono">
-                {{ code.id_closing_code }}
-              </td>
               <td class="px-6 py-4 text-sm text-slate-700 font-medium">
                 {{ code.closing_code_name }}
               </td>
@@ -116,6 +112,15 @@
         </div>
       </div>
     </Teleport>
+    <ConfirmDialog 
+      :is-visible="showConfirmDialog" 
+      type="delete" title="Confirmar Eliminación"
+      :message="`¿Está seguro de que desea eliminar el cliente '${clientToDelete?.closing_code_name}'?`"
+      details="Esta acción eliminará permanentemente el código de cierre del sistema. Los ticket relacionados a este código de cierre también podrían verse afectados."
+      confirm-text="Sí, Eliminar" 
+      cancel-text="Cancelar" 
+      @confirm="handleDeleteConfirm" 
+      @cancel="handleDeleteCancel" />
   </div>
 </template>
 
@@ -124,13 +129,14 @@ import { ref, reactive, onMounted } from "vue";
 import { CheckCircle, Plus, Edit2, Trash2 } from "lucide-vue-next";
 import { useNotification } from "../../utils/useNotification";
 import { ClosingCodeService } from "../../services/closingCode";
-import type { ClosingCode } from "../../models/ClosingCode";
+import { ClosingCode } from "../../models/ClosingCode";
+import ConfirmDialog from "../../components/ConfirmDialog.vue";
 
 const notification = useNotification();
 const closingCodeService = new ClosingCodeService()
-
 const closingCodes = ref<ClosingCode[]>([]);
-
+const showConfirmDialog = ref(false)
+const clientToDelete = ref<ClosingCode | null>(null);
 const showModal = ref(false);
 const isEditing = ref(false);
 const editingIndex = ref(-1);
@@ -169,59 +175,104 @@ const closeModal = () => {
   editingIndex.value = -1;
 };
 
-const handleSubmit = async () => {
+const handleSubmit = () => {
+  if (isEditing.value) {
+    update()
+    return
+  }
+  create()
+};
+
+const create = async () => {
   try {
-    if (isEditing.value) {
-      let dataUpdate: ClosingCode = ({
-        closing_code_name: form.closing_code_name,
-        closing_code_description: form.closing_code_description,
-      })
+    let dataCreate: ClosingCode = ({
+      closing_code_name: form.closing_code_name,
+      closing_code_description: form.closing_code_description,
+    })
 
-      let response = await closingCodeService.update(dataUpdate, form.id_closing_code)
-      if (response.success) {
-        notification.success(
-          "¡Actualizado!",
-          "El código de cierre ha sido actualizado correctamente"
-        );
-        loadClosingCodes();
-      }
+    let response = await closingCodeService.create(dataCreate)
+    if (response.success) {
+      notification.success(
+        "¡Creado!",
+        "El código de cierre ha sido creado correctamente"
+      );
+      loadClosingCodes();
+      closeModal();
+      return
     }
-    if (!isEditing.value) {
-      let dataCreate: ClosingCode = ({
-        closing_code_name: form.closing_code_name,
-        closing_code_description: form.closing_code_description,
-      })
-
-      let response = await closingCodeService.create(dataCreate)
-      if (response.success) {
-        notification.success(
-          "¡Creado!",
-          "El código de cierre ha sido creado correctamente"
-        );
-        loadClosingCodes();
-      }
-    }
+    console.error("Error al crear el código de cierre: ", response.error)
+    notification.error("Error", "No se logro crear el código de cierre")
     closeModal();
   } catch (error) {
-    console.error("Error al crear el codigo de cierre: ", error)
-    notification.error("Error", "No se logro crear el codigo de cierre")
+    console.error("Error al crear el código de cierre: ", error)
+    notification.error("Error", "No se logro crear el código de cierre")
+    closeModal();
+  }
+}
+
+const update = async () => {
+  try {
+    let data: ClosingCode = ({
+        closing_code_name: form.closing_code_name,
+        closing_code_description: form.closing_code_description,
+      })
+
+      let response = await closingCodeService.update(data, form.id_closing_code)
+    if (response.success) {
+      notification.success(
+        "¡Creado!",
+        "El código de cierre ha sido actualizado correctamente"
+      );
+      loadClosingCodes();
+      closeModal();
+      return
+    }
+    console.error("Error al actualizar el código de cierre: ", response.error)
+    notification.error("Error", "No se logro actualizar el código de cierre")
+    closeModal();
+  } catch (error) {
+    console.error("Error al actualizar el código de cierre: ", error)
+    notification.error("Error", "No se logro actualizar el código de cierre")
+    closeModal();
+  }
+}
+
+const confirmDelete = (code: ClosingCode) => {
+  clientToDelete.value = code;
+  showConfirmDialog.value = true;
+};
+const handleDeleteCancel = () => {
+  showConfirmDialog.value = false;
+  clientToDelete.value = null;
+};
+
+const handleDeleteConfirm = async () => {
+  try {
+    if (clientToDelete.value && clientToDelete.value.id_closing_code != undefined) {
+      let response = await closingCodeService.delete(clientToDelete.value.id_closing_code)
+      if (response.success) {
+
+        notification.success(
+          "¡Eliminado!",
+          "El código de cierre ha sido eliminado correctamente"
+        );
+
+        loadClosingCodes();
+        handleDeleteCancel()
+        return
+      }
+      console.error("Error al eliminar el código de cierre: ", response.error)
+      notification.error("Error", "No se logro eliminar el código de cierre")
+      handleDeleteCancel()
+    }
+  } catch (error) {
+    console.error("Error al eliminar el código de cierre: ", error)
+    notification.error("Error", "No se logro eliminar el código de cierre")
+    handleDeleteCancel()
   }
 };
 
-const confirmDelete = async (code: ClosingCode) => {
-  if (
-    confirm(`¿Está seguro de eliminar el código "${code.closing_code_name}"?`)
-  ) {
-    if (code.id_closing_code) {
-      console.log(code.id_closing_code)
-      // let response = await closingCodeService.delete(code.id_closing_code) 
-      notification.success(
-        "¡Eliminado!",
-        "El código de cierre ha sido eliminado correctamente"
-      );
-    }
-  }
-};
+
 
 const loadClosingCodes = async () => {
   try {
@@ -230,8 +281,8 @@ const loadClosingCodes = async () => {
       closingCodes.value = response.data.results
     }
   } catch (error) {
-    console.error("Error al cargar los codigos de cierre: ", error)
-    notification.error("Error", "No se pudieron cargar los codigos de cierre")
+    console.error("Error al cargar los códigos de cierre: ", error)
+    notification.error("Error", "No se pudieron cargar los códigos de cierre")
   }
 }
 
