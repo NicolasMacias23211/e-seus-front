@@ -1,8 +1,9 @@
 import { env } from "../config/env";
-import {SessionStorageService} from "./SessionStorageService";
+import { SessionStorageService } from "./SessionStorageService";
 
 interface RequestOptions extends RequestInit {
   timeout?: number;
+  skipAuth?: boolean;
 }
 
 export interface ApiResponse<T> {
@@ -28,16 +29,19 @@ export class HttpService {
     this.defaultTimeout = env.apiTimeout;
   }
 
-  private getDefaultHeaders(): HeadersInit {
+  private getDefaultHeaders(skipAuth: boolean = false): HeadersInit {
     const headers: HeadersInit = {
       "Content-Type": "application/json",
     };
-    //este ejemplo es copn Bearer definir que vamos a usar en la aplciacion real JWT? Bearer, Basic, etc.
-    const sessionStorageService = new SessionStorageService();
-    const token = sessionStorageService.getAccessToken();
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
+
+    if (!skipAuth) {
+      const sessionStorageService = new SessionStorageService();
+      const token = sessionStorageService.getAccessToken();
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
     }
+
     return headers;
   }
 
@@ -48,7 +52,11 @@ export class HttpService {
     url: string,
     options: RequestOptions = {}
   ): Promise<Response> {
-    const { timeout = this.defaultTimeout, ...fetchOptions } = options;
+    const {
+      timeout = this.defaultTimeout,
+      skipAuth = false,
+      ...fetchOptions
+    } = options;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -58,7 +66,7 @@ export class HttpService {
         ...fetchOptions,
         signal: controller.signal,
         headers: {
-          ...this.getDefaultHeaders(),
+          ...this.getDefaultHeaders(skipAuth),
           ...fetchOptions.headers,
         },
       });
@@ -110,7 +118,7 @@ export class HttpService {
    */
   async post<T>(
     endpoint: string,
-    data?: any,
+    data?: T,
     options?: RequestOptions
   ): Promise<ApiResponse<T>> {
     try {
@@ -138,7 +146,7 @@ export class HttpService {
    */
   async put<T>(
     endpoint: string,
-    data?: any,
+    data?: T,
     options?: RequestOptions
   ): Promise<ApiResponse<T>> {
     try {
@@ -192,7 +200,7 @@ export class HttpService {
    */
   async patch<T>(
     endpoint: string,
-    data?: any,
+    data?: T,
     options?: RequestOptions
   ): Promise<ApiResponse<T>> {
     try {
@@ -216,5 +224,4 @@ export class HttpService {
   }
 }
 
-// Exportar instancia única del servicio
 export const http = new HttpService();

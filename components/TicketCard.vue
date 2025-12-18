@@ -7,28 +7,27 @@
       <div class="flex items-start justify-between gap-2">
         <div class="flex items-center gap-2">
           <component
-            :is="typeIcons[getTicketTypeByService(ticket.ticketService)].icon"
+            :is="typeIcons[getTicketTypeByName(ticket.service_name)].icon"
             :class="[
               'h-4 w-4',
-              typeIcons[getTicketTypeByService(ticket.ticketService)].color,
+              typeIcons[getTicketTypeByName(ticket.service_name)].color,
             ]"
           />
           <span
             class="font-mono text-xs font-semibold px-2.5 py-1 bg-[#50bdeb]/10 text-[#021C7D] border border-[#50bdeb]/20 rounded-md"
           >
-            #{{ ticket.idTicket }}
+            #{{ ticket.id_ticket }}
           </span>
         </div>
         <span
           :class="[
             'text-xs font-semibold px-2.5 py-1 rounded-md border-2',
-            priorityConfig[ticket.ticketPriority]?.color ||
+            priorityConfig[ticket.priority_name]?.color ||
               'bg-slate-50 text-slate-700 border-slate-300',
           ]"
         >
           {{
-            priorityConfig[ticket.ticketPriority]?.label ||
-            ticket.ticketPriority
+            priorityConfig[ticket.priority_name]?.label || ticket.priority_name
           }}
         </span>
       </div>
@@ -36,14 +35,14 @@
       <h4
         class="font-semibold text-sm line-clamp-2 leading-snug text-slate-800 group-hover:text-[#021C7D] transition-colors"
       >
-        {{ ticket.ticketTitle }}
+        {{ ticket.ticket_title }}
       </h4>
 
       <div class="flex flex-wrap gap-1.5">
         <span
           class="text-xs px-2.5 py-1 bg-gradient-to-r from-slate-100 to-slate-50 text-slate-700 rounded-md border border-slate-200 font-medium"
         >
-          {{ ticket.clientName }}
+          {{ ticket.sub_program_name || "Sin cliente" }}
         </span>
       </div>
 
@@ -65,11 +64,11 @@
           </div>
         </div>
         <div
-          v-if="ticket.assignedTo"
+          v-if="ticket.assigned_to"
           class="h-8 w-8 rounded-full bg-gradient-to-br from-[#50bdeb] to-[#021C7D] text-white text-xs font-bold flex items-center justify-center shadow-md ring-2 ring-white"
-          :title="ticket.assignedTo"
+          :title="ticket.assigned_to"
         >
-          {{ ticket.assignedTo.substring(0, 2).toUpperCase() }}
+          {{ ticket.assigned_to.substring(0, 2).toUpperCase() }}
         </div>
         <div
           v-else
@@ -126,14 +125,15 @@ const typeIcons: Record<string, { icon: any; color: string }> = {
   improvement: { icon: Wrench, color: "text-amber-500" },
 };
 
-// Helper to get ticket type by service
-const getTicketTypeByService = (serviceId: number) => {
-  const typeMap: Record<number, keyof typeof typeIcons> = {
-    1: "feature",
-    2: "improvement",
-    3: "bug",
+// Helper to get ticket type by service name
+const getTicketTypeByName = (serviceName: string) => {
+  const nameMap: Record<string, keyof typeof typeIcons> = {
+    "Soporte Técnico": "bug",
+    Desarrollo: "feature",
+    Infraestructura: "improvement",
+    Consultoría: "task",
   };
-  return typeMap[serviceId] || "task";
+  return nameMap[serviceName] || "task";
 };
 
 function openTicket() {

@@ -1,8 +1,4 @@
-import type {
-  Login,
-  UserInfo,
-  EldapAuthResponse,
-} from "../models/login";
+import type { Login, UserInfo, EldapAuthResponse } from "../models/login";
 import { http, HttpService } from "./http";
 import { env } from "../config/env";
 import { SessionStorageService } from "./SessionStorageService";
@@ -50,13 +46,12 @@ export class LoginService extends HttpService {
     }
   }
 
-
   public async getEldapLogin(
     user: string,
     password: string
   ): Promise<EldapAuthResponse> {
-      const headers: HeadersInit = {
-      "Authorization": `Bearer ${this.AuthTokenELdap}`,
+    const headers: HeadersInit = {
+      Authorization: `Bearer ${this.AuthTokenELdap}`,
     };
     const formData = new FormData();
     formData.append("user", user);
@@ -65,7 +60,7 @@ export class LoginService extends HttpService {
     const opciones: RequestInit = {
       method: "POST",
       body: formData,
-      headers: headers
+      headers: headers,
     };
 
     try {
@@ -85,20 +80,42 @@ export class LoginService extends HttpService {
     }
   }
 
-  public async loginBack(user: UserInfo): Promise<Login>{
+  public async loginBack(user: UserInfo): Promise<Login> {
     const backendPayload = {
       ldap: {
         user: user.username,
         full_name: user.full_name,
         position: user.position,
         mail: user.email,
-        document: user.document.toString()
-      }
+        document: user.document.toString(),
+      },
     };
-    let result =  await http.post<Login>(`/auth/login/`, backendPayload);
-    if (!result.data) {
-      throw new Error("No se recibió información de login del backend.");
+
+    const url = `${env.apiBaseUrl}/auth/login/`;
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+    };
+
+    const opciones: RequestInit = {
+      method: "POST",
+      body: JSON.stringify(backendPayload),
+      headers: headers,
+    };
+
+    try {
+      const response = await fetch(url, opciones);
+
+      if (!response.ok) {
+        throw new Error(
+          `Error del servidor backend: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const data: Login = await response.json();
+      return data;
+    } catch (error) {
+      console.error("No se pudo conectar al servicio backend:", error);
+      throw error;
     }
-    return result.data;
   }
 }
