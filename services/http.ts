@@ -33,9 +33,10 @@ export class HttpService {
       "Content-Type": "application/json",
     };
     //este ejemplo es copn Bearer definir que vamos a usar en la aplciacion real JWT? Bearer, Basic, etc.
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2MDEzMTQ1LCJpYXQiOjE3NjYwMDIzNDUsImp0aSI6ImRjMTczYzBhNzRhMzRjOTdiN2M3YzdmZDFlMGRhNjRiIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJzamltZWhlciIsImVtYWlsIjoic2ppbWVoZXJAZW10ZWxjby5jb20uY28iLCJmdWxsX25hbWUiOiJTRUJBU1RJQU4gQ0FNSUxPIEpJTUVORVogSEVSTkFOREVaIiwicG9zaXRpb24iOiJBUlFVSVRFQ1RPIERFIEFWQSIsImRvY3VtZW50IjoiMTAxNzI2MzA0MyJ9.dRnHSbLBCWFvbybwyiKxFcXc28ejJsa01L1nOjWmNzA";
-    // const token = sessionStorageService.getAccessToken();
-    // const sessionStorageService = new SessionStorageService();
+    // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2MDEzMTQ1LCJpYXQiOjE3NjYwMDIzNDUsImp0aSI6ImRjMTczYzBhNzRhMzRjOTdiN2M3YzdmZDFlMGRhNjRiIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJzamltZWhlciIsImVtYWlsIjoic2ppbWVoZXJAZW10ZWxjby5jb20uY28iLCJmdWxsX25hbWUiOiJTRUJBU1RJQU4gQ0FNSUxPIEpJTUVORVogSEVSTkFOREVaIiwicG9zaXRpb24iOiJBUlFVSVRFQ1RPIERFIEFWQSIsImRvY3VtZW50IjoiMTAxNzI2MzA0MyJ9.dRnHSbLBCWFvbybwyiKxFcXc28ejJsa01L1nOjWmNzA";
+    const sessionStorageService = new SessionStorageService();
+    const token = sessionStorageService.getAccessToken();
+    
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
     }

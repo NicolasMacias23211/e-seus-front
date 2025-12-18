@@ -208,7 +208,7 @@ const create = async () => {
     notification.error("Error", "No se logro crear el código de cierre")
     closeModal();
   }
-}
+} 
 
 const update = async () => {
   try {

@@ -6,8 +6,10 @@ export const env = {
   // URL base del API
   apiBaseUrl: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api",
   eldapApiUrl: import.meta.env.ELDAP_API_URL || "https://ldapnet.emtelco.co/Emtelco/ldapnet/login/",
-  EldapAuthToken : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImFwbGljYWNpb25lc2dyYWxAaG90bWFpbC5jb20iLCJqdGkiOiI1NDJkNDYyZi04OTMyLTQxNDEtYTUwMi1jMGU5ZTMzMzA2MTIiLCJleHAiOjE4ODcwMjMyNzcsImlzcyI6InlvdXJkb21haW4uY29tIiwiYXVkIjoieW91cmRvbWFpbi5jb20ifQ.7pB8dcmkgmBOkemWDmO32GdweZ2ElRwi0Hx71QD5qos",
+
+  EldapAuthToken : "",
   
+  // Variable de Desarrollo. Eliminar en producción
   EldapUser: {
     user: "sjimeher",
     full_name: "SEBASTIAN CAMILO JIMENEZ HERNANDEZ",
