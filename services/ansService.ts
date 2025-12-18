@@ -22,32 +22,32 @@ export class AnsService {
   /**
    * Crear un nuevo ANS
    */
-  async create(ans: Omit<ANS, "idAns">): Promise<ApiResponse<ANS>> {
-    return await http.post<ANS>(this.endpoint, ans);
-  }
+  // async create(ans: Omit<ANS, "idAns">): Promise<ApiResponse<ANS>> {
+  //   return await http.post<ANS>(this.endpoint, ans);
+  // }
 
-  /**
-   * Actualizar un ANS existente
-   */
-  async update(id: number, ans: Partial<ANS>): Promise<ApiResponse<ANS>> {
-    return await http.put<ANS>(`${this.endpoint}/${id}`, ans);
-  }
+  // /**
+  //  * Actualizar un ANS existente
+  //  */
+  // async update(id: number, ans: Partial<ANS>): Promise<ApiResponse<ANS>> {
+  //   return await http.put<ANS>(`${this.endpoint}/${id}`, ans);
+  // }
 
-  /**
-   * Eliminar un ANS
-   */
-  async delete(id: number): Promise<ApiResponse<void>> {
-    return await http.delete<void>(`${this.endpoint}/${id}`);
-  }
+  // /**
+  //  * Eliminar un ANS
+  //  */
+  // async delete(id: number): Promise<ApiResponse<void>> {
+  //   return await http.delete<void>(`${this.endpoint}/${id}`);
+  // }
 
-  /**
-   * Buscar ANS por nombre
-   */
-  async searchByName(name: string): Promise<ApiResponse<ANS[]>> {
-    return await http.get<ANS[]>(
-      `${this.endpoint}/search?name=${encodeURIComponent(name)}`
-    );
-  }
+  // /**
+  //  * Buscar ANS por nombre
+  //  */
+  // async searchByName(name: string): Promise<ApiResponse<ANS[]>> {
+  //   return await http.get<ANS[]>(
+  //     `${this.endpoint}/search?name=${encodeURIComponent(name)}`
+  //   );
+  // }
 }
 
 // Exportar instancia única del servicio

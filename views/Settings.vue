@@ -107,9 +107,9 @@
           </div>
           <div class="flex-1">
             <h3 class="text-lg font-bold text-[#021C7D] mb-1">
-              Estados de Solicitud
+              Proridades de tickets
             </h3>
-            <p class="text-xs text-slate-600">Estados de tickets</p>
+            <p class="text-xs text-slate-600">Proridades de tickets</p>
           </div>
         </div>
       </router-link>
