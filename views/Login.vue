@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-[#021C7D] via-[#0a2f9e] to-[#50bdeb] flex items-center justify-center p-4"
+    class="min-h-screen bg-gradient-to-br from-[#021C7D] via-[#0a2f9e] to-[#50bdeb] flex flex-col items-center justify-center p-4 gap-4"
   >
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
       <div
@@ -221,7 +221,7 @@
         </p>
       </div>
     </div>
-    <div class="absolute bottom-4 left-0 right-0 text-center">
+    <div class="text-center mt-auto">
       <p class="text-white/60 text-sm">
         Copyright © Emtelco S.A.S {{ currentYear }}
       </p>
