@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { SessionStorageService } from "../../services/SessionStorageService";
 import Login from "../../views/Login.vue";
 import Dashboard from "../../views/Dashboard.vue";
 import KanvanBoard from "../../views/Board.vue";
@@ -23,6 +24,8 @@ import TicketPriorities from "../../views/adminMenu/TicketPriorities.vue";
 import EUsers from "../../views/adminMenu/EUsers.vue";
 import Users from "../../views/adminMenu/Users.vue";
 import Roles from "../../views/adminMenu/Roles.vue";
+
+const sessionStorage = new SessionStorageService();
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -151,6 +154,27 @@ const router = createRouter({
       component: Reports,
     },
   ],
+});
+
+router.beforeEach((to, from, next) => {
+  const userInfo = sessionStorage.getUserInfo();
+  const isAuthenticated = userInfo !== null;
+
+  const eUsersRoutes = ["/login"];
+
+  const publicRoutes = ["/create-ticket", "/created-tickets", "/login"];
+
+  if (!isAuthenticated && !eUsersRoutes.includes(to.path)) {
+    next("/login");
+  } else if (
+    isAuthenticated &&
+    userInfo.isEUser === false &&
+    !publicRoutes.includes(to.path)
+  ) {
+    next("/create-ticket");
+  } else {
+    next();
+  }
 });
 
 export default router;

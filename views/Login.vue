@@ -236,7 +236,7 @@ import { Lock, User, KeyRound, Eye, EyeOff, Loader2 } from "lucide-vue-next";
 import { useNotification } from "../utils/useNotification";
 import { LoginService } from "../services/loginService";
 import { computed } from "vue";
-import type { Login, UserInfo } from "../models/login";
+import type { Login } from "../models/login";
 import { SessionStorageService } from "../services/SessionStorageService";
 
 const currentYear = computed(() => new Date().getFullYear());

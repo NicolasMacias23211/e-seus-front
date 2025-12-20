@@ -1,4 +1,4 @@
-import { http, PaginatedResponse, type ApiResponse } from "./http";
+import { http, type PaginatedResponse, type ApiResponse } from "./http";
 import type { Ticket } from "../models/Ticket";
 
 export class TicketsService {

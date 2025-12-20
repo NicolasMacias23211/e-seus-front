@@ -1,12 +1,14 @@
 import type { Login, UserInfo, EldapAuthResponse } from "../models/login";
-import { http, HttpService } from "./http";
+import { HttpService } from "./http";
 import { env } from "../config/env";
 import { SessionStorageService } from "./SessionStorageService";
+import { eUsersService } from "./e-usersService";
 
 export class LoginService extends HttpService {
   private endPointElDap = env.eldapApiUrl;
   private AuthTokenELdap = env.EldapAuthToken;
   private sessionStorageService = new SessionStorageService();
+  private eUsersService = new eUsersService();
 
   public async login(user: string, password: string): Promise<Login> {
     try {
@@ -32,6 +34,7 @@ export class LoginService extends HttpService {
       if (eldapResponse.success && eldapResponse.user) {
         const backendLoginResponse = await this.loginBack(eldapResponse.user);
         if (backendLoginResponse.success) {
+          await this.checkEUserStatus(backendLoginResponse.user);
           this.sessionStorageService.handleLogin(backendLoginResponse);
         }
         return backendLoginResponse;
@@ -116,6 +119,17 @@ export class LoginService extends HttpService {
     } catch (error) {
       console.error("No se pudo conectar al servicio backend:", error);
       throw error;
+    }
+  }
+
+  private async checkEUserStatus(user: UserInfo): Promise<void> {
+    try {
+      const response = await this.eUsersService.GetEUsersByPerson(
+        user.username
+      );
+      user.isEUser = response.success && response.data !== null;
+    } catch (error) {
+      user.isEUser = false;
     }
   }
 }

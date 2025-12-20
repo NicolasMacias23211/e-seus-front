@@ -11,6 +11,7 @@ export interface UserInfo {
   email: string;
   position: string;
   document: number;
+  isEUser?: boolean;
 }
 
 export interface Tokens {
