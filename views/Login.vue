@@ -251,23 +251,47 @@ const form = reactive({
 });
 const showPassword = ref(false);
 const isLoading = ref(false);
+const sessionStorageService = new SessionStorageService();
+
 const handleLogin = async () => {
-  if (form.username && form.password) {
-    const sessionStorageService = new SessionStorageService();
+  if (!form.username || !form.password) {
+    notification.error("Error", "Por favor ingrese usuario y contraseña");
+    return;
+  }
+
+  isLoading.value = true;
+
+  try {
     const loginResult: Login = await loginService.login(
       form.username,
       form.password
     );
-    sessionStorageService.handleLogin(loginResult);
-    if (sessionStorageService.getAccessToken != null) {
+
+    if (loginResult.success && sessionStorageService.getAccessToken()) {
+      const userInfo = sessionStorageService.getUserInfo();
       notification.success(
         "¡Bienvenido!",
         `Sesión iniciada como ${form.username}`
       );
-      router.push("/dashboard");
+      if (userInfo?.isEUser) {
+        router.push("/eusers/tickets");
+      } else {
+        router.push("/dashboard");
+      }
+    } else {
+      notification.error(
+        "Error",
+        `${loginResult.message}` || "Error al iniciar sesión"
+      );
     }
-  } else {
-    notification.error("Error", "Credenciales inválidas");
+  } catch (error: any) {
+    console.error("Error en login:", error);
+    notification.error(
+      "Error de autenticación",
+      error.message || "No se pudo iniciar sesión. Verifique sus credenciales."
+    );
+  } finally {
+    isLoading.value = false;
   }
 };
 </script>
