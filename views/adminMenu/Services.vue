@@ -354,20 +354,6 @@
   })
 
 
-  // const confirmDelete = (service: Service) => {
-  //   if (
-  //     confirm(`¿Está seguro de eliminar el servicio "${service.service_name}"?`)
-  //   ) {
-  //     const index = services.value.findIndex(
-  //       (s) => s.id_services === service.id_services
-  //     );
-  //     services.value.splice(index, 1);
-  //     notification.success(
-  //       "¡Eliminado!",
-  //       "El servicio ha sido eliminado correctamente"
-  //     );
-  //   }
-  // };
   </script>
 
   <style scoped>
