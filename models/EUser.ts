@@ -1,12 +1,12 @@
 export interface EUser {
-  networkUser: string;
+  network_user: string;
   name: string;
-  middleName: string | null;
-  lastName: string;
-  secondLastName: string | null;
+  middle_name: string | null;
+  last_name: string;
+  second_last_name: string | null;
   email: string | null;
   phone: string | null;
-  userClientName: string;
-  idServices: number;
-  rolName: string;
+  rol_name: string;
+  user_client_name?: string | null;
+  id_services?: number | null;
 }
