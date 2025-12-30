@@ -343,16 +343,18 @@ const isEditing = ref(false);
 const editingIndex = ref(-1);
 
 
-const form = reactive({
+
+
+const form = reactive<EUser>({
   network_user: "",
   name: "",
-  middle_name: null as string | null,
+  middle_name: null,
   last_name: "",
-  second_last_name: null as string | null,
-  email: null as string | null,
-  phone: null as string | null,
-  user_client_name: null as string | null,
-  id_services: null as number | null,
+  second_last_name: null,
+  email: null,
+  phone: null,
+  user_client_name: null,
+  id_services: null,
   rol_name: "",
 });
 
