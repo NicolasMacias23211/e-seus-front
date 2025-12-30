@@ -6,7 +6,7 @@ export interface EUser {
   second_last_name: string | null;
   email: string | null;
   phone: string | null;
-  user_client_name: string;
-  id_services: number;
   rol_name: string;
+  user_client_name?: string | null;
+  id_services?: number | null;
 }
