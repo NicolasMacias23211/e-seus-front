@@ -124,7 +124,7 @@ export class LoginService extends HttpService {
 
   private async checkEUserStatus(user: UserInfo): Promise<void> {
     try {
-      const response = await this.eUsersService.GetEUsersByPerson(
+      const response = await this.eUsersService.GetEUsersByNetworkUser(
         user.username
       );
       user.isEUser = response.success && response.data !== null;

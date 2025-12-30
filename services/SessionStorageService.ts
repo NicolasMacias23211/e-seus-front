@@ -1,13 +1,12 @@
 import type { Login, UserInfo, Tokens } from "../models/login";
+import { env } from "../config/env";
 
 export class SessionStorageService {
-
   public getItem<T>(key: string): T | null {
     try {
       const item = window.sessionStorage.getItem(key);
       return item ? (JSON.parse(item) as T) : null;
     } catch (error) {
-      console.error(`Error al obtener el item ${key} de sessionStorage`, error);
       return null;
     }
   }
@@ -15,19 +14,19 @@ export class SessionStorageService {
   public setItem<T>(key: string, value: T): void {
     try {
       window.sessionStorage.setItem(key, JSON.stringify(value));
-    } catch (error) {
-      console.error(`Error al guardar el item ${key} en sessionStorage`, error);
-    }
+    } catch (error) {}
   }
 
   public removeItem(key: string): void {
     try {
       window.sessionStorage.removeItem(key);
     } catch (error) {
-      console.error(`Error al eliminar el item ${key} de sessionStorage`, error);
+      console.error(
+        `Error al eliminar el item ${key} de sessionStorage`,
+        error
+      );
     }
   }
-
 
   public handleLogin(loginData: Login): void {
     if (loginData.success) {
@@ -44,19 +43,17 @@ export class SessionStorageService {
   }
 
   private setAuthTokens(tokens: Tokens): void {
-    this.setItem('authTokens', tokens);
+    this.setItem("authTokens", tokens);
   }
 
   public getAuthTokens(): Tokens | null {
-    return this.getItem<Tokens>('authTokens');
+    return this.getItem<Tokens>("authTokens");
   }
-
 
   public getAccessToken(): string | null {
     const tokens = this.getAuthTokens();
     return tokens ? tokens.access : null;
   }
-
 
   public getRefreshToken(): string | null {
     const tokens = this.getAuthTokens();
@@ -64,50 +61,54 @@ export class SessionStorageService {
   }
 
   private clearAuthTokens(): void {
-    this.removeItem('authTokens');
+    this.removeItem("authTokens");
   }
 
   private setUserInfo(user: UserInfo): void {
-    this.setItem('userInfo', user);
+    this.setItem("userInfo", user);
   }
 
-
   public getUserInfo(): UserInfo | null {
-    return this.getItem<UserInfo>('userInfo');
+    return this.getItem<UserInfo>("userInfo");
   }
 
   private clearUserInfo(): void {
-    this.removeItem('userInfo');
+    this.removeItem("userInfo");
   }
 
   public async refreshToken(): Promise<Tokens | null> {
     const currentRefreshToken = this.getRefreshToken();
 
     if (!currentRefreshToken) {
-      console.log('No hay token de refresco disponible.');
+      console.log("No hay token de refresco disponible.");
       return null;
     }
 
-    console.log('Refrescando el token de acceso...');
-    
-    const simulateApiCall = new Promise<Tokens>((resolve) => {
-      setTimeout(() => {
-        const newTokens: Tokens = {
-          access: 'nuevo-token-de-acceso-refrescado-' + Date.now(),
-          refresh: currentRefreshToken, 
-        };
-        resolve(newTokens);
-      }, 1000);
-    });
+    console.log("Refrescando el token de acceso...");
 
     try {
-      const newTokens = await simulateApiCall;
+      const response = await fetch(`${env.apiBaseUrl}/auth/token/refresh/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refresh: currentRefreshToken }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error al refrescar token: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const newTokens: Tokens = {
+        access: data.access,
+        refresh: currentRefreshToken,
+      };
+
       this.setAuthTokens(newTokens);
-      console.log('Token refrescado y guardado exitosamente.');
       return newTokens;
     } catch (error) {
-      console.error('Error al refrescar el token', error);
-      this.handleLogout(); 
+      this.handleLogout();
       return null;
     }
   }
