@@ -1,66 +1,31 @@
 <template>
   <div
-    class="min-h-screen relative flex items-center justify-center p-4 overflow-hidden"
-    style="background: linear-gradient(135deg, #0538d4 0%, #001e5c 100%)"
+    class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 p-6"
   >
-    <div
-      class="absolute inset-0 opacity-10 pointer-events-none"
-      style="
-        background-image: linear-gradient(
-            rgba(80, 189, 235, 0.4) 1px,
-            transparent 1px
-          ),
-          linear-gradient(90deg, rgba(80, 189, 235, 0.4) 1px, transparent 1px);
-        background-size: 30px 30px;
-      "
-    ></div>
-
-    <div
-      class="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-transparent via-[#50bdeb] to-transparent opacity-80"
-    ></div>
-    <div
-      class="absolute bottom-0 left-0 w-full h-3 bg-gradient-to-r from-transparent via-[#50bdeb] to-transparent opacity-80"
-    ></div>
-
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="w-full max-w-5xl mx-auto">
+      <!-- Header con gradiente -->
       <div
-        class="absolute top-20 left-10 w-40 h-40 bg-[#50bdeb] rounded-full opacity-20 blur-3xl animate-pulse"
-      ></div>
-      <div
-        class="absolute bottom-20 right-10 w-48 h-48 bg-[#50bdeb] rounded-full opacity-20 blur-3xl animate-pulse"
-        style="animation-delay: 1s"
-      ></div>
-      <div
-        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#0538d4] rounded-full opacity-10 blur-3xl"
-      ></div>
-    </div>
-
-    <div class="w-full max-w-4xl relative z-10">
-      <div class="text-center mb-8">
-        <div
-          class="inline-block p-4 bg-white/10 rounded-2xl mb-4 backdrop-blur-sm border border-[#50bdeb]/30 shadow-lg shadow-[#50bdeb]/20"
-        >
-          <User class="w-12 h-12 text-[#50bdeb]" />
+        class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] rounded-2xl p-6 mb-6 shadow-lg"
+      >
+        <div class="flex items-center gap-4">
+          <div
+            class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center"
+          >
+            <User class="w-7 h-7 text-white" />
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-white">Mi Perfil</h1>
+            <p class="text-sm text-white/90">
+              Información personal y configuración de cuenta
+            </p>
+          </div>
         </div>
-        <h1
-          class="text-4xl font-bold text-white mb-3 drop-shadow-lg tracking-wide"
-        >
-          Mi Perfil
-        </h1>
-        <p class="text-blue-100 text-lg font-medium">
-          Información personal y configuración de cuenta
-        </p>
-        <div
-          class="mt-4 w-24 h-1 bg-gradient-to-r from-transparent via-[#50bdeb] to-transparent rounded-full mx-auto"
-        ></div>
       </div>
 
-      <div
-        class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-[0_8px_32px_rgba(0,25,80,0.4)] p-8 border border-[#50bdeb]/20"
-      >
+      <div class="bg-white rounded-2xl shadow-md border-2 border-blue-100 p-8">
         <!-- Avatar y nombre -->
         <div
-          class="flex items-center gap-6 mb-8 pb-8 border-b-2 border-slate-200"
+          class="flex items-center gap-6 mb-8 pb-8 border-b-2 border-blue-100 bg-gradient-to-r from-blue-50/50 to-transparent p-6 rounded-xl"
         >
           <div
             class="w-24 h-24 rounded-full bg-gradient-to-br from-[#021C7D] to-[#50bdeb] flex items-center justify-center text-white text-3xl font-bold shadow-xl"
@@ -73,22 +38,22 @@
             </h2>
             <p class="text-slate-600 font-medium flex items-center gap-2">
               <Briefcase class="w-4 h-4" />
-              {{ userProfile.rolName }}
+              {{ userProfile.rol_name }}
             </p>
             <p class="text-slate-500 text-sm mt-1 flex items-center gap-2">
               <Building2 class="w-4 h-4" />
-              {{ userProfile.userClientName }}
+              {{ userProfile.user_client_name }}
             </p>
           </div>
         </div>
 
         <form @submit.prevent="handleSubmit">
           <!-- Información Personal (Solo lectura) -->
-          <div class="mb-8">
+          <div class="mb-6">
             <h3
-              class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2"
+              class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"
             >
-              <UserCircle class="w-5 h-5 text-blue-600" />
+              <UserCircle class="w-5 h-5 text-[#021C7D]" />
               Información Personal
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -99,7 +64,7 @@
                 <div
                   class="w-full px-4 py-3 bg-slate-100 border-2 border-slate-200 rounded-xl text-slate-600 font-medium cursor-not-allowed"
                 >
-                  {{ userProfile.networkUser }}
+                  {{ userProfile.network_user }}
                 </div>
               </div>
 
@@ -121,7 +86,7 @@
                 <div
                   class="w-full px-4 py-3 bg-slate-100 border-2 border-slate-200 rounded-xl text-slate-600 font-medium cursor-not-allowed"
                 >
-                  {{ userProfile.middleName || "N/A" }}
+                  {{ userProfile.middle_name || "N/A" }}
                 </div>
               </div>
 
@@ -132,7 +97,7 @@
                 <div
                   class="w-full px-4 py-3 bg-slate-100 border-2 border-slate-200 rounded-xl text-slate-600 font-medium cursor-not-allowed"
                 >
-                  {{ userProfile.lastName }}
+                  {{ userProfile.last_name }}
                 </div>
               </div>
 
@@ -143,7 +108,7 @@
                 <div
                   class="w-full px-4 py-3 bg-slate-100 border-2 border-slate-200 rounded-xl text-slate-600 font-medium cursor-not-allowed"
                 >
-                  {{ userProfile.secondLastName || "N/A" }}
+                  {{ userProfile.second_last_name || "N/A" }}
                 </div>
               </div>
 
@@ -154,18 +119,18 @@
                 <div
                   class="w-full px-4 py-3 bg-slate-100 border-2 border-slate-200 rounded-xl text-slate-600 font-medium cursor-not-allowed"
                 >
-                  {{ userProfile.userClientName }}
+                  {{ userProfile.user_client_name }}
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Información de Contacto (Editable) -->
-          <div class="mb-8">
+          <div class="mb-6">
             <h3
-              class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2"
+              class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"
             >
-              <Mail class="w-5 h-5 text-blue-600" />
+              <Mail class="w-5 h-5 text-[#021C7D]" />
               Información de Contacto
               <span class="text-sm font-normal text-slate-500 ml-2">
                 (Puedes modificar estos campos)
@@ -177,14 +142,14 @@
                   for="email"
                   class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2"
                 >
-                  <Mail class="w-4 h-4 text-blue-600" />
+                  <Mail class="w-4 h-4 text-[#021C7D]" />
                   Correo Electrónico
                 </label>
                 <input
                   id="email"
                   v-model="editableProfile.email"
                   type="email"
-                  class="w-full px-4 py-3 border-2 border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white"
+                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-[#50bdeb] focus:border-[#50bdeb] transition-all hover:border-slate-300 bg-white"
                   placeholder="ejemplo@correo.com"
                 />
               </div>
@@ -194,14 +159,14 @@
                   for="phone"
                   class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2"
                 >
-                  <Phone class="w-4 h-4 text-blue-600" />
+                  <Phone class="w-4 h-4 text-[#021C7D]" />
                   Teléfono
                 </label>
                 <input
                   id="phone"
                   v-model="editableProfile.phone"
                   type="tel"
-                  class="w-full px-4 py-3 border-2 border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white"
+                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-[#50bdeb] focus:border-[#50bdeb] transition-all hover:border-slate-300 bg-white"
                   placeholder="+57 300 123 4567"
                 />
               </div>
@@ -209,11 +174,11 @@
           </div>
 
           <!-- Información Adicional (Solo lectura) -->
-          <div class="mb-8">
+          <div class="mb-6">
             <h3
-              class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2"
+              class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"
             >
-              <Shield class="w-5 h-5 text-blue-600" />
+              <Shield class="w-5 h-5 text-[#021C7D]" />
               Información del Sistema
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -224,8 +189,8 @@
                 <div
                   class="w-full px-4 py-3 bg-slate-100 border-2 border-slate-200 rounded-xl text-slate-600 font-medium cursor-not-allowed flex items-center gap-2"
                 >
-                  <Shield class="w-4 h-4 text-blue-600" />
-                  {{ userProfile.rolName }}
+                  <Shield class="w-4 h-4 text-[#021C7D]" />
+                  {{ userProfile.rol_name }}
                 </div>
               </div>
             </div>
@@ -252,11 +217,11 @@
           </div>
 
           <!-- Botones de acción -->
-          <div class="flex gap-4 pt-6 border-t-2 border-slate-200">
+          <div class="flex gap-4 pt-6 border-t-2 border-blue-100">
             <button
               type="button"
               @click="resetChanges"
-              class="flex-1 px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-all hover:shadow-md flex items-center justify-center gap-2"
+              class="flex-1 px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-all hover:shadow-md flex items-center justify-center gap-2 border-2 border-slate-200"
             >
               <RotateCcw class="w-5 h-5" />
               Cancelar Cambios
@@ -295,16 +260,16 @@ const showSuccess = ref(false);
 
 // Mock data del usuario
 const userProfile = reactive<EUser>({
-  networkUser: "jperez",
+  network_user: "jperez",
   name: "Juan",
-  middleName: "Carlos",
-  lastName: "Pérez",
-  secondLastName: "González",
+  middle_name: "Carlos",
+  last_name: "Pérez",
+  second_last_name: "González",
   email: "juan.perez@empresa.com",
   phone: "+57 300 123 4567",
-  userClientName: "Cliente Principal A",
-  idServices: 1,
-  rolName: "Soporte Técnico",
+  user_client_name: "Cliente Principal A",
+  id_services: 1,
+  rol_name: "Soporte Técnico",
 });
 
 // Copia editable solo de los campos modificables
@@ -315,16 +280,16 @@ const editableProfile = reactive({
 
 const getUserInitials = () => {
   const firstInitial = userProfile.name.charAt(0).toUpperCase();
-  const lastInitial = userProfile.lastName.charAt(0).toUpperCase();
+  const lastInitial = userProfile.last_name.charAt(0).toUpperCase();
   return `${firstInitial}${lastInitial}`;
 };
 
 const getFullName = () => {
   const parts = [
     userProfile.name,
-    userProfile.middleName,
-    userProfile.lastName,
-    userProfile.secondLastName,
+    userProfile.middle_name,
+    userProfile.last_name,
+    userProfile.second_last_name,
   ].filter(Boolean);
   return parts.join(" ");
 };
@@ -356,17 +321,5 @@ const handleSubmit = () => {
 </script>
 
 <style scoped>
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
+/* Estilos personalizados si son necesarios */
 </style>

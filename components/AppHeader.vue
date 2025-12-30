@@ -32,6 +32,7 @@
 
     <div class="flex items-center gap-2">
       <button
+        @click="showHelpModal = true"
         class="p-2.5 rounded-xl hover:bg-slate-100 text-slate-600 transition-all hover:shadow-sm cursor-pointer"
         title="Ayuda"
       >
@@ -94,9 +95,11 @@
           <div
             class="h-9 w-9 rounded-full bg-gradient-to-br from-[#021C7D] to-[#50bdeb] text-white flex items-center justify-center text-sm font-bold shadow-md"
           >
-            JP
+            {{ getUserInitials }}
           </div>
-          <span class="text-sm font-bold text-slate-700">Juan Pérez</span>
+          <span class="text-sm font-bold text-slate-700">{{
+            getUserName
+          }}</span>
         </button>
 
         <div
@@ -107,21 +110,24 @@
             class="px-5 py-4 border-b-2 bg-gradient-to-r from-[#021C7D] to-[#50bdeb]"
           >
             <h3 class="font-bold text-sm text-white">Mi Cuenta</h3>
-            <p class="text-xs text-white/80 mt-0.5">juan.perez@empresa.com</p>
+            <p class="text-xs text-white/80 mt-0.5">{{ getUserEmail }}</p>
           </div>
           <button
+            @click="goToProfile"
             class="w-full px-5 py-3 hover:bg-slate-50 text-left text-sm font-semibold flex items-center gap-3 transition-colors text-slate-700 hover:text-[#021C7D] cursor-pointer"
           >
             <User class="h-4 w-4" />
             Perfil
           </button>
-          <button
+          <!-- <button
+           por ahora comentado mas adelane validamos si lo dejamos
             class="w-full px-5 py-3 hover:bg-slate-50 text-left text-sm font-semibold transition-colors text-slate-700 hover:text-[#021C7D] cursor-pointer"
           >
             ⚙️ Configuración
-          </button>
+          </button> -->
           <div class="border-t-2">
             <button
+              @click="handleLogout"
               class="w-full px-5 py-3 hover:bg-red-50 text-left text-sm font-bold text-red-600 hover:text-red-700 transition-colors cursor-pointer"
             >
               🚪 Cerrar Sesión
@@ -131,14 +137,45 @@
       </div>
     </div>
   </header>
+
+  <HelpModal :is-open="showHelpModal" @close="showHelpModal = false" />
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
 import { Bell, HelpCircle, User } from "lucide-vue-next";
+import { SessionStorageService } from "../services/SessionStorageService";
+import HelpModal from "./HelpModal.vue";
+
+const router = useRouter();
+const sessionStorageService = new SessionStorageService();
 
 const showNotifications = ref(false);
 const showUserMenu = ref(false);
+const showHelpModal = ref(false);
+
+const userInfo = sessionStorageService.getUserInfo();
+
+const getUserInitials = computed(() => {
+  if (!userInfo?.full_name) return "U";
+  const fullName = userInfo.full_name;
+  const names = fullName.trim().split(/\s+/);
+  const firstName = names[0];
+  const lastName = names[names.length - 1];
+  if (names.length >= 2 && firstName?.[0] && lastName?.[0]) {
+    return (firstName[0] + lastName[0]).toUpperCase();
+  }
+  return fullName[0]?.toUpperCase() || "U";
+});
+
+const getUserName = computed(() => {
+  return userInfo?.full_name || "user";
+});
+
+const getUserEmail = computed(() => {
+  return userInfo?.email || "";
+});
 
 const notifications = [
   {
@@ -169,5 +206,15 @@ function toggleNotifications() {
 function toggleUserMenu() {
   showUserMenu.value = !showUserMenu.value;
   showNotifications.value = false;
+}
+
+function goToProfile() {
+  showUserMenu.value = false;
+  router.push("/profile");
+}
+
+function handleLogout() {
+  sessionStorageService.handleLogout();
+  router.push("/login");
 }
 </script>
