@@ -23,6 +23,8 @@ export interface PaginatedResponse<T> {
 export class HttpService {
   private baseUrl: string;
   private defaultTimeout: number;
+  private isRefreshing: boolean = false;
+  private refreshPromise: Promise<boolean> | null = null;
 
   constructor() {
     this.baseUrl = env.apiBaseUrl;
@@ -45,9 +47,55 @@ export class HttpService {
     return headers;
   }
 
-  /**
-   * Realiza una petición HTTP con timeout
-   */
+  private async refreshAccessToken(): Promise<boolean> {
+    if (this.isRefreshing && this.refreshPromise) {
+      return this.refreshPromise;
+    }
+
+    this.isRefreshing = true;
+    this.refreshPromise = (async () => {
+      try {
+        const sessionStorageService = new SessionStorageService();
+        const refreshToken = sessionStorageService.getRefreshToken();
+
+        if (!refreshToken) {
+          sessionStorageService.handleLogout();
+          return false;
+        }
+
+        const url = `${this.baseUrl}/api/auth/token/refresh/`;
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ refresh: refreshToken }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error al refrescar token: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const newTokens = {
+          access: data.access,
+          refresh: refreshToken,
+        };
+        sessionStorageService.setItem("authTokens", newTokens);
+        return true;
+      } catch (error) {
+        const sessionStorageService = new SessionStorageService();
+        sessionStorageService.handleLogout();
+        return false;
+      } finally {
+        this.isRefreshing = false;
+        this.refreshPromise = null;
+      }
+    })();
+
+    return this.refreshPromise;
+  }
+
   protected async fetchWithTimeout(
     url: string,
     options: RequestOptions = {}
@@ -72,6 +120,50 @@ export class HttpService {
       });
 
       clearTimeout(timeoutId);
+
+      if (response.status === 401 && !skipAuth) {
+        const refreshed = await this.refreshAccessToken();
+
+        if (refreshed) {
+          const retryController = new AbortController();
+          const retryTimeoutId = setTimeout(
+            () => retryController.abort(),
+            timeout
+          );
+
+          try {
+            const retryResponse = await fetch(url, {
+              ...fetchOptions,
+              signal: retryController.signal,
+              headers: {
+                ...this.getDefaultHeaders(skipAuth),
+                ...fetchOptions.headers,
+              },
+            });
+
+            clearTimeout(retryTimeoutId);
+
+            if (!retryResponse.ok) {
+              throw new Error(`HTTP error! status: ${retryResponse.status}`);
+            }
+
+            return retryResponse;
+          } catch (retryError) {
+            clearTimeout(retryTimeoutId);
+            if (
+              retryError instanceof Error &&
+              retryError.name === "AbortError"
+            ) {
+              throw new Error("Request timeout");
+            }
+            throw retryError;
+          }
+        } else {
+          throw new Error(
+            "No se pudo refrescar el token. Por favor, inicie sesión nuevamente."
+          );
+        }
+      }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
