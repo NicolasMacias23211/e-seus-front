@@ -3,8 +3,7 @@
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div
-          class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#021C7D] to-[#50bdeb] flex items-center justify-center"
-        >
+          class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#021C7D] to-[#50bdeb] flex items-center justify-center">
           <Clock class="w-5 h-5 text-white" />
         </div>
         <div>
@@ -25,42 +24,32 @@
     >
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead
-            class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white"
-          >
+          <thead class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white">
             <tr>
-              <th class="px-6 py-4 text-left text-sm font-bold">ID</th>
               <th class="px-6 py-4 text-left text-sm font-bold">Nombre</th>
               <th class="px-6 py-4 text-left text-sm font-bold">Descripción</th>
               <th class="px-6 py-4 text-center text-sm font-bold">Acciones</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-200">
-            <tr
-              v-for="(ans, index) in ansList"
-              :key="index"
-              class="hover:bg-blue-50 transition-colors"
-            >
-              <td class="px-6 py-4 text-sm text-slate-700 font-mono">
-                {{ ans.idAns }}
-              </td>
+            <tr v-for="(code, index) in ans" :key="index" class="hover:bg-blue-50 transition-colors">
               <td class="px-6 py-4 text-sm text-slate-700 font-medium">
-                {{ ans.ansName }}
+                {{ code.ans_name }}
               </td>
               <td class="px-6 py-4 text-sm text-slate-600">
-                {{ ans.ansDescription }}
+                {{ code.ans_description }}
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center justify-center gap-2">
                   <button
-                    @click="openEditModal(ans)"
+                    @click="openEditModal(code)"
                     class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all"
                     title="Editar"
                   >
                     <Edit2 class="w-4 h-4" />
                   </button>
                   <button
-                    @click="confirmDelete(ans)"
+                    @click="confirmDelete(code)"
                     class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all"
                     title="Eliminar"
                   >
@@ -69,7 +58,7 @@
                 </div>
               </td>
             </tr>
-            <tr v-if="ansList.length === 0">
+            <tr v-if="ans.length === 0">
               <td colspan="4" class="px-6 py-8 text-center text-slate-500">
                 No hay ANS registrados
               </td>
@@ -79,17 +68,10 @@
       </div>
     </div>
     <Teleport to="body">
-      <div
-        v-if="showModal"
-        class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-        @click.self="closeModal"
-      >
-        <div
-          class="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-scale-in"
-        >
-          <div
-            class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white px-6 py-4 rounded-t-2xl"
-          >
+      <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+        @click.self="closeModal">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-scale-in">
+          <div class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white px-6 py-4 rounded-t-2xl">
             <h2 class="text-xl font-bold">
               {{ isEditing ? "Editar ANS" : "Nuevo ANS" }}
             </h2>
@@ -97,17 +79,12 @@
 
           <form @submit.prevent="handleSubmit" class="p-6 space-y-4">
             <div>
-              <label
-                for="ansId"
-                class="block text-sm font-bold text-slate-700 mb-2"
-              >
-                ID <span class="text-red-500">*</span>
-              </label>
               <input
                 id="ansId"
-                v-model.number="form.idAns"
+                v-model.number="form.id_ans"
                 type="number"
                 required
+                hidden
                 :disabled="isEditing"
                 class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all disabled:bg-slate-100"
                 placeholder="ID del ANS"
@@ -123,7 +100,7 @@
               </label>
               <input
                 id="ansName"
-                v-model="form.ansName"
+                v-model="form.ans_name"
                 type="text"
                 required
                 maxlength="45"
@@ -141,7 +118,7 @@
               </label>
               <textarea
                 id="ansDescription"
-                v-model="form.ansDescription"
+                v-model="form.ans_description"
                 maxlength="100"
                 rows="3"
                 class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all resize-none"
@@ -168,103 +145,185 @@
         </div>
       </div>
     </Teleport>
+    <ConfirmDialog 
+      :is-visible="showConfirmDialog" 
+      type="delete" title="Confirmar Eliminación"
+      :message="`¿Está seguro de que desea eliminar el ANS '${ansToDelete?.ans_name}'?`"
+      details="Esta acción eliminará permanente el ANS del sistema"
+      confirm-text="Sí, eliminar"
+      cancel-text="Cancelar"
+      @confirm="handleDeleteConfirm"
+      @cancel="handleDeleteCancel"/>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { Clock, Plus, Edit2, Trash2 } from "lucide-vue-next";
 import { useNotification } from "../../utils/useNotification";
+import { AnsService } from "../../services/ansService";
 import type { ANS } from "../../models/ANS";
+import ConfirmDialog from "../../components/ConfirmDialog.vue";
+
 
 const notification = useNotification();
-
-const ansList = ref<ANS[]>([
-  {
-    idAns: 1,
-    ansName: "24 horas",
-    ansDescription: "Resolución en 24 horas hábiles",
-  },
-  {
-    idAns: 2,
-    ansName: "48 horas",
-    ansDescription: "Resolución en 48 horas hábiles",
-  },
-  {
-    idAns: 3,
-    ansName: "72 horas",
-    ansDescription: "Resolución en 72 horas hábiles",
-  },
-]);
-
+const ansService = new AnsService();
+const ans = ref<ANS[]>([]);
+const showConfirmDialog = ref(false);
+const ansToDelete = ref<ANS | null>(null);
 const showModal = ref(false);
 const isEditing = ref(false);
 const editingIndex = ref(-1);
 
 const form = reactive({
-  idAns: 0,
-  ansName: "",
-  ansDescription: "" as string | null,
+  id_ans: 0,
+  ans_name: "",
+  ans_description: "" as string | null,
 });
 
 const openCreateModal = () => {
   isEditing.value = false;
-  form.idAns = 0;
-  form.ansName = "";
-  form.ansDescription = "";
+  form.id_ans = 0;
+  form.ans_name = "";
+  form.ans_description = "";
   showModal.value = true;
 };
 
-const openEditModal = (ans: ANS) => {
+const openEditModal = (code: ANS) => {
   isEditing.value = true;
-  editingIndex.value = ansList.value.findIndex((a) => a.idAns === ans.idAns);
-  form.idAns = ans.idAns;
-  form.ansName = ans.ansName;
-  form.ansDescription = ans.ansDescription;
+  editingIndex.value = ans.value.findIndex(
+    (a) => a.id_ans === code.id_ans);
+  form.id_ans = code.id_ans ?? 0;
+  form.ans_name = code.ans_name ?? "";
+  form.ans_description = code.ans_description ?? "";
   showModal.value = true;
 };
 
 const closeModal = () => {
   showModal.value = false;
-  form.idAns = 0;
-  form.ansName = "";
-  form.ansDescription = "";
+  form.id_ans = 0;
+  form.ans_name = "";
+  form.ans_description = "";
   isEditing.value = false;
   editingIndex.value = -1;
 };
 
 const handleSubmit = () => {
   if (isEditing.value) {
-    ansList.value[editingIndex.value] = {
-      idAns: form.idAns,
-      ansName: form.ansName,
-      ansDescription: form.ansDescription,
-    };
-    notification.success(
-      "¡Actualizado!",
-      "El ANS ha sido actualizado correctamente"
-    );
+    update();
   } else {
-    ansList.value.push({
-      idAns: form.idAns,
-      ansName: form.ansName,
-      ansDescription: form.ansDescription,
-    });
-    notification.success("¡Creado!", "El ANS ha sido creado correctamente");
+    create();
   }
-  closeModal();
 };
 
-const confirmDelete = (ans: ANS) => {
-  if (confirm(`¿Está seguro de eliminar el ANS "${ans.ansName}"?`)) {
-    const index = ansList.value.findIndex((a) => a.idAns === ans.idAns);
-    ansList.value.splice(index, 1);
-    notification.success(
-      "¡Eliminado!",
-      "El ANS ha sido eliminado correctamente"
-    );
+
+const create = async () => {
+  try {
+    let dataCreate: ANS = ({
+      ans_name: form.ans_name,
+      ans_description: form.ans_description,
+    })
+
+    let response = await ansService.create(dataCreate);
+    if(response.success){
+      notification.success(
+        "¡Creado!",
+        "El ANS ha sido creado correctamente"
+      );
+      loadAns();
+      closeModal();
+      return
+    }
+    console.error("Error al crear el ANS:", response.error);
+    notification.error("Error", "No se logró crear el ANS");
+    closeModal();
+  } catch (error) {
+    console.error("Error al crear el ANS: ", error);
+    notification.error("Error", "No se logró crear el ANS");
+    closeModal();
+  }
+}
+
+
+const update = async () => {
+  try {
+    let data: ANS = ({
+        ans_name: form.ans_name,
+        ans_description: form.ans_description,
+      })
+
+    let response = await ansService.update(data, form.id_ans)
+    if (response.success) {
+      notification.success(
+        "¡Actualizado!",
+        "El ANS ha sido actualizado correctamente"
+      );
+      loadAns();
+      closeModal();
+      return
+    }
+    console.error("Error al actualizar el ANS: ", response.error)
+    notification.error("Error", "No se logro actualizar el ANS")
+    closeModal();
+  } catch (error) {
+    console.error("Error al actualizar el ANS: ", error)
+    notification.error("Error", "No se logró actualizar el ANS")
+    closeModal();
+  }
+}
+
+const confirmDelete = (code: ANS) => {
+  ansToDelete.value = code;
+  showConfirmDialog.value = true;
+};
+
+const handleDeleteCancel = () => {
+  showConfirmDialog.value = false;
+  ansToDelete.value = null;
+};
+
+const handleDeleteConfirm = async () => {
+  try {
+    if (ansToDelete.value && ansToDelete.value.id_ans != undefined) {
+      let response = await ansService.delete(ansToDelete.value.id_ans)
+      if (response.success) {
+
+        notification.success(
+          "¡Eliminado!",
+          "El ANS ha sido eliminado correctamente"
+        );
+
+        loadAns();
+        handleDeleteCancel()
+        return
+      }
+      console.error("Error al eliminar el ANS: ", response.error)
+      notification.error("Error", "No se logro eliminar el ANS")
+      handleDeleteCancel()
+    }
+  } catch (error) {
+    console.error("Error al eliminar el ANS: ", error)
+    notification.error("Error", "No se logro eliminar el ANS")
+    handleDeleteCancel()
   }
 };
+
+const loadAns = async () => {
+  try {
+    const response = await ansService.getAll()
+    if (response.data && response.data.results) {
+      ans.value = response.data.results
+    }
+  } catch (error) {
+    console.error("Error al cargar los ANS: ", error)
+    notification.error("Error", "No se pudieron cargar los ANS")
+  }
+}
+
+onMounted(() => {
+  loadAns();
+})
+
 </script>
 
 <style scoped>

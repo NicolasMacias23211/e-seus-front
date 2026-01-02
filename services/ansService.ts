@@ -1,54 +1,25 @@
-// Servicio para gestionar ANS (Acuerdo de Nivel de Servicio)
-import { http, type ApiResponse } from "./http";
-import type { ANS } from "../models/ANS";
+import { type ANS } from "../models/ANS";
+import { http, type ApiResponse, type PaginatedResponse} from "./http";
+
 
 export class AnsService {
-  private endpoint = "/ans";
+  private endpoint = "/ans/";
 
-  /**
-   * Obtener todos los ANS
-   */
-  async getAll(): Promise<ApiResponse<ANS[]>> {
-    return await http.get<ANS[]>(this.endpoint);
+  async getAll(): Promise<ApiResponse<PaginatedResponse<ANS>>> {
+    return await http.get<PaginatedResponse<ANS>>(this.endpoint);
   }
 
-  /**
-   * Obtener un ANS por ID
-   */
-  async getById(id: number): Promise<ApiResponse<ANS>> {
-    return await http.get<ANS>(`${this.endpoint}/${id}`);
+  async create(ans: ANS): Promise<ApiResponse<ANS>> {
+    return await http.post<ANS>(this.endpoint, ans);
   }
 
-  /**
-   * Crear un nuevo ANS
-   */
-  // async create(ans: Omit<ANS, "idAns">): Promise<ApiResponse<ANS>> {
-  //   return await http.post<ANS>(this.endpoint, ans);
-  // }
-
-  // /**
-  //  * Actualizar un ANS existente
-  //  */
-  // async update(id: number, ans: Partial<ANS>): Promise<ApiResponse<ANS>> {
-  //   return await http.put<ANS>(`${this.endpoint}/${id}`, ans);
-  // }
-
-  // /**
-  //  * Eliminar un ANS
-  //  */
-  // async delete(id: number): Promise<ApiResponse<void>> {
-  //   return await http.delete<void>(`${this.endpoint}/${id}`);
-  // }
-
-  // /**
-  //  * Buscar ANS por nombre
-  //  */
-  // async searchByName(name: string): Promise<ApiResponse<ANS[]>> {
-  //   return await http.get<ANS[]>(
-  //     `${this.endpoint}/search?name=${encodeURIComponent(name)}`
-  //   );
-  // }
+  async update(ans: ANS, id: number): Promise<ApiResponse<ANS>> {
+    return await http.put<ANS>(`${this.endpoint+id}/`, ans);
+  }
+ 
+  async delete(id: number): Promise<ApiResponse<ANS>> {
+    return await http.delete<ANS>(this.endpoint+id+"/")
+  }
 }
 
-// Exportar instancia única del servicio
-export const ansService = new AnsService();
+
