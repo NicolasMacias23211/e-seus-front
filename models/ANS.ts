@@ -1,5 +1,5 @@
 export interface ANS {
-  idAns: number;
-  ansName: string;
-  ansDescription: string | null;
+  id_ans?: number;
+  ans_name: string;
+  ans_description: string | null;
 }
