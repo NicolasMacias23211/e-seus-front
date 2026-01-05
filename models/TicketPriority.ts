@@ -1,4 +1,4 @@
 export interface TicketPriority {
-  priorityName: string;
-  priorityDescription: string | null;
+  priority_name: string;
+  priority_description: string | null;
 }
