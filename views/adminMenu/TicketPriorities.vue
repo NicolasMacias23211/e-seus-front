@@ -205,28 +205,6 @@ const handleSubmit = () => {
   create();
 }
 
-// const handleSubmit = () => {
-//   if (isEditing.value) {
-//     priorities.value[editingIndex.value] = {
-//       priority_name: form.priority_name,
-//       priority_description: form.priority_description || null,
-//     };
-//     notification.success(
-//       "¡Actualizado!",
-//       "La prioridad ha sido actualizada correctamente"
-//     );
-//   } else {
-//     priorities.value.push({
-//       priority_name: form.priority_name,
-//       priority_description: form.priority_description || null,
-//     });
-//     notification.success(
-//       "¡Creado!",
-//       "La prioridad ha sido creada correctamente"
-//     );
-//   }
-//   closeModal();
-// };
 
 const create = async () => {
   try {
@@ -318,22 +296,6 @@ const handleDeleteConfirm = async () => {
     handleDeleteCancel()
   }
 };
-
-// const confirmDelete = (priority: TicketPriority) => {
-//   if (
-//     confirm(`¿Está seguro de eliminar la prioridad "${priority.priority_name}"?`)
-//   ) {
-//     const index = priorities.value.findIndex(
-//       (p: TicketPriority) => p.priority_name === priority.priority_name
-//     );
-//     priorities.value.splice(index, 1);
-//     notification.success(
-//       "¡Eliminado!",
-//       "La prioridad ha sido eliminada correctamente"
-//     );
-//   }
-// };
-
 
 const loadPriorities = async () => {
   try {
