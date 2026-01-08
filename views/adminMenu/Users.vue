@@ -35,6 +35,7 @@
               <th class="px-6 py-4 text-left text-sm font-bold">
                 Usuario de Red
               </th>
+              <th class="px-6 py-4 text-left text-sm font-bold">Nombre Completo</th>
               <th class="px-6 py-4 text-left text-sm font-bold">Email</th>
               <th class="px-6 py-4 text-left text-sm font-bold">Teléfono</th>
               <th class="px-6 py-4 text-center text-sm font-bold">Acciones</th>
@@ -47,7 +48,10 @@
               class="hover:bg-emerald-50 transition-colors"
             >
               <td class="px-6 py-4 text-sm text-slate-700 font-mono">
-                {{ user.networkUser }}
+                {{ user.network_user }}
+              </td>
+              <td class="px-6 py-4 text-sm text-slate-700 font-medium">
+                {{ user.full_name || "-" }}
               </td>
               <td class="px-6 py-4 text-sm text-slate-600">
                 {{ user.mail || "-" }}
@@ -101,18 +105,15 @@
             </h2>
           </div>
 
-          <form @submit.prevent="handleSubmit" class="p-6 space-y-4">
+          <form @submit.prevent="handleSubmit" class="p-6 space-y-1">
             <div>
-              <label
-                for="networkUser"
-                class="block text-sm font-bold text-slate-700 mb-2"
-              >
+              <label for="networkUser" class="block text-sm font-bold text-slate-700 mb-2">
                 <User class="w-4 h-4 inline mr-1" />
                 Usuario de Red <span class="text-red-500">*</span>
               </label>
               <input
                 id="networkUser"
-                v-model="form.networkUser"
+                v-model="form.network_user"
                 type="text"
                 required
                 maxlength="45"
@@ -126,10 +127,24 @@
             </div>
 
             <div>
-              <label
-                for="mail"
-                class="block text-sm font-bold text-slate-700 mb-2"
-              >
+              <label for="fullName" class="block text-sm font-bold text-slate-700 mb-2">
+                <User class="w-4 h-4 inline mr-1" />
+                Nombre Completo
+              </label>
+              <input
+                id="fullName"
+                v-model="form.full_name"
+                type="text"
+                maxlength="45"
+                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+                placeholder="Nombre y Apellido (opcional)"
+              />
+              <p class="text-xs text-slate-500 mt-1">
+                Nombre completo del usuario
+              </p>
+            </div>
+            <div>
+              <label for="mail" class="block text-sm font-bold text-slate-700 mb-2">
                 <Mail class="w-4 h-4 inline mr-1" />
                 Email
               </label>
@@ -147,10 +162,7 @@
             </div>
 
             <div>
-              <label
-                for="phone"
-                class="block text-sm font-bold text-slate-700 mb-2"
-              >
+              <label for="phone" class="block text-sm font-bold text-slate-700 mb-2">
                 <Phone class="w-4 h-4 inline mr-1" />
                 Teléfono
               </label>
@@ -201,74 +213,61 @@
         </div>
       </div>
     </Teleport>
+    <ConfirmDialog 
+      :is-visible="showConfirmDialog" 
+      type="delete" title="Confirmar Eliminación"
+      :message="`¿Está seguro de que desea eliminar el usuario '${userToDelete?.network_user}'?`"
+      details="Esta acción eliminará permanentemente el usuario del sistema. Los tickets relacionados a este usuario también podrían verse afectados."
+      confirm-text="Sí, Eliminar" 
+      cancel-text="Cancelar" 
+      @confirm="handleDeleteConfirm" 
+      @cancel="handleDeleteCancel" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
-import {
-  Users,
-  Plus,
-  Edit2,
-  Trash2,
-  User,
-  Mail,
-  Phone,
-  Info,
-} from "lucide-vue-next";
+import { ref, reactive, onMounted } from "vue";
+import {Users,Plus, Edit2, Trash2, Mail, Phone, Info } from "lucide-vue-next";
 import { useNotification } from "../../utils/useNotification";
-import type { User as UserModel } from "../../models/User";
+import {UsersService} from "../../services/usersService";
+import type { User } from "../../models/User";
+import ConfirmDialog from "../../components/ConfirmDialog.vue";
+
 
 const notification = useNotification();
+const usersService = new UsersService();
+const users = ref<User[]>([]);
 
-// Estado
-const users = ref<UserModel[]>([
-  {
-    networkUser: "alopez",
-    mail: "alopez@clienteexterno.com",
-    phone: "+54 11 1234-5678",
-  },
-  {
-    networkUser: "rmartinez",
-    mail: "rmartinez@empresa.com",
-    phone: "+54 11 8765-4321",
-  },
-  {
-    networkUser: "crodriguez",
-    mail: null,
-    phone: null,
-  },
-]);
-
+const showConfirmDialog = ref(false);
+const userToDelete = ref<User | null>(null);
 const showModal = ref(false);
 const isEditing = ref(false);
 const editingIndex = ref(-1);
 
-const form = reactive<{
-  networkUser: string;
-  mail: string | null;
-  phone: string | null;
-}>({
-  networkUser: "",
+const form = reactive<User>({
+  network_user: "",
   mail: null,
   phone: null,
+  full_name: "",
 });
 
-// Métodos
+
 const openCreateModal = () => {
   isEditing.value = false;
-  form.networkUser = "";
+  form.full_name = "";
+  form.network_user = "";
   form.mail = null;
   form.phone = null;
   showModal.value = true;
 };
 
-const openEditModal = (user: UserModel) => {
+const openEditModal = (user: User) => {
   isEditing.value = true;
   editingIndex.value = users.value.findIndex(
-    (u) => u.networkUser === user.networkUser
+    (u) => u.network_user === user.network_user
   );
-  form.networkUser = user.networkUser;
+  form.network_user = user.network_user;
+  form.full_name = user.full_name;
   form.mail = user.mail;
   form.phone = user.phone;
   showModal.value = true;
@@ -276,42 +275,132 @@ const openEditModal = (user: UserModel) => {
 
 const closeModal = () => {
   showModal.value = false;
+  form.full_name = "";
+  form.network_user = "";
+  form.mail = null;
+  form.phone = null;
   isEditing.value = false;
   editingIndex.value = -1;
 };
 
 const handleSubmit = () => {
-  const userData: UserModel = {
-    networkUser: form.networkUser,
-    mail: form.mail && form.mail.trim() !== "" ? form.mail : null,
-    phone: form.phone && form.phone.trim() !== "" ? form.phone : null,
-  };
-
   if (isEditing.value) {
-    users.value[editingIndex.value] = userData;
-    notification.success(
-      "¡Actualizado!",
-      "El usuario ha sido actualizado correctamente"
-    );
-  } else {
-    users.value.push(userData);
-    notification.success("¡Creado!", "El usuario ha sido creado correctamente");
+    update();
+    return;
   }
-  closeModal();
+  create();
+  }
+ 
+const create = async () => {
+  try {
+    let dataCreate: User = ({
+      network_user: form.network_user,
+      full_name: form.full_name,
+      mail: form.mail,
+      phone: form.phone
+    })
+
+    let response = await usersService.create(dataCreate)
+    if (response.success) {
+      notification.success(
+        "¡Creado!",
+        "El usuario ha sido creado correctamente"
+      );
+      loadUsers();
+      closeModal();
+      return
+    }
+    console.error("Error al crear el usuario: ", response.error)
+    notification.error("Error", "No se logro crear el usuario")
+    closeModal();
+  } catch (error) {
+    console.error("Error al crear el usuario: ", error)
+    notification.error("Error", "No se logro crear el usuario")
+    closeModal();
+  }
+} 
+
+const update = async () => {
+  try {
+    let data: User = ({
+        network_user: form.network_user,
+        full_name: form.full_name,
+        mail: form.mail,
+        phone: form.phone
+      })
+
+    let response = await usersService.update(data, form.network_user)
+    if (response.success) {
+      notification.success(
+        "¡Actualizado!",
+        "El usuario ha sido actualizado correctamente"
+      );
+      loadUsers();
+      closeModal();
+      return
+    }
+    console.error("Error al actualizar el usuario: ", response.error)
+    notification.error("Error", "No se logro actualizar el usuario")
+    closeModal();
+  } catch (error) {
+    console.error("Error al actualizar el usuario: ", error)
+    notification.error("Error", "No se logro actualizar el usuario")
+    closeModal();
+  }
+}
+
+const confirmDelete = (user: User) => {
+  userToDelete.value = user;
+  showConfirmDialog.value = true;
 };
 
-const confirmDelete = (user: UserModel) => {
-  if (confirm(`¿Está seguro de eliminar el usuario "${user.networkUser}"?`)) {
-    const index = users.value.findIndex(
-      (u) => u.networkUser === user.networkUser
-    );
-    users.value.splice(index, 1);
-    notification.success(
-      "¡Eliminado!",
-      "El usuario ha sido eliminado correctamente"
-    );
+const handleDeleteCancel = () => {
+  showConfirmDialog.value = false;
+  userToDelete.value = null;
+};
+
+const handleDeleteConfirm = async () => {
+  try {
+    if (userToDelete.value && userToDelete.value.network_user != undefined) {
+      let response = await usersService.delete(userToDelete.value.network_user)
+      if (response.success) {
+
+        notification.success(
+          "¡Eliminado!",
+          "El usuario ha sido eliminado correctamente"
+        );
+
+        loadUsers();
+        handleDeleteCancel()
+        return
+      }
+      console.error("Error al eliminar el usuario: ", response.error)
+      notification.error("Error", "No se logro eliminar el usuario")
+      handleDeleteCancel()
+    }
+  } catch (error) {
+    console.error("Error al eliminar el usuario: ", error)
+    notification.error("Error", "No se logro eliminar el usuario")
+    handleDeleteCancel()
   }
 };
+
+
+const loadUsers = async () => {
+  try {
+    const response = await usersService.getAll()
+    if (response.data && response.data.results) {
+      users.value = response.data.results
+    }
+  } catch (error) {
+    console.error("Error al cargar los usuarios: ", error)
+    notification.error("Error", "No se pudieron cargar los usuarios")
+  }
+}
+
+onMounted(() => {
+  loadUsers();
+});
 </script>
 
 <style scoped>

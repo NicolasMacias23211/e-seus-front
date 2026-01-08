@@ -1,7 +1,6 @@
 import { type User } from '../models/User';
 import { http, type ApiResponse, type PaginatedResponse } from "./http";
 
-
 export class UsersService {
     private endPoint = "/users/"
 
@@ -15,6 +14,10 @@ export class UsersService {
 
     async create(user: User): Promise<ApiResponse<User>> {
         return await http.post<User>(this.endPoint, user)
+    }
+
+    async update(user: User, id: string): Promise<ApiResponse<User>> {
+        return await http.put<User>(`${this.endPoint+id}/`, user)
     }
 
     async ensureUserExists(user: User): Promise<ApiResponse<User>> {
@@ -34,5 +37,9 @@ export class UsersService {
             }
             throw error;
         }
+    }
+
+    async delete(id: string): Promise<ApiResponse<User>> {
+        return await http.delete<User>(this.endPoint+id+'/')
     }
 }
