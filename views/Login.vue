@@ -273,7 +273,8 @@ const handleLogin = async () => {
         "¡Bienvenido!",
         `Sesión iniciada como ${form.username}`
       );
-      if (userInfo?.isEUser) {
+
+      if (userInfo?.isEUser === true) {
         router.push("/dashboard");
       } else {
         router.push("/create-ticket");

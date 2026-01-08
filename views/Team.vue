@@ -145,7 +145,7 @@ const availableRoles = ref<Role[]>([]);
 
 const loadTeamMembers = async () => {
   try {
-    const response = await eUsers.GetAllEUsers();
+    const response = await eUsers.getAll();
     if (response.data && response.data.results) {
       teamMembers.value = response.data.results.flat().map((member: EUser) => ({
         ...member,

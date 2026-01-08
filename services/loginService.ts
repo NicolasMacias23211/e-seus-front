@@ -34,8 +34,18 @@ export class LoginService extends HttpService {
       if (eldapResponse.success && eldapResponse.user) {
         const backendLoginResponse = await this.loginBack(eldapResponse.user);
         if (backendLoginResponse.success) {
-          await this.checkEUserStatus(backendLoginResponse.user);
-          this.sessionStorageService.handleLogin(backendLoginResponse);
+          this.sessionStorageService.setItem(
+            "authTokens",
+            backendLoginResponse.tokens
+          );
+          const isEUser = await this.checkEUserStatus(
+            backendLoginResponse.user.username
+          );
+          backendLoginResponse.user.isEUser = isEUser;
+          this.sessionStorageService.setItem(
+            "userInfo",
+            backendLoginResponse.user
+          );
         }
         return backendLoginResponse;
       } else {
@@ -122,14 +132,15 @@ export class LoginService extends HttpService {
     }
   }
 
-  private async checkEUserStatus(user: UserInfo): Promise<void> {
+  private async checkEUserStatus(username: string): Promise<boolean> {
     try {
       const response = await this.eUsersService.GetEUsersByNetworkUser(
-        user.username
+        username
       );
-      user.isEUser = response.success && response.data !== null;
+      return response.success && response.data !== null;
     } catch (error) {
-      user.isEUser = false;
+      console.error("Error al verificar estado de EUser:", error);
+      return false;
     }
   }
 }
