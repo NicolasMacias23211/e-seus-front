@@ -208,11 +208,11 @@ export class HttpService {
   /**
    * POST request
    */
-  async post<T>(
+  async post<TResponse, TBody = TResponse>(
     endpoint: string,
-    data?: T,
+    data?: TBody,
     options?: RequestOptions
-  ): Promise<ApiResponse<T>> {
+  ): Promise<ApiResponse<TResponse>> {
     try {
       const url = `${this.baseUrl}${endpoint}`;
       const response = await this.fetchWithTimeout(url, {
@@ -236,11 +236,11 @@ export class HttpService {
   /**
    * PUT request
    */
-  async put<T>(
+  async put<TResponse, TBody = TResponse>(
     endpoint: string,
-    data?: T,
+    data?: TBody,
     options?: RequestOptions
-  ): Promise<ApiResponse<T>> {
+  ): Promise<ApiResponse<TResponse>> {
     try {
       const url = `${this.baseUrl}${endpoint}`;
       const response = await this.fetchWithTimeout(url, {
@@ -290,11 +290,11 @@ export class HttpService {
   /**
    * PATCH request
    */
-  async patch<T>(
+  async patch<TResponse, TBody = TResponse>(
     endpoint: string,
-    data?: T,
+    data?: TBody,
     options?: RequestOptions
-  ): Promise<ApiResponse<T>> {
+  ): Promise<ApiResponse<TResponse>> {
     try {
       const url = `${this.baseUrl}${endpoint}`;
       const response = await this.fetchWithTimeout(url, {

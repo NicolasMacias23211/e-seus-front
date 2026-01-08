@@ -12,7 +12,7 @@ export * from "./User";
 export * from "./Status";
 export * from "./Ticket";
 export * from "./ReportedTime";
-export * from "./Comment";
+export * from "./Notes";
 
 // Legacy type definitions (for backward compatibility)
 // These can be removed once all views are migrated to use the new models
