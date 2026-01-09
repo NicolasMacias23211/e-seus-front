@@ -1,5 +1,5 @@
 export interface Status {
-  statusId: number;
-  statusName: string;
-  statusDescription: string | null;
+  status_id: number;
+  status_name: string;
+  status_description: string | null;
 }
