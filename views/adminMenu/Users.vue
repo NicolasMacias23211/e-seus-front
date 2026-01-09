@@ -2,9 +2,7 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div
-          class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#021C7D] to-[#50bdeb] flex items-center justify-center"
-        >
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#021C7D] to-[#50bdeb] flex items-center justify-center">
           <Users class="w-5 h-5 text-white" />
         </div>
         <div>
@@ -14,23 +12,12 @@
           </p>
         </div>
       </div>
-      <button
-        @click="openCreateModal"
-        class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white rounded-lg hover:shadow-lg transition-all font-medium"
-      >
-        <Plus class="w-5 h-5" />
-        Nuevo Usuario
-      </button>
     </div>
 
-    <div
-      class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden"
-    >
+    <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead
-            class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white"
-          >
+          <thead class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white">
             <tr>
               <th class="px-6 py-4 text-left text-sm font-bold">
                 Usuario de Red
@@ -38,15 +25,11 @@
               <th class="px-6 py-4 text-left text-sm font-bold">Nombre Completo</th>
               <th class="px-6 py-4 text-left text-sm font-bold">Email</th>
               <th class="px-6 py-4 text-left text-sm font-bold">Teléfono</th>
-              <th class="px-6 py-4 text-center text-sm font-bold">Acciones</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-200">
-            <tr
-              v-for="(user, index) in users"
-              :key="index"
-              class="hover:bg-emerald-50 transition-colors"
-            >
+            <tr v-for="(user, index) in users"
+              :key="index" class="hover:bg-emerald-50 transition-colors">
               <td class="px-6 py-4 text-sm text-slate-700 font-mono">
                 {{ user.network_user }}
               </td>
@@ -59,24 +42,6 @@
               <td class="px-6 py-4 text-sm text-slate-600">
                 {{ user.phone || "-" }}
               </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center justify-center gap-2">
-                  <button
-                    @click="openEditModal(user)"
-                    class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all"
-                    title="Editar"
-                  >
-                    <Edit2 class="w-4 h-4" />
-                  </button>
-                  <button
-                    @click="confirmDelete(user)"
-                    class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all"
-                    title="Eliminar"
-                  >
-                    <Trash2 class="w-4 h-4" />
-                  </button>
-                </div>
-              </td>
             </tr>
             <tr v-if="users.length === 0">
               <td colspan="4" class="px-6 py-8 text-center text-slate-500">
@@ -87,304 +52,19 @@
         </table>
       </div>
     </div>
-
-    <Teleport to="body">
-      <div
-        v-if="showModal"
-        class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-        @click.self="closeModal"
-      >
-        <div
-          class="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-scale-in"
-        >
-          <div
-            class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white px-6 py-4 rounded-t-2xl"
-          >
-            <h2 class="text-xl font-bold">
-              {{ isEditing ? "Editar Usuario" : "Nuevo Usuario" }}
-            </h2>
-          </div>
-
-          <form @submit.prevent="handleSubmit" class="p-6 space-y-1">
-            <div>
-              <label for="networkUser" class="block text-sm font-bold text-slate-700 mb-2">
-                <User class="w-4 h-4 inline mr-1" />
-                Usuario de Red <span class="text-red-500">*</span>
-              </label>
-              <input
-                id="networkUser"
-                v-model="form.network_user"
-                type="text"
-                required
-                maxlength="45"
-                :disabled="isEditing"
-                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all disabled:bg-slate-100"
-                placeholder="usuario.red"
-              />
-              <p class="text-xs text-slate-500 mt-1">
-                Este campo se usa como identificador único
-              </p>
-            </div>
-
-            <div>
-              <label for="fullName" class="block text-sm font-bold text-slate-700 mb-2">
-                <User class="w-4 h-4 inline mr-1" />
-                Nombre Completo
-              </label>
-              <input
-                id="fullName"
-                v-model="form.full_name"
-                type="text"
-                maxlength="45"
-                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
-                placeholder="Nombre y Apellido (opcional)"
-              />
-              <p class="text-xs text-slate-500 mt-1">
-                Nombre completo del usuario
-              </p>
-            </div>
-            <div>
-              <label for="mail" class="block text-sm font-bold text-slate-700 mb-2">
-                <Mail class="w-4 h-4 inline mr-1" />
-                Email
-              </label>
-              <input
-                id="mail"
-                v-model="form.mail"
-                type="email"
-                maxlength="50"
-                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
-                placeholder="correo@ejemplo.com (opcional)"
-              />
-              <p class="text-xs text-slate-500 mt-1">
-                Email para notificaciones sobre sus tickets
-              </p>
-            </div>
-
-            <div>
-              <label for="phone" class="block text-sm font-bold text-slate-700 mb-2">
-                <Phone class="w-4 h-4 inline mr-1" />
-                Teléfono
-              </label>
-              <input
-                id="phone"
-                v-model="form.phone"
-                type="tel"
-                maxlength="45"
-                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
-                placeholder="+54 11 1234-5678 (opcional)"
-              />
-              <p class="text-xs text-slate-500 mt-1">
-                Teléfono de contacto del usuario
-              </p>
-            </div>
-
-            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-              <div class="flex gap-2">
-                <Info class="w-5 h-5 text-blue-600 flex-shrink-0" />
-                <div>
-                  <p class="text-sm text-blue-800 font-medium">
-                    Usuarios básicos
-                  </p>
-                  <p class="text-xs text-blue-700 mt-1">
-                    Estos usuarios solo pueden crear y consultar sus propios
-                    tickets. No tienen acceso al sistema completo.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex gap-3 pt-4">
-              <button
-                type="button"
-                @click="closeModal"
-                class="flex-1 px-4 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 transition-all font-medium"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                class="flex-1 px-4 py-3 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white rounded-xl hover:shadow-lg transition-all font-medium"
-              >
-                {{ isEditing ? "Actualizar" : "Crear" }}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </Teleport>
-    <ConfirmDialog 
-      :is-visible="showConfirmDialog" 
-      type="delete" title="Confirmar Eliminación"
-      :message="`¿Está seguro de que desea eliminar el usuario '${userToDelete?.network_user}'?`"
-      details="Esta acción eliminará permanentemente el usuario del sistema. Los tickets relacionados a este usuario también podrían verse afectados."
-      confirm-text="Sí, Eliminar" 
-      cancel-text="Cancelar" 
-      @confirm="handleDeleteConfirm" 
-      @cancel="handleDeleteCancel" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
-import {Users,Plus, Edit2, Trash2, Mail, Phone, Info } from "lucide-vue-next";
+import { ref,  onMounted } from "vue";
+import {Users } from "lucide-vue-next";
 import { useNotification } from "../../utils/useNotification";
 import {UsersService} from "../../services/usersService";
 import type { User } from "../../models/User";
-import ConfirmDialog from "../../components/ConfirmDialog.vue";
-
 
 const notification = useNotification();
 const usersService = new UsersService();
 const users = ref<User[]>([]);
-
-const showConfirmDialog = ref(false);
-const userToDelete = ref<User | null>(null);
-const showModal = ref(false);
-const isEditing = ref(false);
-const editingIndex = ref(-1);
-
-const form = reactive<User>({
-  network_user: "",
-  mail: null,
-  phone: null,
-  full_name: "",
-});
-
-
-const openCreateModal = () => {
-  isEditing.value = false;
-  form.full_name = "";
-  form.network_user = "";
-  form.mail = null;
-  form.phone = null;
-  showModal.value = true;
-};
-
-const openEditModal = (user: User) => {
-  isEditing.value = true;
-  editingIndex.value = users.value.findIndex(
-    (u) => u.network_user === user.network_user
-  );
-  form.network_user = user.network_user;
-  form.full_name = user.full_name;
-  form.mail = user.mail;
-  form.phone = user.phone;
-  showModal.value = true;
-};
-
-const closeModal = () => {
-  showModal.value = false;
-  form.full_name = "";
-  form.network_user = "";
-  form.mail = null;
-  form.phone = null;
-  isEditing.value = false;
-  editingIndex.value = -1;
-};
-
-const handleSubmit = () => {
-  if (isEditing.value) {
-    update();
-    return;
-  }
-  create();
-  }
- 
-const create = async () => {
-  try {
-    let dataCreate: User = ({
-      network_user: form.network_user,
-      full_name: form.full_name,
-      mail: form.mail,
-      phone: form.phone
-    })
-
-    let response = await usersService.create(dataCreate)
-    if (response.success) {
-      notification.success(
-        "¡Creado!",
-        "El usuario ha sido creado correctamente"
-      );
-      loadUsers();
-      closeModal();
-      return
-    }
-    console.error("Error al crear el usuario: ", response.error)
-    notification.error("Error", "No se logro crear el usuario")
-    closeModal();
-  } catch (error) {
-    console.error("Error al crear el usuario: ", error)
-    notification.error("Error", "No se logro crear el usuario")
-    closeModal();
-  }
-} 
-
-const update = async () => {
-  try {
-    let data: User = ({
-        network_user: form.network_user,
-        full_name: form.full_name,
-        mail: form.mail,
-        phone: form.phone
-      })
-
-    let response = await usersService.update(data, form.network_user)
-    if (response.success) {
-      notification.success(
-        "¡Actualizado!",
-        "El usuario ha sido actualizado correctamente"
-      );
-      loadUsers();
-      closeModal();
-      return
-    }
-    console.error("Error al actualizar el usuario: ", response.error)
-    notification.error("Error", "No se logro actualizar el usuario")
-    closeModal();
-  } catch (error) {
-    console.error("Error al actualizar el usuario: ", error)
-    notification.error("Error", "No se logro actualizar el usuario")
-    closeModal();
-  }
-}
-
-const confirmDelete = (user: User) => {
-  userToDelete.value = user;
-  showConfirmDialog.value = true;
-};
-
-const handleDeleteCancel = () => {
-  showConfirmDialog.value = false;
-  userToDelete.value = null;
-};
-
-const handleDeleteConfirm = async () => {
-  try {
-    if (userToDelete.value && userToDelete.value.network_user != undefined) {
-      let response = await usersService.delete(userToDelete.value.network_user)
-      if (response.success) {
-
-        notification.success(
-          "¡Eliminado!",
-          "El usuario ha sido eliminado correctamente"
-        );
-
-        loadUsers();
-        handleDeleteCancel()
-        return
-      }
-      console.error("Error al eliminar el usuario: ", response.error)
-      notification.error("Error", "No se logro eliminar el usuario")
-      handleDeleteCancel()
-    }
-  } catch (error) {
-    console.error("Error al eliminar el usuario: ", error)
-    notification.error("Error", "No se logro eliminar el usuario")
-    handleDeleteCancel()
-  }
-};
-
 
 const loadUsers = async () => {
   try {

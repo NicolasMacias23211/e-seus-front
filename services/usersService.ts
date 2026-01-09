@@ -16,10 +16,6 @@ export class UsersService {
         return await http.post<User>(this.endPoint, user)
     }
 
-    async update(user: User, id: string): Promise<ApiResponse<User>> {
-        return await http.put<User>(`${this.endPoint+id}/`, user)
-    }
-
     async ensureUserExists(user: User): Promise<ApiResponse<User>> {
         try {
             const existingUser = await this.getByNetworkUser(user.network_user);
@@ -37,9 +33,5 @@ export class UsersService {
             }
             throw error;
         }
-    }
-
-    async delete(id: string): Promise<ApiResponse<User>> {
-        return await http.delete<User>(this.endPoint+id+'/')
     }
 }
