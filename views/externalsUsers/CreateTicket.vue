@@ -864,23 +864,6 @@ const clients = ref<Client[]>([]);
 const ansList = ref<ANS[]>([]);
 const isLoadingData = ref(true);
 
-const programs = ref([
-  { program_name: "Programa Alpha", client_name: "Cliente A - Empresa Tech" },
-  { program_name: "Programa Beta", client_name: "Cliente A - Empresa Tech" },
-  { program_name: "Programa Gamma", client_name: "Cliente B - Corporación Global" },
-  { program_name: "Programa Delta", client_name: "Cliente B - Corporación Global" },
-  { program_name: "Programa Epsilon", client_name: "Cliente C - Soluciones SA" },
-  { program_name: "Programa Zeta", client_name: "Cliente C - Soluciones SA" },
-]);
-
-const subPrograms = ref([
-  { sub_program_name: "Subprograma 1.1", program_name: "Programa Alpha" },
-  { sub_program_name: "Subprograma 1.2", program_name: "Programa Alpha" },
-  { sub_program_name: "Subprograma 2.1", program_name: "Programa Beta" },
-  { sub_program_name: "Subprograma 2.2", program_name: "Programa Beta" },
-  { sub_program_name: "Subprograma 3.1", program_name: "Programa Gamma" },
-  { sub_program_name: "Subprograma 3.2", program_name: "Programa Gamma" },
-]);
 
 
 const loadFormData = async () => {
