@@ -804,33 +804,43 @@ import type { TicketPriority } from "../../models/TicketPriority";
 import type { Client } from "../../models/Client";
 import type { Program } from "../../models/Program";
 import type { SubProgram } from "../../models/SubProgram";
+import type { Status } from "../../models/Status";
 import { AnsService } from "../../services/ansService";
 import { ServiceService } from "../../services/serviceService";
 import { TicketPriorityService } from "../../services/ticketPriorityService";
 import { ClientsService } from "../../services/clientsService";
+import { StatusService } from "../../services/statusService";
 import { SessionStorageService } from "../../services/SessionStorageService";
 import { UsersService } from "../../services/usersService";
 import { TicketsService } from "../../services/ticketsService";
+import { ProgramsService } from "../../services/programService";
+import { SubProgramsService } from "../../services/subProgramServices";
 
 const ansService = new AnsService();
 const serviceService = new ServiceService();
 const priorityService = new TicketPriorityService();
 const clientsService = new ClientsService();
+const statusService = new StatusService();
 const sessionStorageService = new SessionStorageService();
 const usersService = new UsersService();
 const ticketsService = new TicketsService();
+const programsService = new ProgramsService();
+const subProgramsService = new SubProgramsService();
+
+const subPrograms = ref<SubProgram[]>([]);
+const programs = ref<Program[]>([]);
 
 const form = reactive<Ticket>({
   id_ticket: 0,
   ticket_title: "",
   ticket_description: "",
   ticket_attachments: null,
-  ticket_service: "" as any,
+  ticket_service: "",
   ticket_priority: "",
-  ticket_ans: "" as any,
+  ticket_ans: "",
   sub_program_name: "",
   reporter_user: "",
-  status_id: 1,
+  status_id: 0,  
   estimated_closing_date: null,
   service_name: "",
   priority_name: "",
@@ -860,11 +870,10 @@ const filteredSubPrograms = ref<SubProgram[]>([]);
 const uploadedFiles = ref<File[]>([]);
 const services = ref<Service[]>([]);
 const priorities = ref<TicketPriority[]>([]);
+const statuses = ref<Status[]>([]);
 const clients = ref<Client[]>([]);
 const ansList = ref<ANS[]>([]);
 const isLoadingData = ref(true);
-
-
 
 const loadFormData = async () => {
   isLoadingData.value = true;
@@ -874,11 +883,40 @@ const loadFormData = async () => {
       loadServices(),
       loadPriorities(),
       loadClients(),
+      loadPrograms(),
+      loadSubPrograms(),
+      loadStatuses(),
     ]);
+
+    if (statuses.value.length > 0) {
+      form.status_id = statuses.value[0].status_id;
+    }
   } catch (error) {
     console.error("Error al cargar datos del formulario:", error);
   } finally {
     isLoadingData.value = false;
+  }
+};
+
+const loadPrograms = async () => {
+  try {
+    const response = await programsService.getAll();
+    if (response.success && response.data) {
+      programs.value = response.data.results || [];
+    }
+  } catch (error) {
+    console.error("Error al cargar programas:", error);
+  }
+};
+
+const loadSubPrograms = async () => {
+  try {
+    const response = await subProgramsService.getAll();
+    if (response.success && response.data) {
+      subPrograms.value = response.data.results || [];
+    }
+  } catch (error) {
+    console.error("Error al cargar subprogramas:", error);
   }
 };
 
@@ -927,6 +965,16 @@ const loadClients = async () => {
   }
 };
 
+const loadStatuses = async () => {
+  try {
+    const response = await statusService.getAll();
+    if (response.success && response.data) {
+      statuses.value = (response.data.results || []).flat(); 
+    }
+  } catch (error) {
+    console.error("Error al cargar estados:", error);
+  }
+};
 
 const filterClients = () => {
   const search = clientSearch.value.toLowerCase();
@@ -1096,7 +1144,6 @@ const handleSubmit = async () => {
       return;
     }
 
-    
     const currentUser = sessionStorageService.getUserInfo();
 
     if (!currentUser) {
@@ -1124,7 +1171,6 @@ const handleSubmit = async () => {
       return;
     }
 
-    
     const ticketData = {
       id_ticket: form.id_ticket,
       ticket_title: form.ticket_title,
@@ -1156,8 +1202,6 @@ const handleSubmit = async () => {
         errorMessage.value = ticketResult.message || "Error al crear el ticket";
         return;
       }
-
-      console.log("Ticket creado exitosamente:", ticketResult.data.id_ticket);
 
       createdTicketId.value = ticketResult.data.id_ticket || null;
       showSuccess.value = true;
@@ -1194,9 +1238,9 @@ const resetForm = () => {
   form.ticket_title = "";
   form.ticket_description = "";
   form.ticket_attachments = "";
-  form.ticket_service = "" as any;
+  form.ticket_service = "";
   form.ticket_priority = "";
-  form.ticket_ans = "" as any;
+  form.ticket_ans = "";
   form.client_name = "";
   form.program_name = "";
   form.sub_program_name = "";
@@ -1209,7 +1253,6 @@ const resetForm = () => {
   createdTicketId.value = null;
   errorMessage.value = "";
 };
-
 
 onMounted(async () => {
   await loadFormData();

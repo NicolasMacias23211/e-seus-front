@@ -2,9 +2,9 @@ export interface Ticket {
   ticket_title: string;
   ticket_description: string;
   ticket_attachments: string | null;
-  ticket_service: number;
+  ticket_service: number | "";
   ticket_priority: string;
-  ticket_ans: number;
+  ticket_ans: number | "";
   sub_program_name: string;
   reporter_user: string;
   status_id: number;
