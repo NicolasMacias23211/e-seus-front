@@ -1,4 +1,4 @@
 export interface SubProgram {
-  subProgramName: string;
-  programName: string;
+  sub_program_name: string;
+  program_name: string;
 }
