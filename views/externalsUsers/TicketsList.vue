@@ -83,11 +83,11 @@
             >
               <div
                 v-for="ticket in tickets"
-                :key="ticket.idTicket"
+                :key="ticket.id_ticket"
                 @click="selectTicket(ticket)"
                 :class="[
                   'p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-lg',
-                  selectedTicket?.idTicket === ticket.idTicket
+                  selectedTicket?.id_ticket === ticket.id_ticket
                     ? 'bg-blue-50 border-blue-500 shadow-md'
                     : 'bg-white border-slate-200 hover:border-blue-300',
                 ]"
@@ -95,36 +95,36 @@
                 <div class="flex items-start justify-between gap-3">
                   <div class="flex-1 min-w-0">
                     <h3 class="font-bold text-slate-800 mb-1 truncate">
-                      {{ ticket.ticketTitle }}
+                      {{ ticket.ticket_title }}
                     </h3>
                     <div
                       class="flex items-center gap-3 text-xs text-slate-500 mb-2"
                     >
                       <span class="flex items-center gap-1">
                         <Calendar class="w-3 h-3" />
-                        {{ formatDate(ticket.createAt) }}
+                        {{ formatDate(new Date(ticket.create_at)) }}
                       </span>
                       <span class="flex items-center gap-1">
                         <Clock class="w-3 h-3" />
-                        {{ formatTime(ticket.createAt) }}
+                        {{ formatTime(new Date(ticket.create_at)) }}
                       </span>
                     </div>
                     <div class="flex items-center gap-2">
                       <span
                         :class="[
                           'px-3 py-1 text-xs font-bold rounded-full',
-                          getStatusClass(ticket.statusId),
+                          getStatusClass(ticket.status_id),
                         ]"
                       >
-                        {{ getStatusName(ticket.statusId) }}
+                        {{ getStatusName(ticket.status_id) }}
                       </span>
                       <span
                         :class="[
                           'px-3 py-1 text-xs font-bold rounded-full',
-                          getPriorityClass(ticket.ticketPriority),
+                          getPriorityClass(ticket.ticket_priority),
                         ]"
                       >
-                        {{ ticket.ticketPriority }}
+                        {{ ticket.ticket_priority }}
                       </span>
                     </div>
                   </div>
@@ -135,17 +135,17 @@
                       <MessageSquare
                         :class="[
                           'w-5 h-5',
-                          getTicketComments(ticket.idTicket).length > 0
+                          getTicketComments(ticket.id_ticket).length > 0
                             ? 'text-blue-600'
                             : 'text-slate-400',
                         ]"
                       />
                     </div>
                     <span
-                      v-if="getTicketComments(ticket.idTicket).length > 0"
+                      v-if="getTicketComments(ticket.id_ticket).length > 0"
                       class="block text-center text-xs font-bold text-blue-600 mt-1"
                     >
-                      {{ getTicketComments(ticket.idTicket).length }}
+                      {{ getTicketComments(ticket.id_ticket).length }}
                     </span>
                   </div>
                 </div>
@@ -181,17 +181,17 @@
                     Detalles del Ticket
                   </h2>
                   <span class="text-sm text-slate-500">
-                    #{{ selectedTicket.idTicket }}
+                    #{{ selectedTicket.id_ticket }}
                   </span>
                 </div>
 
                 <div class="space-y-4">
                   <div>
                     <h3 class="font-bold text-lg text-slate-800 mb-2">
-                      {{ selectedTicket.ticketTitle }}
+                      {{ selectedTicket.ticket_title }}
                     </h3>
                     <p class="text-slate-600 text-sm leading-relaxed">
-                      {{ selectedTicket.ticketDescription }}
+                      {{ selectedTicket.ticket_description }}
                     </p>
                   </div>
 
@@ -207,10 +207,10 @@
                       <span
                         :class="[
                           'px-3 py-1 text-xs font-bold rounded-full inline-block',
-                          getStatusClass(selectedTicket.statusId),
+                          getStatusClass(selectedTicket.status_id),
                         ]"
                       >
-                        {{ getStatusName(selectedTicket.statusId) }}
+                        {{ getStatusName(selectedTicket.status_id) }}
                       </span>
                     </div>
                     <div>
@@ -222,10 +222,10 @@
                       <span
                         :class="[
                           'px-3 py-1 text-xs font-bold rounded-full inline-block',
-                          getPriorityClass(selectedTicket.ticketPriority),
+                          getPriorityClass(selectedTicket.ticket_priority),
                         ]"
                       >
-                        {{ selectedTicket.ticketPriority }}
+                        {{ selectedTicket.ticket_priority }}
                       </span>
                     </div>
                     <div>
@@ -235,7 +235,7 @@
                         Fecha de Creación
                       </span>
                       <span class="text-sm text-slate-700 font-medium">
-                        {{ formatDate(selectedTicket.createAt) }}
+                        {{ formatDate(new Date(selectedTicket.create_at)) }}
                       </span>
                     </div>
                     <div>
@@ -245,7 +245,7 @@
                         Hora
                       </span>
                       <span class="text-sm text-slate-700 font-medium">
-                        {{ formatTime(selectedTicket.createAt) }}
+                        {{ formatTime(new Date(selectedTicket.create_at)) }}
                       </span>
                     </div>
                   </div>
@@ -261,16 +261,16 @@
                     Comentarios
                   </h3>
                   <span
-                    v-if="getTicketComments(selectedTicket.idTicket).length > 0"
+                    v-if="getTicketComments(selectedTicket.id_ticket).length > 0"
                     class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full"
                   >
-                    {{ getTicketComments(selectedTicket.idTicket).length }}
+                    {{ getTicketComments(selectedTicket.id_ticket).length }}
                     comentarios
                   </span>
                 </div>
 
                 <div
-                  v-if="getTicketComments(selectedTicket.idTicket).length === 0"
+                  v-if="getTicketComments(selectedTicket.id_ticket).length === 0"
                   class="text-center py-8"
                 >
                   <MessageSquare
@@ -286,31 +286,31 @@
                   class="space-y-4 max-h-[calc(100vh-580px)] overflow-y-auto pr-2"
                 >
                   <div
-                    v-for="comment in getTicketComments(
-                      selectedTicket.idTicket
+                    v-for="note in getTicketComments(
+                      selectedTicket.id_ticket
                     )"
-                    :key="comment.idComment"
+                    :key="note.id_note"
                     class="bg-slate-50 border border-slate-200 rounded-xl p-4 hover:shadow-md transition-shadow"
                   >
                     <div class="flex items-start gap-3">
                       <div
                         class="w-10 h-10 rounded-full bg-gradient-to-br from-[#021C7D] to-[#50bdeb] flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
                       >
-                        {{ getUserInitials(comment.userName) }}
+                        {{ getUserInitials(note.network_user) }}
                       </div>
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between mb-1">
                           <span class="font-bold text-slate-800 text-sm">
-                            {{ comment.userName }}
+                            {{ note.network_user }}
                           </span>
                           <span class="text-xs text-slate-500">
-                            {{ formatDate(comment.createAt) }} -
-                            {{ formatTime(comment.createAt) }}
+                            {{ formatDate(note.create_at) }} -
+                            {{ formatTime(note.create_at) }}
                           </span>
                         </div>
                         <p class="text-slate-700 text-sm leading-relaxed">
-                          {{ comment.comment }}
-                        </p>
+                          {{ note.note }}
+                          </p>
                       </div>
                     </div>
                   </div>
@@ -325,7 +325,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import {
   List,
   FileText,
@@ -336,189 +336,84 @@ import {
   ArrowLeft,
 } from "lucide-vue-next";
 import type { Ticket } from "../../models";
-
-interface Comment {
-  idComment: number;
-  comment: string;
-  createAt: Date;
-  updateAt: Date | null;
-  idTicket: number;
-  userName: string;
-}
+import type { Note } from "../../models/Notes";
+import { TicketsService } from "../../services/ticketsService";
+import { NotesService } from "../../services/notesService";
+import { SessionStorageService } from "../../services/SessionStorageService";
 
 const selectedTicket = ref<Ticket | null>(null);
+const isLoading = ref(false);
+const errorMessage = ref("");
 
-// Mock data para tickets
-const tickets = ref<Ticket[]>([
-  {
-    idTicket: 101,
-    ticketTitle: "Error en el sistema de reportes",
-    ticketDescription:
-      "Al intentar generar el reporte mensual, el sistema muestra un error 500 y no permite descargar el archivo.",
-    ticketAttachments: null,
-    ticketService: 1,
-    ticketPriority: "Alta",
-    ticketClosingCode: null,
-    ticketAns: 1,
-    reporterUser: "jperez",
-    createAt: new Date("2025-12-10T09:30:00"),
-    updateAt: null,
-    assignedTo: "mgonzalez",
-    closingDate: null,
-    estimatedClosingDate: new Date("2025-12-15"),
-    statusId: 2,
-    subProgramName: "Soporte Nivel 1 - A1",
-  },
-  {
-    idTicket: 102,
-    ticketTitle: "Solicitud de acceso a módulo de ventas",
-    ticketDescription:
-      "Necesito acceso al módulo de ventas para poder consultar el historial de pedidos del cliente.",
-    ticketAttachments: null,
-    ticketService: 2,
-    ticketPriority: "Media",
-    ticketClosingCode: null,
-    ticketAns: 2,
-    reporterUser: "mlopez",
-    createAt: new Date("2025-12-09T14:20:00"),
-    updateAt: null,
-    assignedTo: "aramirez",
-    closingDate: null,
-    estimatedClosingDate: new Date("2025-12-12"),
-    statusId: 3,
-    subProgramName: "Soporte Nivel 1 - A1",
-  },
-  {
-    idTicket: 103,
-    ticketTitle: "Actualización de información personal",
-    ticketDescription:
-      "Por favor actualizar mi correo electrónico y número de teléfono en el sistema.",
-    ticketAttachments: null,
-    ticketService: 1,
-    ticketPriority: "Baja",
-    ticketClosingCode: 1,
-    ticketAns: 1,
-    reporterUser: "cgarcia",
-    createAt: new Date("2025-12-08T11:00:00"),
-    updateAt: new Date("2025-12-09T16:30:00"),
-    assignedTo: "ltorres",
-    closingDate: new Date("2025-12-09T16:30:00"),
-    estimatedClosingDate: new Date("2025-12-11"),
-    statusId: 5,
-    subProgramName: "Soporte Nivel 1 - A1",
-  },
-  {
-    idTicket: 104,
-    ticketTitle: "Problema con inicio de sesión",
-    ticketDescription:
-      "No puedo iniciar sesión en la plataforma. Me aparece un mensaje de credenciales incorrectas aunque estoy seguro de que son correctas.",
-    ticketAttachments: null,
-    ticketService: 3,
-    ticketPriority: "Urgente",
-    ticketClosingCode: null,
-    ticketAns: 1,
-    reporterUser: "dsilva",
-    createAt: new Date("2025-12-11T08:15:00"),
-    updateAt: null,
-    assignedTo: "jmorales",
-    closingDate: null,
-    estimatedClosingDate: new Date("2025-12-11"),
-    statusId: 1,
-    subProgramName: "Soporte Nivel 1 - A1",
-  },
-  {
-    idTicket: 105,
-    ticketTitle: "Consulta sobre funcionalidad de exportación",
-    ticketDescription:
-      "¿Es posible exportar los datos en formato Excel? Solo veo la opción de PDF.",
-    ticketAttachments: null,
-    ticketService: 1,
-    ticketPriority: "Baja",
-    ticketClosingCode: null,
-    ticketAns: 2,
-    reporterUser: "rdiaz",
-    createAt: new Date("2025-12-07T16:45:00"),
-    updateAt: null,
-    assignedTo: "mgonzalez",
-    closingDate: null,
-    estimatedClosingDate: new Date("2025-12-14"),
-    statusId: 4,
-    subProgramName: "Soporte Nivel 1 - A1",
-  },
-]);
+const ticketsService = new TicketsService();
+const notesService = new NotesService();
+const sessionStorageService = new SessionStorageService();
 
-// Mock data para comentarios
-const comments = ref<Comment[]>([
-  {
-    idComment: 1,
-    comment:
-      "Hemos recibido tu reporte. Estamos investigando el problema con el servidor de reportes.",
-    createAt: new Date("2025-12-10T10:15:00"),
-    updateAt: null,
-    idTicket: 101,
-    userName: "María González",
-  },
-  {
-    idComment: 2,
-    comment:
-      "El equipo técnico ya identificó la causa. Será solucionado hoy antes de las 5pm.",
-    createAt: new Date("2025-12-10T14:30:00"),
-    updateAt: null,
-    idTicket: 101,
-    userName: "Carlos Ramírez",
-  },
-  {
-    idComment: 3,
-    comment:
-      "Tu solicitud de acceso ha sido aprobada. Procederemos con la configuración.",
-    createAt: new Date("2025-12-09T15:00:00"),
-    updateAt: null,
-    idTicket: 102,
-    userName: "Ana Ramírez",
-  },
-  {
-    idComment: 4,
-    comment: "Los datos han sido actualizados correctamente en el sistema.",
-    createAt: new Date("2025-12-09T16:15:00"),
-    updateAt: null,
-    idTicket: 103,
-    userName: "Luis Torres",
-  },
-  {
-    idComment: 5,
-    comment:
-      "Ticket cerrado. Si tienes alguna otra consulta, no dudes en contactarnos.",
-    createAt: new Date("2025-12-09T16:30:00"),
-    updateAt: null,
-    idTicket: 103,
-    userName: "Luis Torres",
-  },
-  {
-    idComment: 6,
-    comment:
-      "Hemos restablecido tu contraseña. Deberías haber recibido un correo con las nuevas credenciales.",
-    createAt: new Date("2025-12-11T09:00:00"),
-    updateAt: null,
-    idTicket: 104,
-    userName: "Jorge Morales",
-  },
-  {
-    idComment: 7,
-    comment:
-      "Sí, es posible exportar en Excel. Te enviaré un instructivo para activar esa opción.",
-    createAt: new Date("2025-12-07T17:30:00"),
-    updateAt: null,
-    idTicket: 105,
-    userName: "María González",
-  },
-]);
+const tickets = ref<Ticket[]>([]);
 
-const selectTicket = (ticket: Ticket) => {
+const notes = ref<Note[]>([]);
+
+
+const loadMyTickets = async () => {
+  isLoading.value = true;
+  errorMessage.value = "";
+  
+  try {
+    const currentUser = sessionStorageService.getUserInfo();
+    
+    if (!currentUser || !currentUser.username) {
+      errorMessage.value = "No se pudo obtener el usuario actual";
+      return;
+    }
+
+    const networkUser = currentUser.username;
+    const response = await ticketsService.GetTicketByReporter(networkUser);
+    
+    if (response && response.results) {
+      tickets.value = response.results;
+    } else {
+      tickets.value = [];
+    }
+  } catch (error) {
+    errorMessage.value = "Error al cargar los tickets";
+    tickets.value = [];
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const loadTicketNotes = async (ticketId: number) => {
+  try {
+    const response = await notesService.getNotesByTicket(ticketId);
+    
+    if (response.data && response.data.results) {
+      const ticketNotes = response.data.results;
+      
+      ticketNotes.forEach((note: Note) => {
+        const existingIndex = notes.value.findIndex(n => n.id_note === note.id_note);
+        if (existingIndex >= 0) {
+          notes.value[existingIndex] = note;
+        } else {
+          notes.value.push(note);
+        }
+      });
+    }
+  } catch (error) {
+    console.error("Error al cargar notas:", error);
+  }
+};
+
+onMounted(() => {
+  loadMyTickets();
+});
+
+const selectTicket = async (ticket: Ticket) => {
   selectedTicket.value = ticket;
+  await loadTicketNotes(ticket.id_ticket);
 };
 
 const getTicketComments = (ticketId: number) => {
-  return comments.value.filter((comment) => comment.idTicket === ticketId);
+  return notes.value.filter((note) => note.id_ticket === ticketId);
 };
 
 const getStatusName = (statusId: number) => {
@@ -568,8 +463,11 @@ const formatTime = (date: Date) => {
   });
 };
 
-const getUserInitials = (name: string) => {
-  return name
+const getUserInitials = (name: string | number) => {
+  const userName = String(name);
+  if (!userName || userName.trim() === "") return "??";
+  
+  return userName
     .split(" ")
     .map((n) => n[0])
     .join("")
