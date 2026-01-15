@@ -624,36 +624,6 @@ const openTicket = (ticketId: number) => {
   router.push(`/ticket/${ticketId}`);
 };
 
-const getTypeIcon = (type: string) => {
-  const icons: Record<string, any> = {
-    bug: AlertCircle,
-    feature: Zap,
-    task: CheckCircle,
-    improvement: Wrench,
-  };
-  return icons[type] || CheckCircle;
-};
-
-const getTypeColor = (type: string) => {
-  const colors: Record<string, string> = {
-    bug: "text-red-500",
-    feature: "text-[#50bdeb]",
-    task: "text-green-500",
-    improvement: "text-amber-500",
-  };
-  return colors[type] || "text-slate-500";
-};
-
-const getTypeLabel = (type: string) => {
-  const labels: Record<string, string> = {
-    bug: "Bug",
-    feature: "Feature",
-    task: "Task",
-    improvement: "Improvement",
-  };
-  return labels[type] || type;
-};
-
 const getPriorityClass = (priorityName: string) => {
   const priority = getPriorityKey(priorityName);
   const classes: Record<string, string> = {
