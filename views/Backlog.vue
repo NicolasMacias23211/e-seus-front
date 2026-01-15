@@ -111,44 +111,35 @@
               class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent"
             >
               <option value="">Todas</option>
-              <option value="highest">🔴 Crítica</option>
-              <option value="high">🟠 Alta</option>
-              <option value="medium">🟡 Media</option>
-              <option value="low">🟢 Baja</option>
-              <option value="lowest">⚪ Mínima</option>
+              <option
+                v-for="priority in priorities"
+                :key="priority.priority_name"
+                :value="priority.priority_name"
+              >
+                {{ getPriorityEmoji(priority.priority_name) }}
+                {{ priority.priority_name }}
+              </option>
             </select>
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-2"
-              >Tipo</label
+              >Servicio</label
             >
             <select
-              v-model="filterType"
+              v-model="filterService"
               class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent"
             >
-              <option value="">Todos los tipos</option>
-              <option value="bug">🐛 Bug</option>
-              <option value="feature">⚡ Feature</option>
-              <option value="task">✅ Task</option>
-              <option value="improvement">🔧 Improvement</option>
+              <option value="">Todos los servicios</option>
+              <option
+                v-for="service in services"
+                :key="service.id_services"
+                :value="service.id_services"
+              >
+                {{ service.service_name }}
+              </option>
             </select>
           </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-2"
-              >Asignación</label
-            >
-            <select
-              v-model="filterAssignee"
-              class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent"
-            >
-              <option value="">Todos</option>
-              <option value="unassigned">Sin asignar</option>
-              <option value="assigned">Asignados</option>
-            </select>
-          </div>
-
           <div class="flex items-end">
             <button
               @click="clearFilters"
@@ -399,19 +390,26 @@ import {
   Wrench,
 } from "lucide-vue-next";
 import type { Ticket } from "../models/Ticket";
+import type { Service } from "../models/Service";
+import type { TicketPriority } from "../models/TicketPriority";
 import { TicketsService } from "../services/ticketsService";
+import { ServiceService } from "../services/serviceService";
+import { TicketPriorityService } from "../services/ticketPriorityService";
 
 const router = useRouter();
 const ticketsService = new TicketsService();
+const serviceService = new ServiceService();
+const priorityService = new TicketPriorityService();
 
 const searchQuery = ref("");
 const filterPriority = ref("");
-const filterType = ref("");
-const filterAssignee = ref("");
+const filterService = ref<number | "">("");
 const showFilters = ref(false);
 const viewMode = ref<"list" | "card">("list");
 const sortBy = ref<"priority" | "created" | "updated" | "title">("priority");
 const backlogTickets = ref<Ticket[]>([]);
+const services = ref<Service[]>([]);
+const priorities = ref<TicketPriority[]>([]);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
 
@@ -420,6 +418,30 @@ const sortLabels = {
   created: "Fecha creación",
   updated: "Última actualización",
   title: "Título",
+};
+
+// Función para cargar servicios
+const loadServices = async () => {
+  try {
+    const response = await serviceService.getAll();
+    if (response.success && response.data) {
+      services.value = response.data.results;
+    }
+  } catch (err) {
+    console.error("Error loading services:", err);
+  }
+};
+
+// Función para cargar prioridades
+const loadPriorities = async () => {
+  try {
+    const response = await priorityService.getAll();
+    if (response.success && response.data) {
+      priorities.value = response.data.results;
+    }
+  } catch (err) {
+    console.error("Error loading priorities:", err);
+  }
 };
 
 // Función para cargar los tickets de backlog
@@ -458,6 +480,8 @@ const loadBacklogTickets = async () => {
 // Cargar tickets al montar el componente
 onMounted(() => {
   loadBacklogTickets();
+  loadServices();
+  loadPriorities();
 });
 
 // Watcher para búsqueda con debounce
@@ -474,20 +498,17 @@ watch(searchQuery, () => {
 
 const filteredTickets = computed(() => {
   // La búsqueda por texto/ID ya se hace en el backend
-  // Solo filtramos localmente por prioridad, tipo y asignación
+  // Solo filtramos localmente por prioridad, servicio y asignación
   return backlogTickets.value.filter((ticket) => {
     const matchesPriority =
       !filterPriority.value ||
-      getPriorityKey(ticket.priority.priority_name) === filterPriority.value;
+      ticket.priority.priority_name === filterPriority.value;
 
-    const matchesType = !filterType.value; // Por ahora no hay tipo en la respuesta
+    const matchesService =
+      !filterService.value ||
+      ticket.service.id_services === filterService.value;
 
-    const matchesAssignee =
-      !filterAssignee.value ||
-      (filterAssignee.value === "unassigned" && !ticket.assigned_to) ||
-      (filterAssignee.value === "assigned" && ticket.assigned_to);
-
-    return matchesPriority && matchesType && matchesAssignee;
+    return matchesPriority && matchesService;
   });
 });
 
@@ -545,10 +566,21 @@ const highPriorityCount = computed(
 const activeFiltersCount = computed(() => {
   let count = 0;
   if (filterPriority.value) count++;
-  if (filterType.value) count++;
-  if (filterAssignee.value) count++;
+  if (filterService.value) count++;
   return count;
 });
+
+// Función para obtener emoji de prioridad
+const getPriorityEmoji = (priorityName: string): string => {
+  const emojiMap: Record<string, string> = {
+    Crítica: "🔴",
+    Alta: "🟠",
+    Media: "🟡",
+    Baja: "🟢",
+    Mínima: "⚪",
+  };
+  return emojiMap[priorityName] || "⚪";
+};
 
 // Función para mapear prioridades de la API a las del frontend
 const getPriorityKey = (priorityName: string): string => {
@@ -584,8 +616,7 @@ const toggleSort = () => {
 
 const clearFilters = () => {
   filterPriority.value = "";
-  filterType.value = "";
-  filterAssignee.value = "";
+  filterService.value = "";
   searchQuery.value = "";
 };
 
