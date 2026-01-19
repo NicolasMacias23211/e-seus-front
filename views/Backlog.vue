@@ -20,12 +20,92 @@
           </div>
 
           <div class="flex items-center gap-3">
-            <button
-              class="px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all text-sm font-medium text-slate-700 flex items-center gap-2"
-            >
-              <Download class="h-4 w-4" />
-              Exportar
-            </button>
+            <div class="relative">
+              <button
+                @click="showExportMenu = !showExportMenu"
+                class="px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all text-sm font-medium text-slate-700 flex items-center gap-2"
+              >
+                <Download class="h-4 w-4" />
+                Exportar
+                <svg
+                  class="h-3 w-3 transition-transform"
+                  :class="{ 'rotate-180': showExportMenu }"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+
+              <!-- Dropdown menu -->
+              <div
+                v-if="showExportMenu"
+                @click="showExportMenu = false"
+                class="fixed inset-0 z-10"
+              ></div>
+              <div
+                v-if="showExportMenu"
+                class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-20"
+              >
+                <ExportToExcel
+                  :data="exportData"
+                  fileName="backlog_tickets"
+                  sheetName="Backlog"
+                  title="Reporte de Tickets - Backlog"
+                  :excludeFields="['status', 'notes', 'reported_times']"
+                  :customHeaders="{
+                    id_ticket: 'ID',
+                    ticket_title: 'Título',
+                    ticket_description: 'Descripción',
+                    service_name: 'Servicio',
+                    priority_name: 'Prioridad',
+                    assigned_to: 'Asignado a',
+                    ans_name: 'ANS',
+                    create_at: 'Fecha de Creación',
+                    update_at: 'Última Actualización',
+                    tiempo_reportado: 'Tiempo Reportado',
+                  }"
+                  :dateFields="['create_at', 'update_at']"
+                  buttonClass="w-full px-4 py-2 text-left hover:bg-slate-50 transition-all text-sm font-medium text-slate-700 flex items-center gap-2"
+                  @afterExport="showExportMenu = false"
+                >
+                  <FileSpreadsheet class="h-4 w-4 text-green-600" />
+                  Exportar a Excel
+                </ExportToExcel>
+
+                <ExportToPDF
+                  :data="exportData"
+                  fileName="backlog_tickets"
+                  title="Reporte de Tickets - Backlog"
+                  :excludeFields="['status', 'notes', 'reported_times']"
+                  :customHeaders="{
+                    id_ticket: 'ID',
+                    ticket_title: 'Título',
+                    ticket_description: 'Descripción',
+                    service_name: 'Servicio',
+                    priority_name: 'Prioridad',
+                    assigned_to: 'Asignado a',
+                    ans_name: 'ANS',
+                    create_at: 'Fecha de Creación',
+                    update_at: 'Última Actualización',
+                    tiempo_reportado: 'Tiempo Reportado',
+                  }"
+                  :dateFields="['create_at', 'update_at']"
+                  orientation="landscape"
+                  buttonClass="w-full px-4 py-2 text-left hover:bg-slate-50 transition-all text-sm font-medium text-slate-700 flex items-center gap-2"
+                  @afterExport="showExportMenu = false"
+                >
+                  <FileText class="h-4 w-4 text-red-600" />
+                  Exportar a PDF
+                </ExportToPDF>
+              </div>
+            </div>
+
             <button
               class="px-4 py-2 bg-gradient-to-r from-[#50bdeb] to-[#3da8d5] hover:from-[#3da8d5] hover:to-[#2a96c4] text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg flex items-center gap-2"
             >
@@ -374,6 +454,8 @@
 import { ref, computed, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import TicketCard from "../components/TicketCard.vue";
+import ExportToExcel from "../components/ExportToExcel.vue";
+import ExportToPDF from "../components/ExportToPDF.vue";
 import {
   Search,
   Filter,
@@ -385,9 +467,8 @@ import {
   LayoutGrid,
   List,
   AlertCircle,
-  Zap,
-  CheckCircle,
-  Wrench,
+  FileSpreadsheet,
+  FileText,
 } from "lucide-vue-next";
 import type { Ticket } from "../models/Ticket";
 import type { Service } from "../models/Service";
@@ -412,6 +493,7 @@ const services = ref<Service[]>([]);
 const priorities = ref<TicketPriority[]>([]);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
+const showExportMenu = ref(false);
 
 const sortLabels = {
   priority: "Prioridad",
@@ -485,7 +567,7 @@ onMounted(() => {
 });
 
 // Watcher para búsqueda con debounce
-let searchTimeout: NodeJS.Timeout | null = null;
+let searchTimeout: number | null = null;
 watch(searchQuery, () => {
   if (searchTimeout) {
     clearTimeout(searchTimeout);
@@ -659,4 +741,20 @@ const getTotalReportedTime = (ticket: Ticket): string => {
   if (mins === 0) return `${hours}h`;
   return `${hours}h ${mins}m`;
 };
+
+// Preparar datos para exportar
+const exportData = computed(() => {
+  return filteredTickets.value.map((ticket) => ({
+    id_ticket: ticket.id_ticket,
+    ticket_title: ticket.ticket_title,
+    ticket_description: ticket.ticket_description,
+    service_name: ticket.service.service_name,
+    priority_name: ticket.priority.priority_name,
+    assigned_to: ticket.assigned_to || "Sin asignar",
+    ans_name: ticket.ans.ans_name,
+    create_at: ticket.create_at,
+    update_at: ticket.update_at,
+    tiempo_reportado: getTotalReportedTime(ticket),
+  }));
+});
 </script>
