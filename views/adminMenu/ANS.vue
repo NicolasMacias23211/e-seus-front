@@ -76,57 +76,15 @@
       </div>
 
      
-      <div class="px-6 py-4 border-t border-slate-200 bg-slate-50">
-        <div class="flex items-center justify-between">
-          <div class="text-sm text-slate-600">
-            Mostrando {{ (currentPage - 1) * pageSize + 1 }} a {{ Math.min(currentPage * pageSize, totalItems) }} de {{ totalItems }} registros
-          </div>
-          <div class="flex items-center gap-3">
-            <select
-              :value="pageSize"
-              @change="(e) => changePageSize(Number((e.target as HTMLSelectElement).value))"
-              class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm"
-            >
-              <option :value="10">10 por página</option>
-              <option :value="25">25 por página</option>
-              <option :value="50">50 por página</option>
-              <option :value="100">100 por página</option>
-            </select>
-            <div class="flex items-center gap-1">
-              <button
-                @click="prevPage"
-                :disabled="currentPage === 1"
-                class="p-2 border border-slate-300 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronLeft class="w-4 h-4" />
-              </button>
-              <template v-for="page in visiblePages" :key="page">
-                <button
-                  v-if="typeof page === 'number'"
-                  @click="goToPage(page)"
-                  :class="[
-                    'px-3 py-1.5 rounded-lg text-sm font-medium',
-                    page === currentPage
-                      ? 'bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white'
-                      : 'border border-slate-300 hover:bg-slate-100'
-                  ]"
-                >
-                  {{ page }}
-                </button>
-                <span v-else class="px-2 text-slate-400">...</span>
-              </template>
-
-              <button
-                @click="nextPage"
-                :disabled="currentPage === totalPages"
-                class="p-2 border border-slate-300 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronRight class="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PaginationControls
+        :currentPage="currentPage"
+        :pageSize="pageSize"
+        :totalItems="totalItems"
+        @page-size-change="changePageSize"
+        @prev-page="prevPage"
+        @next-page="nextPage"
+        @go-to-page="goToPage"
+      />
     </div>
     <Teleport to="body">
       <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
@@ -220,12 +178,13 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
-import { Clock, Plus, Edit2, Trash2, ChevronLeft, ChevronRight } from "lucide-vue-next";
+import { Clock, Plus, Edit2, Trash2 } from "lucide-vue-next";
 import { useNotification } from "../../utils/useNotification";
 import { usePagination } from "../../utils/usePagination";
 import { AnsService } from "../../services/ansService";
 import type { ANS } from "../../models/ANS";
 import ConfirmDialog from "../../components/ConfirmDialog.vue";
+import PaginationControls from "../../components/PaginationControls.vue";
 
 const notification = useNotification();
 const ansService = new AnsService();
@@ -235,9 +194,7 @@ const {
   currentPage,
   pageSize,
   totalItems,
-  totalPages,
   isLoading,
-  visiblePages,
   loadData,
   goToPage,
   nextPage,
