@@ -24,6 +24,7 @@ import TicketPriorities from "../../views/adminMenu/TicketPriorities.vue";
 import EUsers from "../../views/adminMenu/EUsers.vue";
 import Users from "../../views/adminMenu/Users.vue";
 import Roles from "../../views/adminMenu/Roles.vue";
+import WorkingHours from '../../views/adminMenu/WorkingHours.vue';
 
 const sessionStorage = new SessionStorageService();
 
@@ -129,6 +130,11 @@ const router = createRouter({
       path: "/settings/roles",
       name: "settings-roles",
       component: Roles,
+    },
+    {
+      path: "/settings/horarios",
+      name: "settings-horarios",
+      component: WorkingHours,
     },
     {
       path: "/create-ticket",
