@@ -217,7 +217,7 @@
             </label>
             <input
               id="title"
-              v-model="form.ticketTitle"
+              v-model="form.ticket_title"
               type="text"
               required
               maxlength="45"
@@ -246,7 +246,7 @@
             </label>
             <textarea
               id="description"
-              v-model="form.ticketDescription"
+              v-model="form.ticket_description"
               required
               maxlength="250"
               rows="5"
@@ -254,7 +254,7 @@
               placeholder="Describa detalladamente el problema o solicitud..."
             ></textarea>
             <div class="text-right text-sm text-slate-500 mt-1 font-medium">
-              {{ form.ticketDescription.length }}/250 caracteres
+              {{ form.ticket_description.length }}/250 caracteres
             </div>
           </div>
 
@@ -282,17 +282,18 @@
               </label>
               <select
                 id="service"
-                v-model="form.ticketService"
+                v-model="form.ticket_service"
                 required
-                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white"
+                :disabled="isLoadingData"
+                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white disabled:bg-slate-100"
               >
                 <option value="" disabled>Seleccione un servicio</option>
                 <option
                   v-for="service in services"
-                  :key="service.id"
-                  :value="service.id"
+                  :key="service.id_services"
+                  :value="service.id_services"
                 >
-                  {{ service.name }}
+                  {{ service.service_name }}
                 </option>
               </select>
             </div>
@@ -315,17 +316,21 @@
               </label>
               <select
                 id="priority"
-                v-model="form.ticketPriority"
+                v-model="form.ticket_priority"
                 required
-                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white"
+                :disabled="isLoadingData"
+                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white disabled:bg-slate-100"
               >
                 <option value="" disabled>Seleccione una prioridad</option>
                 <option
                   v-for="priority in priorities"
-                  :key="priority.name"
-                  :value="priority.name"
+                  :key="priority.priority_name"
+                  :value="priority.priority_name"
                 >
-                  {{ priority.name }} - {{ priority.description }}
+                  {{ priority.priority_name }}
+                  <template v-if="priority.priority_description">
+                    - {{ priority.priority_description }}
+                  </template>
                 </option>
               </select>
             </div>
@@ -366,11 +371,11 @@
               >
                 <div
                   v-for="client in filteredClients"
-                  :key="client.name"
+                  :key="client.client_name"
                   @mousedown.prevent="selectClient(client)"
                   class="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-100 last:border-b-0 font-medium text-slate-700"
                 >
-                  {{ client.name }}
+                  {{ client.client_name }}
                 </div>
               </div>
               <div
@@ -413,7 +418,7 @@
                   type="text"
                   required
                   autocomplete="off"
-                  :disabled="!form.clientName"
+                  :disabled="!form.client_name"
                   class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:bg-slate-100 disabled:cursor-not-allowed hover:border-blue-300"
                   placeholder="Buscar programa..."
                 />
@@ -423,11 +428,11 @@
                 >
                   <div
                     v-for="program in filteredPrograms"
-                    :key="program.name"
+                    :key="program.program_name"
                     @mousedown.prevent="selectProgram(program)"
                     class="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-100 last:border-b-0 font-medium text-slate-700"
                   >
-                    {{ program.name }}
+                    {{ program.program_name }}
                   </div>
                 </div>
                 <div
@@ -474,7 +479,7 @@
                   type="text"
                   required
                   autocomplete="off"
-                  :disabled="!form.programName"
+                  :disabled="!form.program_name"
                   class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:bg-slate-100 disabled:cursor-not-allowed hover:border-blue-300"
                   placeholder="Buscar subprograma..."
                 />
@@ -486,11 +491,11 @@
                 >
                   <div
                     v-for="subprogram in filteredSubPrograms"
-                    :key="subprogram.name"
+                    :key="subprogram.sub_program_name"
                     @mousedown.prevent="selectSubProgram(subprogram)"
                     class="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-100 last:border-b-0 font-medium text-slate-700"
                   >
-                    {{ subprogram.name }}
+                    {{ subprogram.sub_program_name }}
                   </div>
                 </div>
                 <div
@@ -527,13 +532,17 @@
             </label>
             <select
               id="ans"
-              v-model="form.ticketAns"
+              v-model="form.ticket_ans"
               required
-              class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white"
+              :disabled="isLoadingData"
+              class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white disabled:bg-slate-100"
             >
               <option value="" disabled>Seleccione un ANS</option>
-              <option v-for="ans in ansList" :key="ans.id" :value="ans.id">
-                {{ ans.name }} - {{ ans.description }}
+              <option v-for="ans in ansList" :key="ans.id_ans" :value="ans.id_ans">
+                {{ ans.ans_name }}
+                <template v-if="ans.ans_description">
+                  - {{ ans.ans_description }}
+                </template>
               </option>
             </select>
           </div>
@@ -787,21 +796,60 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import type { Ticket } from "../../models/Ticket";
+import type { ANS } from "../../models/ANS";
+import type { Service } from "../../models/Service";
+import type { TicketPriority } from "../../models/TicketPriority";
+import type { Client } from "../../models/Client";
+import type { Program } from "../../models/Program";
+import type { SubProgram } from "../../models/SubProgram";
+import type { Status } from "../../models/Status";
+import { AnsService } from "../../services/ansService";
+import { ServiceService } from "../../services/serviceService";
+import { TicketPriorityService } from "../../services/ticketPriorityService";
+import { ClientsService } from "../../services/clientsService";
+import { StatusService } from "../../services/statusService";
+import { SessionStorageService } from "../../services/SessionStorageService";
+import { UsersService } from "../../services/usersService";
+import { TicketsService } from "../../services/ticketsService";
+import { ProgramsService } from "../../services/programService";
+import { SubProgramsService } from "../../services/subProgramService";
 
-// Form data
-const form = reactive({
-  ticketTitle: "",
-  ticketDescription: "",
-  ticketAttachments: "",
-  ticketService: "" as number | "",
-  ticketPriority: "",
-  ticketAns: "" as number | "",
-  clientName: "",
-  programName: "",
-  subProgramName: "",
-  estimatedClosingDate: "",
+const ansService = new AnsService();
+const serviceService = new ServiceService();
+const priorityService = new TicketPriorityService();
+const clientsService = new ClientsService();
+const statusService = new StatusService();
+const sessionStorageService = new SessionStorageService();
+const usersService = new UsersService();
+const ticketsService = new TicketsService();
+const programsService = new ProgramsService();
+const subProgramsService = new SubProgramsService();
+
+const subPrograms = ref<SubProgram[]>([]);
+const programs = ref<Program[]>([]);
+
+const form = reactive<Ticket>({
+  id_ticket: 0,
+  ticket_title: "",
+  ticket_description: "",
+  ticket_attachments: null,
+  ticket_service: "",
+  ticket_priority: "",
+  ticket_ans: "",
+  sub_program_name: "",
+  reporter_user: "",
+  status_id: 0,  
+  estimated_closing_date: null,
+  service_name: "",
+  priority_name: "",
+  reporter_user_name: "",
+  client_name: "",
+  program_name: "",
+  status_name: "",
+  assigned_to: null,
+  create_at: "",
 });
 
 const isSubmitting = ref(false);
@@ -815,81 +863,137 @@ const subProgramSearch = ref("");
 const showClientDropdown = ref(false);
 const showProgramDropdown = ref(false);
 const showSubProgramDropdown = ref(false);
-const filteredClients = ref<Array<{ name: string }>>([]);
-const filteredPrograms = ref<Array<{ name: string; clientName: string }>>([]);
-const filteredSubPrograms = ref<Array<{ name: string; programName: string }>>(
-  []
-);
+const filteredClients = ref<Client[]>([]);
+const filteredPrograms = ref<Program[]>([]);
+const filteredSubPrograms = ref<SubProgram[]>([]);
 
 const uploadedFiles = ref<File[]>([]);
+const services = ref<Service[]>([]);
+const priorities = ref<TicketPriority[]>([]);
+const statuses = ref<Status[]>([]);
+const clients = ref<Client[]>([]);
+const ansList = ref<ANS[]>([]);
+const isLoadingData = ref(true);
 
-const services = ref([
-  { id: 1, name: "Soporte Técnico" },
-  { id: 2, name: "Desarrollo" },
-  { id: 3, name: "Infraestructura" },
-  { id: 4, name: "Consultoría" },
-]);
+const loadFormData = async () => {
+  isLoadingData.value = true;
+  try {
+    await Promise.all([
+      loadAns(),
+      loadServices(),
+      loadPriorities(),
+      loadClients(),
+      loadPrograms(),
+      loadSubPrograms(),
+      loadStatuses(),
+    ]);
 
-const priorities = ref([
-  { name: "Baja", description: "No urgente" },
-  { name: "Media", description: "Moderada" },
-  { name: "Alta", description: "Urgente" },
-  { name: "Crítica", description: "Muy urgente" },
-]);
+    if (statuses.value.length > 0) {
+      form.status_id = statuses.value[0].status_id;
+    }
+  } catch (error) {
+    console.error("Error al cargar datos del formulario:", error);
+  } finally {
+    isLoadingData.value = false;
+  }
+};
 
-const clients = ref([
-  { name: "Cliente A - Empresa Tech" },
-  { name: "Cliente B - Corporación Global" },
-  { name: "Cliente C - Soluciones SA" },
-  { name: "Cliente D - Innovación Digital" },
-  { name: "Cliente E - Sistemas Integrados" },
-  { name: "Cliente F - Desarrollo Web" },
-]);
+const loadPrograms = async () => {
+  try {
+    const response = await programsService.getAll();
+    if (response.success && response.data) {
+      programs.value = response.data.results || [];
+    }
+  } catch (error) {
+    console.error("Error al cargar programas:", error);
+  }
+};
 
-const programs = ref([
-  { name: "Programa Alpha", clientName: "Cliente A - Empresa Tech" },
-  { name: "Programa Beta", clientName: "Cliente A - Empresa Tech" },
-  { name: "Programa Gamma", clientName: "Cliente B - Corporación Global" },
-  { name: "Programa Delta", clientName: "Cliente B - Corporación Global" },
-  { name: "Programa Epsilon", clientName: "Cliente C - Soluciones SA" },
-  { name: "Programa Zeta", clientName: "Cliente C - Soluciones SA" },
-]);
+const loadSubPrograms = async () => {
+  try {
+    const response = await subProgramsService.getAll();
+    if (response.success && response.data) {
+      subPrograms.value = response.data.results || [];
+    }
+  } catch (error) {
+    console.error("Error al cargar subprogramas:", error);
+  }
+};
 
-const subPrograms = ref([
-  { name: "Subprograma 1.1", programName: "Programa Alpha" },
-  { name: "Subprograma 1.2", programName: "Programa Alpha" },
-  { name: "Subprograma 2.1", programName: "Programa Beta" },
-  { name: "Subprograma 2.2", programName: "Programa Beta" },
-  { name: "Subprograma 3.1", programName: "Programa Gamma" },
-  { name: "Subprograma 3.2", programName: "Programa Gamma" },
-]);
+const loadAns = async () => {
+  try {
+    const response = await ansService.getAll();
+    if (response.success && response.data) {
+      ansList.value = response.data.results || [];
+    }
+  } catch (error) {
+    console.error("Error al cargar ANS:", error);
+  }
+};
 
-const ansList = ref([
-  { id: 1, name: "ANS 24h", description: "24 horas" },
-  { id: 2, name: "ANS 48h", description: "48 horas" },
-  { id: 3, name: "ANS 72h", description: "72 horas" },
-  { id: 4, name: "ANS 1 semana", description: "1 semana" },
-]);
+const loadServices = async () => {
+  try {
+    const response = await serviceService.getAll();
+    if (response.success && response.data) {
+      services.value = response.data.results || [];
+    }
+  } catch (error) {
+    console.error("Error al cargar servicios:", error);
+  }
+};
 
-// Autocomplete methods
+const loadPriorities = async () => {
+  try {
+    const response = await priorityService.getAll();
+    if (response.success && response.data) {
+      priorities.value = response.data.results || [];
+    }
+  } catch (error) {
+    console.error("Error al cargar prioridades:", error);
+  }
+};
+
+const loadClients = async () => {
+  try {
+    const response = await clientsService.getAll();
+    if (response.success && response.data) {
+      clients.value = response.data.results || [];
+      filteredClients.value = clients.value;
+    }
+  } catch (error) {
+    console.error("Error al cargar clientes:", error);
+  }
+};
+
+const loadStatuses = async () => {
+  try {
+    const response = await statusService.getAll();
+    if (response.success && response.data) {
+      statuses.value = (response.data.results || []).flat(); 
+    }
+  } catch (error) {
+    console.error("Error al cargar estados:", error);
+  }
+};
+
 const filterClients = () => {
   const search = clientSearch.value.toLowerCase();
   if (search.length === 0) {
     filteredClients.value = clients.value;
   } else {
     filteredClients.value = clients.value.filter((client) =>
-      client.name.toLowerCase().includes(search)
+      client.client_name.toLowerCase().includes(search)
     );
   }
 };
 
-const selectClient = (client: { name: string }) => {
-  form.clientName = client.name;
-  clientSearch.value = client.name;
+const selectClient = (client: Client) => {
+  form.client_name = client.client_name;
+  clientSearch.value = client.client_name;
   showClientDropdown.value = false;
-  // Limpiar programa y subprograma al cambiar cliente
-  form.programName = "";
-  form.subProgramName = "";
+  
+  form.program_name = "";
+  form.sub_program_name = "";
   programSearch.value = "";
   subProgramSearch.value = "";
 };
@@ -903,24 +1007,24 @@ const hideClientDropdown = () => {
 const filterPrograms = () => {
   const search = programSearch.value.toLowerCase();
   const clientPrograms = programs.value.filter(
-    (p) => p.clientName === form.clientName
+    (p) =>  p.client_name === form.client_name
   );
 
   if (search.length === 0) {
     filteredPrograms.value = clientPrograms;
   } else {
     filteredPrograms.value = clientPrograms.filter((program) =>
-      program.name.toLowerCase().includes(search)
+      program.program_name.toLowerCase().includes(search)
     );
   }
 };
 
-const selectProgram = (program: { name: string; clientName: string }) => {
-  form.programName = program.name;
-  programSearch.value = program.name;
+const selectProgram = (program: Program) => {
+  form.program_name = program.program_name;
+  programSearch.value = program.program_name;
   showProgramDropdown.value = false;
   // Limpiar subprograma al cambiar programa
-  form.subProgramName = "";
+  form.sub_program_name = "";
   subProgramSearch.value = "";
 };
 
@@ -933,24 +1037,21 @@ const hideProgramDropdown = () => {
 const filterSubPrograms = () => {
   const search = subProgramSearch.value.toLowerCase();
   const programSubPrograms = subPrograms.value.filter(
-    (sp) => sp.programName === form.programName
+    (sp) => sp.program_name === form.program_name
   );
 
   if (search.length === 0) {
     filteredSubPrograms.value = programSubPrograms;
   } else {
     filteredSubPrograms.value = programSubPrograms.filter((subprogram) =>
-      subprogram.name.toLowerCase().includes(search)
+      subprogram.sub_program_name.toLowerCase().includes(search)
     );
   }
 };
 
-const selectSubProgram = (subprogram: {
-  name: string;
-  programName: string;
-}) => {
-  form.subProgramName = subprogram.name;
-  subProgramSearch.value = subprogram.name;
+const selectSubProgram = (subprogram: SubProgram) => {
+  form.sub_program_name = subprogram.sub_program_name;
+  subProgramSearch.value = subprogram.sub_program_name;
   showSubProgramDropdown.value = false;
 };
 
@@ -1003,70 +1104,121 @@ const handleSubmit = async () => {
     showSuccess.value = false;
 
     // Validaciones adicionales
-    if (!form.ticketTitle.trim()) {
+    if (!form.ticket_title.trim()) {
       errorMessage.value = "El título es requerido";
       return;
     }
 
-    if (!form.ticketDescription.trim()) {
+    if (!form.ticket_description.trim()) {
       errorMessage.value = "La descripción es requerida";
       return;
     }
 
-    if (!form.clientName) {
+    if (!form.ticket_service) {
+      errorMessage.value = "Debe seleccionar un servicio";
+      return;
+    }
+
+    if (!form.ticket_priority) {
+      errorMessage.value = "Debe seleccionar una prioridad";
+      return;
+    }
+
+    if (!form.ticket_ans) {
+      errorMessage.value = "Debe seleccionar un ANS";
+      return;
+    }
+
+    if (!form.client_name) {
       errorMessage.value = "Debe seleccionar un cliente";
       return;
     }
 
-    if (!form.programName) {
+    if (!form.program_name) {
       errorMessage.value = "Debe seleccionar un programa";
       return;
     }
 
-    if (!form.subProgramName) {
+    if (!form.sub_program_name) {
       errorMessage.value = "Debe seleccionar un subprograma";
       return;
     }
 
-    // Simular creación del ticket
-    // En producción, aquí se haría la llamada a la API
-    const newTicket: Partial<Ticket> = {
-      ticketTitle: form.ticketTitle,
-      ticketDescription: form.ticketDescription,
-      ticketAttachments:
-        uploadedFiles.value.length > 0
-          ? uploadedFiles.value.map((f) => f.name).join(", ")
-          : null,
-      ticketService: form.ticketService as number,
-      ticketPriority: form.ticketPriority,
-      ticketAns: form.ticketAns as number,
-      subProgramName: form.subProgramName,
-      estimatedClosingDate: form.estimatedClosingDate
-        ? new Date(form.estimatedClosingDate)
-        : null,
-      reporterUser: "current-user", // Se obtendría del contexto de autenticación
-      statusId: 1, // Estado inicial "Nuevo"
-      createAt: new Date(),
+    const currentUser = sessionStorageService.getUserInfo();
+
+    if (!currentUser) {
+      errorMessage.value = "No se pudo obtener la información del usuario. Por favor inicie sesión nuevamente.";
+      return;
+    }
+
+    const userData = {
+      network_user: currentUser.username,
+      mail: currentUser.email || "",
+      phone: "",
+      full_name: currentUser.full_name || currentUser.username,
     };
 
-    // Simular delay de API
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const userResult = await usersService.ensureUserExists(userData);
+      
+      if (!userResult.success) {
+        errorMessage.value = "Error al validar/crear usuario. Por favor intente nuevamente.";
+        return;
+      }
+    } catch (error: any) {
+      console.error("Error al validar/crear usuario:", error);
+      errorMessage.value = `Error al validar usuario: ${error.message || 'Error desconocido'}`;
+      return;
+    }
 
-    // Simular respuesta exitosa
-    createdTicketId.value = Math.floor(Math.random() * 10000);
-    showSuccess.value = true;
+    const ticketData = {
+      id_ticket: form.id_ticket,
+      ticket_title: form.ticket_title,
+      ticket_description: form.ticket_description,
+      ticket_attachments: uploadedFiles.value.length > 0
+        ? uploadedFiles.value.map((f) => f.name).join(", ")
+        : null,
+      ticket_service: form.ticket_service as number,
+      ticket_priority: form.ticket_priority,
+      ticket_ans: form.ticket_ans as number,
+      sub_program_name: form.sub_program_name,
+      reporter_user: currentUser.username,
+      status_id: 0,    
+      estimated_closing_date: form.estimated_closing_date || null,
+      service_name: '',
+      priority_name: '',
+      reporter_user_name: currentUser.full_name || currentUser.username,
+      client_name: form.client_name,
+      program_name: form.program_name,
+      status_name: '',
+      assigned_to: null,
+      create_at: '',
+    };
 
-    // Limpiar formulario después de 3 segundos
-    setTimeout(() => {
-      resetForm();
-    }, 3000);
+    try {
+      const ticketResult = await ticketsService.create(ticketData);
 
-    console.log("Ticket creado:", newTicket);
-    console.log("Archivos adjuntos:", uploadedFiles.value);
-  } catch (error) {
-    errorMessage.value =
-      "Error al crear el ticket. Por favor intente nuevamente.";
-    console.error("Error:", error);
+      if (!ticketResult.success || !ticketResult.data) {
+        errorMessage.value = ticketResult.message || "Error al crear el ticket";
+        return;
+      }
+
+      createdTicketId.value = ticketResult.data.id_ticket || null;
+      showSuccess.value = true;
+
+      // Limpiar formulario después de 3 segundos
+      setTimeout(() => {
+        resetForm();
+      }, 3000);
+
+    } catch (error: any) {
+      console.error("Error al crear ticket:", error);
+      errorMessage.value = error.message || "Error al crear el ticket. Por favor intente nuevamente.";
+    }
+
+  } catch (error: any) {
+    console.error("Error general:", error);
+    errorMessage.value = error.message || "Error al crear el ticket. Por favor intente nuevamente.";
   } finally {
     isSubmitting.value = false;
   }
@@ -1083,16 +1235,16 @@ const handleCancel = () => {
 };
 
 const resetForm = () => {
-  form.ticketTitle = "";
-  form.ticketDescription = "";
-  form.ticketAttachments = "";
-  form.ticketService = "";
-  form.ticketPriority = "";
-  form.ticketAns = "";
-  form.clientName = "";
-  form.programName = "";
-  form.subProgramName = "";
-  form.estimatedClosingDate = "";
+  form.ticket_title = "";
+  form.ticket_description = "";
+  form.ticket_attachments = "";
+  form.ticket_service = "";
+  form.ticket_priority = "";
+  form.ticket_ans = "";
+  form.client_name = "";
+  form.program_name = "";
+  form.sub_program_name = "";
+  form.estimated_closing_date = "";
   clientSearch.value = "";
   programSearch.value = "";
   subProgramSearch.value = "";
@@ -1101,6 +1253,12 @@ const resetForm = () => {
   createdTicketId.value = null;
   errorMessage.value = "";
 };
+
+onMounted(async () => {
+  await loadFormData();
+  filteredPrograms.value = programs.value;
+  filteredSubPrograms.value = subPrograms.value;
+});
 </script>
 
 <style scoped>
