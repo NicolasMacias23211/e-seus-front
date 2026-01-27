@@ -107,6 +107,7 @@
             </div>
 
             <button
+              @click="showCreateModal = true"
               class="px-4 py-2 bg-gradient-to-r from-[#50bdeb] to-[#3da8d5] hover:from-[#3da8d5] hover:to-[#2a96c4] text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg flex items-center gap-2"
             >
               <Plus class="h-4 w-4" />
@@ -431,6 +432,7 @@
             </p>
             <button
               v-if="backlogTickets.length === 0"
+              @click="showCreateModal = true"
               class="px-4 py-2 bg-gradient-to-r from-[#50bdeb] to-[#3da8d5] hover:from-[#3da8d5] hover:to-[#2a96c4] text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg flex items-center gap-2"
             >
               <Plus class="h-4 w-4" />
@@ -447,6 +449,12 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal de Crear Ticket -->
+    <CreateTicketModal
+      v-model="showCreateModal"
+      @ticketCreated="handleTicketCreated"
+    />
   </div>
 </template>
 
@@ -454,6 +462,7 @@
 import { ref, computed, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import TicketCard from "../components/TicketCard.vue";
+import CreateTicketModal from "../components/CreateTicketModal.vue";
 import ExportToExcel from "../components/ExportToExcel.vue";
 import ExportToPDF from "../components/ExportToPDF.vue";
 import {
@@ -473,14 +482,17 @@ import {
 import type { Ticket } from "../models/Ticket";
 import type { Service } from "../models/Service";
 import type { TicketPriority } from "../models/TicketPriority";
+import type { TicketCreate } from "../models/Ticket";
 import { TicketsService } from "../services/ticketsService";
 import { ServiceService } from "../services/serviceService";
 import { TicketPriorityService } from "../services/ticketPriorityService";
+import { useNotification } from "../utils/useNotification";
 
 const router = useRouter();
 const ticketsService = new TicketsService();
 const serviceService = new ServiceService();
 const priorityService = new TicketPriorityService();
+const notification = useNotification();
 
 const searchQuery = ref("");
 const filterPriority = ref("");
@@ -494,6 +506,7 @@ const priorities = ref<TicketPriority[]>([]);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
 const showExportMenu = ref(false);
+const showCreateModal = ref(false);
 
 const sortLabels = {
   priority: "Prioridad",
@@ -567,7 +580,7 @@ onMounted(() => {
 });
 
 // Watcher para búsqueda con debounce
-let searchTimeout: number | null = null;
+let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 watch(searchQuery, () => {
   if (searchTimeout) {
     clearTimeout(searchTimeout);
@@ -616,17 +629,17 @@ const sortedTickets = computed(() => {
       });
     case "title":
       return tickets.sort((a, b) =>
-        a.ticket_title.localeCompare(b.ticket_title)
+        a.ticket_title.localeCompare(b.ticket_title),
       );
     case "created":
       return tickets.sort(
         (a, b) =>
-          new Date(b.create_at).getTime() - new Date(a.create_at).getTime()
+          new Date(b.create_at).getTime() - new Date(a.create_at).getTime(),
       );
     case "updated":
       return tickets.sort(
         (a, b) =>
-          new Date(b.update_at).getTime() - new Date(a.update_at).getTime()
+          new Date(b.update_at).getTime() - new Date(a.update_at).getTime(),
       );
     default:
       return tickets;
@@ -634,7 +647,7 @@ const sortedTickets = computed(() => {
 });
 
 const unassignedCount = computed(
-  () => backlogTickets.value.filter((t) => !t.assigned_to).length
+  () => backlogTickets.value.filter((t) => !t.assigned_to).length,
 );
 
 const highPriorityCount = computed(
@@ -642,7 +655,7 @@ const highPriorityCount = computed(
     backlogTickets.value.filter((t) => {
       const priority = getPriorityKey(t.priority.priority_name);
       return ["highest", "high"].includes(priority);
-    }).length
+    }).length,
 );
 
 const activeFiltersCount = computed(() => {
@@ -757,4 +770,15 @@ const exportData = computed(() => {
     tiempo_reportado: getTotalReportedTime(ticket),
   }));
 });
+
+// Manejar creación de ticket
+const handleTicketCreated = async (ticket: TicketCreate) => {
+  notification.success(
+    "¡Ticket creado!",
+    `El ticket "${ticket.ticket_title}" ha sido creado exitosamente`,
+  );
+
+  // Recargar la lista de tickets
+  await loadBacklogTickets();
+};
 </script>
