@@ -1,7 +1,7 @@
 // Exportar las variables de entorno con valores por defecto
 export const env = {
   // Ambiente de ejecución
-  isDevelopment: import.meta.env.DEV || false,
+  isDevelopment: import.meta.env.DEV || true,
   
   // URL base del API
   apiBaseUrl: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api",

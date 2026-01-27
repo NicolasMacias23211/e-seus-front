@@ -16,6 +16,7 @@ export class ClosingCodeService {
     async update(closingCode: ClosingCode, id: number): Promise<ApiResponse<ClosingCode>> {
         return await http.put<ClosingCode>(`${this.endPoint+id}/`, closingCode)
     }
+    
     async delete(id: number): Promise<ApiResponse<ClosingCode>> {
         return await http.delete<ClosingCode>(this.endPoint+id+"/")
     }

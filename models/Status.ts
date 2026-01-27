@@ -1,5 +1,6 @@
 export interface Status {
-  status_id: number;
+  id_status: number;
   status_name: string;
-  status_description: string | null;
+  status_description: string;
+  is_backlog: boolean;
 }
