@@ -212,6 +212,25 @@
           </div>
         </div>
       </router-link>
+
+      <router-link
+        to="/settings/horarios"
+        class="group bg-white rounded-xl border-2 border-slate-200 p-6 hover:border-[#50bdeb] hover:shadow-lg transition-all duration-200"
+      >
+        <div class="flex items-start gap-4">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-emerald-50 to-emerald-100 group-hover:from-[#021C7D] group-hover:to-[#50bdeb] transition-all"
+          >
+            <Clock class="w-6 h-6 text-emerald-600 group-hover:text-white" />
+          </div>
+          <div class="flex-1">
+            <h3 class="text-lg font-bold text-[#021C7D] mb-1">Horarios</h3>
+            <p class="text-xs text-slate-600">
+              Horarios de trabajo en el área.
+            </p>
+          </div>
+        </div>
+      </router-link>
     </div>
   </div>
 </template>
@@ -227,6 +246,6 @@ import {
   Settings,
   Shield,
   UserCog,
-  Users,
+  Users
 } from "lucide-vue-next";
 </script>

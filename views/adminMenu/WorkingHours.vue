@@ -4,12 +4,12 @@
       <div class="flex items-center gap-3">
         <div
           class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#021C7D] to-[#50bdeb] flex items-center justify-center">
-          <CheckCircle class="w-5 h-5 text-white" />
+          <Clock class="w-5 h-5 text-white" />
         </div>
         <div>
-          <h1 class="text-2xl font-bold text-[#021C7D]">Códigos de Cierre</h1>
+          <h1 class="text-2xl font-bold text-[#021C7D]">Horarios de Trabajo</h1>
           <p class="text-xs text-slate-500">
-            Motivos de finalización de tickets
+            Gestión de horarios de trabajo e-learning
           </p>
         </div>
       </div>
@@ -25,42 +25,45 @@
         <table class="w-full">
           <thead class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white">
             <tr>
-              <th class="px-6 py-4 text-left text-sm font-bold">Nombre</th>
-              <th class="px-6 py-4 text-left text-sm font-bold">Descripción</th>
+              <th class="px-6 py-4 text-left text-sm font-bold">Día</th>
+              <th class="px-6 py-4 text-left text-sm font-bold">Horario Entrada</th>
+              <th class="px-6 py-4 text-left text-sm font-bold">Horario Salida</th>
               <th class="px-6 py-4 text-center text-sm font-bold">Acciones</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-200">
-            <tr v-for="(code, index) in closingCodes" :key="index" class="hover:bg-blue-50 transition-colors">
+            <tr v-for="(object, index) in workingHours" :key="index" class="hover:bg-emerald-50 transition-colors">
+              <td class="px-6 py-4 text-sm text-slate-700 font-mono">
+                {{ object.week_day }}
+              </td>
               <td class="px-6 py-4 text-sm text-slate-700 font-medium">
-                {{ code.closing_code_name }}
+                {{ object.start_time }}
               </td>
               <td class="px-6 py-4 text-sm text-slate-600">
-                {{ code.closing_code_description }}
+                {{ object.end_time }}
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center justify-center gap-2">
-                  <button @click="openEditModal(code)"
+                  <button @click="openEditModal(object)"
                     class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all cursor-pointer" title="Editar">
                     <Edit2 class="w-4 h-4" />
                   </button>
-                  <button @click="confirmDelete(code)"
+                  <button @click="confirmDelete(object)"
                     class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition- cursor-pointer" title="Eliminar">
                     <Trash2 class="w-4 h-4" />
                   </button>
                 </div> 
               </td>
             </tr>
-            <tr v-if="closingCodes.length === 0">
+            <tr v-if="workingHours.length === 0">
               <td colspan="4" class="px-6 py-8 text-center text-slate-500">
-                No hay códigos de cierre registrados
+                No hay horarios de trabajo registrados
               </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-
     <Teleport to="body">
       <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
         @click.self="closeModal">
@@ -75,29 +78,52 @@
 
           <form @submit.prevent="handleSubmit" class="p-6 space-y-4">
             <div>
-              <input id="codeId" v-model.number="form.id_closing_code" type="number" hidden :disabled="isEditing"
+              <input id="codeId" v-model.number="form.id_working_hours" type="number" hidden :disabled="isEditing"
                 class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all disabled:bg-slate-100"
                 placeholder="ID del código" />
             </div>
 
             <div>
               <label for="codeName" class="block text-sm font-bold text-slate-700 mb-2">
-                Nombre del Código <span class="text-red-500">*</span>
+                Día de la Semana <span class="text-red-500">*</span>
               </label>
-              <input id="codeName" v-model="form.closing_code_name" type="text" required maxlength="45"
+              <select id="codeName" v-model="form.week_day" type="text" required maxlength="45"
                 class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-                placeholder="Ej: Resuelto, Cancelado, etc." />
+                placeholder="Ej: Lunes, Martes, etc." >
+                <option value="Lunes">Lunes</option>
+                <option value="Martes">Martes</option>
+                <option value="Miércoles">Miércoles</option>
+                <option value="Jueves">Jueves</option>
+                <option value="Viernes">Viernes</option>
+                <option value="Sábado">Sábado</option>
+                <option value="Domingo">Domingo</option>
+              </select>
             </div>
 
             <div>
               <label for="codeDescription" class="block text-sm font-bold text-slate-700 mb-2">
-                Descripción
+                Hora de Entrada <span class="text-red-500">*</span>
               </label>
-              <textarea id="codeDescription" v-model="form.closing_code_description" maxlength="100" rows="3"
-                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all resize-none"
-                placeholder="Descripción del código de cierre"></textarea>
+              <input id="codeDescription" 
+              v-model="form.start_time" 
+              maxlength="100" rows="3"
+              class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all resize-none"
+              placeholder="Descripción del código de cierre" 
+              type="time"
+              />
             </div>
-
+            <div>
+                <label for="codeDescription" class="block text-sm font-bold text-slate-700 mb-2">
+                  Hora de Salida <span class="text-red-500">*</span>
+              </label>
+              <input id="codeDescription" 
+              v-model="form.end_time" 
+              maxlength="100" rows="3"
+              class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all resize-none"
+              placeholder="Descripción del código de cierre" 
+              type="time"
+              />
+            </div>
             <div class="flex gap-3 pt-4">
               <button type="button" @click="closeModal"
                 class="flex-1 px-4 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 transition-all font-medium cursor-pointer">
@@ -112,65 +138,63 @@
         </div>
       </div>
     </Teleport>
-    <ConfirmDialog 
-      :is-visible="showConfirmDialog" 
-      type="delete" title="Confirmar Eliminación"
-      :message="`¿Está seguro de que desea eliminar el cliente '${clientToDelete?.closing_code_name}'?`"
+    <ConfirmDialog :is-visible="showConfirmDialog" type="delete" title="Confirmar Eliminación"
+      :message="`¿Está seguro de que desea eliminar el cliente '${clientToDelete?.week_day}'?`"
       details="Esta acción eliminará permanentemente el código de cierre del sistema. Los ticket relacionados a este código de cierre también podrían verse afectados."
-      confirm-text="Sí, Eliminar" 
-      cancel-text="Cancelar" 
-      @confirm="handleDeleteConfirm" 
-      @cancel="handleDeleteCancel" />
+      confirm-text="Sí, Eliminar" cancel-text="Cancelar" @confirm="handleDeleteConfirm" @cancel="handleDeleteCancel" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
-import { CheckCircle, Plus, Edit2, Trash2 } from "lucide-vue-next";
+import { Clock, Plus, Edit2, Trash2 } from "lucide-vue-next";
 import { useNotification } from "../../utils/useNotification";
-import { ClosingCodeService } from "../../services/closingCode";
-import type { ClosingCode } from "../../models/ClosingCode";
+import { WorkingHoursService } from "../../services/WorkingHoursService";
+import type { WorkingHours } from "../../models/WorkingHours";
 import ConfirmDialog from "../../components/ConfirmDialog.vue";
 
 const notification = useNotification();
-const closingCodeService = new ClosingCodeService()
-const closingCodes = ref<ClosingCode[]>([]);
+const workingHoursService = new WorkingHoursService()
+const workingHours = ref<WorkingHours[]>([]);
 const showConfirmDialog = ref(false)
-const clientToDelete = ref<ClosingCode | null>(null);
+const clientToDelete = ref<WorkingHours | null>(null);
 const showModal = ref(false);
 const isEditing = ref(false);
 const editingIndex = ref(-1);
 
 const form = reactive({
-  id_closing_code: 0,
-  closing_code_name: "",
-  closing_code_description: "",
+  id_working_hours: 0,
+  week_day: "",
+  start_time: "",
+  end_time: ""
 });
 
 const openCreateModal = () => {
   isEditing.value = false;
-  form.id_closing_code = 0;
-  form.closing_code_name = "";
-  form.closing_code_description = "";
+  form.id_working_hours = 0;
+  form.week_day = "";
+  form.start_time = "";
   showModal.value = true;
 };
 
-const openEditModal = (code: ClosingCode) => {
+const openEditModal = (object: WorkingHours) => {
   isEditing.value = true;
-  editingIndex.value = closingCodes.value.findIndex(
-    (c) => c.id_closing_code === code.id_closing_code
+  editingIndex.value = workingHours.value.findIndex(
+    (element) => element.id_working_hours === object.id_working_hours
   );
-  form.id_closing_code = code.id_closing_code ?? 0;
-  form.closing_code_name = code.closing_code_name ?? "";
-  form.closing_code_description = code.closing_code_description ?? "";
+  form.id_working_hours = object.id_working_hours ?? 0;
+  form.week_day = object.week_day ?? "";
+  form.start_time = object.start_time ?? "";
+  form.end_time = object.end_time ?? "";
   showModal.value = true;
 };
 
 const closeModal = () => {
   showModal.value = false;
-  form.id_closing_code = 0;
-  form.closing_code_name = "";
-  form.closing_code_description = "";
+  form.id_working_hours = 0;
+  form.week_day = "";
+  form.start_time = "";
+  form.end_time = "";
   isEditing.value = false;
   editingIndex.value = -1;
 };
@@ -185,18 +209,19 @@ const handleSubmit = () => {
 
 const create = async () => {
   try {
-    let dataCreate: ClosingCode = ({
-      closing_code_name: form.closing_code_name,
-      closing_code_description: form.closing_code_description,
+    let dataCreate: WorkingHours = ({
+      week_day: form.week_day,
+      start_time: form.start_time,
+      end_time: form.end_time,
     })
 
-    let response = await closingCodeService.create(dataCreate)
+    let response = await workingHoursService.create(dataCreate)
     if (response.success) {
       notification.success(
         "¡Creado!",
         "El código de cierre ha sido creado correctamente"
       );
-      loadClosingCodes();
+      loadWorkingHours();
       closeModal();
       return
     }
@@ -208,22 +233,23 @@ const create = async () => {
     notification.error("Error", "No se logro crear el código de cierre")
     closeModal();
   }
-} 
+}
 
 const update = async () => {
   try {
-    let data: ClosingCode = ({
-        closing_code_name: form.closing_code_name,
-        closing_code_description: form.closing_code_description,
-      })
+    let data: WorkingHours = ({
+      week_day: form.week_day,
+      start_time: form.start_time,
+      end_time: form.end_time,
+    })
 
-    let response = await closingCodeService.update(data, form.id_closing_code)
+    let response = await workingHoursService.update(data, form.id_working_hours)
     if (response.success) {
       notification.success(
         "¡Creado!",
         "El código de cierre ha sido actualizado correctamente"
       );
-      loadClosingCodes();
+      loadWorkingHours();
       closeModal();
       return
     }
@@ -237,7 +263,7 @@ const update = async () => {
   }
 }
 
-const confirmDelete = (code: ClosingCode) => {
+const confirmDelete = (code: WorkingHours) => {
   clientToDelete.value = code;
   showConfirmDialog.value = true;
 };
@@ -248,15 +274,15 @@ const handleDeleteCancel = () => {
 
 const handleDeleteConfirm = async () => {
   try {
-    if (clientToDelete.value && clientToDelete.value.id_closing_code != undefined) {
-      let response = await closingCodeService.delete(clientToDelete.value.id_closing_code)
+    if (clientToDelete.value && clientToDelete.value.id_working_hours != undefined) {
+      let response = await workingHoursService.delete(clientToDelete.value.id_working_hours)
       if (response.success) {
         notification.success(
           "¡Eliminado!",
           "El código de cierre ha sido eliminado correctamente"
         );
 
-        loadClosingCodes();
+        loadWorkingHours();
         handleDeleteCancel()
         return
       }
@@ -273,11 +299,11 @@ const handleDeleteConfirm = async () => {
 
 
 
-const loadClosingCodes = async () => {
+const loadWorkingHours = async () => {
   try {
-    const response = await closingCodeService.getAll()
+    const response = await workingHoursService.getAll()
     if (response.data && response.data.results) {
-      closingCodes.value = response.data.results
+      workingHours.value = response.data.results
     }
   } catch (error) {
     console.error("Error al cargar los códigos de cierre: ", error)
@@ -286,7 +312,7 @@ const loadClosingCodes = async () => {
 }
 
 onMounted(() => {
-  loadClosingCodes();
+  loadWorkingHours();
 })
 
 
