@@ -48,3 +48,17 @@ export interface Ticket {
   status_id: number;
   sub_program_name: string;
 }
+
+// Interfaz simplificada para la creación de tickets
+export interface TicketCreate {
+  ticket_title: string;
+  ticket_description: string;
+  ticket_attachments?: string | null;
+  ticket_service: number;
+  ticket_priority: string;
+  ticket_ans: number;
+  reporter_user: string;
+  sub_program_name: string;
+  status_id: number;
+  assigned_to?: string;
+}
