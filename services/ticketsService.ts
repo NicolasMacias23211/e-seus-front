@@ -1,5 +1,5 @@
 import { http, type PaginatedResponse, type ApiResponse } from "./http";
-import type { Ticket, TicketCreate } from "../models/Ticket";
+import type { Ticket, TicketCreate, TicketShort } from "../models/Ticket";
 import { SessionStorageService } from "./SessionStorageService";
 
 const sessionStorage = new SessionStorageService();
@@ -7,8 +7,8 @@ const sessionStorage = new SessionStorageService();
 export class TicketsService {
   async GetTicketsByPerson(
     assigned_to: string,
-  ): Promise<ApiResponse<PaginatedResponse<Ticket>>> {
-    return await http.get<PaginatedResponse<Ticket>>(
+  ): Promise<ApiResponse<PaginatedResponse<TicketShort>>> {
+    return await http.get<PaginatedResponse<TicketShort>>(
       `/tickets/?assigned_to=${assigned_to}`,
     );
   }

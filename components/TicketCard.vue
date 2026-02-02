@@ -91,10 +91,10 @@ import {
   Clock,
   User,
 } from "lucide-vue-next";
-import type { Ticket } from "../models";
+import type { TicketShort } from "../models";
 
 interface Props {
-  ticket: Ticket;
+  ticket: TicketShort;
 }
 
 defineProps<Props>();

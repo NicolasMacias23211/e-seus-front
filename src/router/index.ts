@@ -8,7 +8,6 @@ import TicketDetail from "../../views/TicketDetail.vue";
 import TimeTracking from "../../views/TimeTracking.vue";
 import Backlog from "../../views/Backlog.vue";
 import Team from "../../views/Team.vue";
-import Proyects from "../../views/Proyects.vue";
 import Reports from "../../views/Reports.vue";
 import Settings from "../../views/Settings.vue";
 import CreateTicket from "../../views/externalsUsers/CreateTicket.vue";
@@ -153,7 +152,6 @@ const router = createRouter({
       name: "profile",
       component: Profile,
     },
-    { path: "/projects", name: "proyects", component: Proyects },
     {
       path: "/reports",
       name: "reports",

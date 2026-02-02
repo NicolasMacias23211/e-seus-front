@@ -184,12 +184,12 @@
   import { ref, reactive, onMounted } from "vue";
   import { FileText, Plus, Edit2, Trash2 } from "lucide-vue-next";
   import { useNotification } from "../../utils/useNotification";
-  import { ServiceService } from "../../services/serviceService";
-  import { Service } from "../../models/Service";
+  import { RequestTypeService } from "../../services/RequestTypeService";
+  import type { Service } from "../../models/Service";
   import ConfirmDialog from "../../components/ConfirmDialog.vue";
 
   const notification = useNotification();
-  const serviceService = new ServiceService();
+  const requestTypeService = new RequestTypeService();
   const services = ref<Service[]>([]);
   const showConfirmDialog = ref(false);
   const clientToDelete = ref<Service | null>(null);
@@ -252,7 +252,7 @@
         estimated_solution_time: form.estimated_solution_time,
       })
 
-      let response = await serviceService.create(dataCreate)
+      let response = await requestTypeService.create(dataCreate)
       if (response.success) {
         notification.success(
           "¡Creado!",
@@ -281,7 +281,7 @@
         estimated_solution_time: form.estimated_solution_time,
       })
 
-      let response = await serviceService.update(data, form.id_services)
+      let response = await requestTypeService.update(data, form.id_services)
       if (response.success) {
         notification.success(
           "¡Actualizado!",
@@ -314,7 +314,7 @@
   const handleDeleteConfirm = async () => {
     try {
       if (clientToDelete.value && clientToDelete.value.id_services != undefined) {
-        let response = await serviceService.delete(clientToDelete.value.id_services)
+        let response = await requestTypeService.delete(clientToDelete.value.id_services)
         if (response.success) {
 
           notification.success(
@@ -339,7 +339,7 @@
 
   const loadServices = async () => {
     try {
-      const response = await serviceService.getAll()
+      const response = await requestTypeService.getAll()
       if (response.data && response.data.results) {
         services.value = response.data.results
       }
