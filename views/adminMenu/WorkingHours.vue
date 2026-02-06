@@ -16,7 +16,7 @@
       <button @click="openCreateModal"
         class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white rounded-lg hover:shadow-lg transition-all font-medium cursor-pointer">
         <Plus class="w-5 h-5" />
-        Nuevo Código
+        Nuevo Horario
       </button>
     </div>
 
@@ -71,7 +71,7 @@
           <div class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white px-6 py-4 rounded-t-2xl">
             <h2 class="text-xl font-bold">
               {{
-                isEditing ? "Editar Código de Cierre" : "Nuevo Código de Cierre"
+                isEditing ? "Editar Horario" : "Nuevo Horario"
               }}
             </h2>
           </div>
@@ -80,7 +80,7 @@
             <div>
               <input id="codeId" v-model.number="form.id_working_hours" type="number" hidden :disabled="isEditing"
                 class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all disabled:bg-slate-100"
-                placeholder="ID del código" />
+                placeholder="Id del horario" />
             </div>
 
             <div>
@@ -108,7 +108,6 @@
               v-model="form.start_time" 
               maxlength="100" rows="3"
               class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all resize-none"
-              placeholder="Descripción del código de cierre" 
               type="time"
               />
             </div>
@@ -120,7 +119,6 @@
               v-model="form.end_time" 
               maxlength="100" rows="3"
               class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all resize-none"
-              placeholder="Descripción del código de cierre" 
               type="time"
               />
             </div>
@@ -139,8 +137,8 @@
       </div>
     </Teleport>
     <ConfirmDialog :is-visible="showConfirmDialog" type="delete" title="Confirmar Eliminación"
-      :message="`¿Está seguro de que desea eliminar el cliente '${clientToDelete?.week_day}'?`"
-      details="Esta acción eliminará permanentemente el código de cierre del sistema. Los ticket relacionados a este código de cierre también podrían verse afectados."
+      :message="`¿Está seguro de que desea eliminar el horario del día '${horarioToDelete?.week_day}'?`"
+      details="Esta acción eliminará permanentemente el horario del sistema. Los ticket relacionados a este horario también podrían verse afectados."
       confirm-text="Sí, Eliminar" cancel-text="Cancelar" @confirm="handleDeleteConfirm" @cancel="handleDeleteCancel" />
   </div>
 </template>
@@ -157,7 +155,7 @@ const notification = useNotification();
 const workingHoursService = new WorkingHoursService()
 const workingHours = ref<WorkingHours[]>([]);
 const showConfirmDialog = ref(false)
-const clientToDelete = ref<WorkingHours | null>(null);
+const horarioToDelete = ref<WorkingHours | null>(null);
 const showModal = ref(false);
 const isEditing = ref(false);
 const editingIndex = ref(-1);
@@ -219,18 +217,18 @@ const create = async () => {
     if (response.success) {
       notification.success(
         "¡Creado!",
-        "El código de cierre ha sido creado correctamente"
+        "El horario ha sido creado correctamente"
       );
       loadWorkingHours();
       closeModal();
       return
     }
-    console.error("Error al crear el código de cierre: ", response.error)
-    notification.error("Error", "No se logro crear el código de cierre")
+    console.error("Error al crear el horario: ", response.error)
+    notification.error("Error", "No se logro crear el horario")
     closeModal();
   } catch (error) {
-    console.error("Error al crear el código de cierre: ", error)
-    notification.error("Error", "No se logro crear el código de cierre")
+    console.error("Error al crear el horario: ", error)
+    notification.error("Error", "No se logro crear el horario")
     closeModal();
   }
 }
@@ -247,52 +245,52 @@ const update = async () => {
     if (response.success) {
       notification.success(
         "¡Creado!",
-        "El código de cierre ha sido actualizado correctamente"
+        "El horario ha sido actualizado correctamente"
       );
       loadWorkingHours();
       closeModal();
       return
     }
-    console.error("Error al actualizar el código de cierre: ", response.error)
-    notification.error("Error", "No se logro actualizar el código de cierre")
+    console.error("Error al actualizar el horario: ", response.error)
+    notification.error("Error", "No se logro actualizar el horario")
     closeModal();
   } catch (error) {
-    console.error("Error al actualizar el código de cierre: ", error)
-    notification.error("Error", "No se logro actualizar el código de cierre")
+    console.error("Error al actualizar el horario: ", error)
+    notification.error("Error", "No se logro actualizar el horario")
     closeModal();
   }
 }
 
 const confirmDelete = (code: WorkingHours) => {
-  clientToDelete.value = code;
+  horarioToDelete.value = code;
   showConfirmDialog.value = true;
 };
 const handleDeleteCancel = () => {
   showConfirmDialog.value = false;
-  clientToDelete.value = null;
+  horarioToDelete.value = null;
 };
 
 const handleDeleteConfirm = async () => {
   try {
-    if (clientToDelete.value && clientToDelete.value.id_working_hours != undefined) {
-      let response = await workingHoursService.delete(clientToDelete.value.id_working_hours)
+    if (horarioToDelete.value && horarioToDelete.value.id_working_hours != undefined) {
+      let response = await workingHoursService.delete(horarioToDelete.value.id_working_hours)
       if (response.success) {
         notification.success(
           "¡Eliminado!",
-          "El código de cierre ha sido eliminado correctamente"
+          "El horario ha sido eliminado correctamente"
         );
 
         loadWorkingHours();
         handleDeleteCancel()
         return
       }
-      console.error("Error al eliminar el código de cierre: ", response.error)
-      notification.error("Error", "No se logro eliminar el código de cierre")
+      console.error("Error al eliminar el horario: ", response.error)
+      notification.error("Error", "No se logro eliminar el horario")
       handleDeleteCancel()
     }
   } catch (error) {
-    console.error("Error al eliminar el código de cierre: ", error)
-    notification.error("Error", "No se logro eliminar el código de cierre")
+    console.error("Error al eliminar el horario: ", error)
+    notification.error("Error", "No se logro eliminar el horario")
     handleDeleteCancel()
   }
 };
@@ -302,12 +300,13 @@ const handleDeleteConfirm = async () => {
 const loadWorkingHours = async () => {
   try {
     const response = await workingHoursService.getAll()
+    console.log("Response working hours: ", response)
     if (response.data && response.data.results) {
       workingHours.value = response.data.results
     }
   } catch (error) {
-    console.error("Error al cargar los códigos de cierre: ", error)
-    notification.error("Error", "No se pudieron cargar los códigos de cierre")
+    console.error("Error al cargar los horarios de cierre: ", error)
+    notification.error("Error", "No se pudieron cargar los horarios de cierre")
   }
 }
 
