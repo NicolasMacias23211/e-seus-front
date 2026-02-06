@@ -32,7 +32,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-200">
-            <tr v-for="(code, index) in ans" :key="index" class="hover:bg-blue-50 transition-colors">
+            <tr v-for="code in ans" :key="code.id_ans" class="hover:bg-blue-50 transition-colors">
               <td class="px-6 py-4 text-sm text-slate-700 font-medium">
                 {{ code.ans_name }}
               </td>
@@ -58,14 +58,33 @@
                 </div>
               </td>
             </tr>
-            <tr v-if="ans.length === 0">
-              <td colspan="4" class="px-6 py-8 text-center text-slate-500">
+            <tr v-if="isLoading">
+              <td colspan="3" class="px-6 py-8 text-center text-slate-500">
+                <div class="flex items-center justify-center gap-2">
+                  <div class="w-5 h-5 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  Cargando...
+                </div>
+              </td>
+            </tr>
+            <tr v-else-if="ans.length === 0">
+              <td colspan="3" class="px-6 py-8 text-center text-slate-500">
                 No hay ANS registrados
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+
+     
+      <PaginationControls
+        :currentPage="currentPage"
+        :pageSize="pageSize"
+        :totalItems="totalItems"
+        @page-size-change="changePageSize"
+        @prev-page="prevPage"
+        @next-page="nextPage"
+        @go-to-page="goToPage"
+      />
     </div>
     <Teleport to="body">
       <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
@@ -161,14 +180,31 @@
 import { ref, reactive, onMounted } from "vue";
 import { Clock, Plus, Edit2, Trash2 } from "lucide-vue-next";
 import { useNotification } from "../../utils/useNotification";
+import { usePagination } from "../../utils/usePagination";
 import { AnsService } from "../../services/ansService";
 import type { ANS } from "../../models/ANS";
 import ConfirmDialog from "../../components/ConfirmDialog.vue";
-
+import PaginationControls from "../../components/PaginationControls.vue";
 
 const notification = useNotification();
 const ansService = new AnsService();
-const ans = ref<ANS[]>([]);
+
+const {
+  items: ans,
+  currentPage,
+  pageSize,
+  totalItems,
+  isLoading,
+  loadData,
+  goToPage,
+  nextPage,
+  prevPage,
+  changePageSize,
+} = usePagination<ANS>(
+  (page, size) => ansService.getAll(page, size),
+  10 
+);
+
 const showConfirmDialog = ref(false);
 const ansToDelete = ref<ANS | null>(null);
 const showModal = ref(false);
@@ -230,7 +266,7 @@ const create = async () => {
         "¡Creado!",
         "El ANS ha sido creado correctamente"
       );
-      loadAns();
+      reloadData();
       closeModal();
       return
     }
@@ -258,7 +294,7 @@ const update = async () => {
         "¡Actualizado!",
         "El ANS ha sido actualizado correctamente"
       );
-      loadAns();
+      reloadData();
       closeModal();
       return
     }
@@ -293,7 +329,7 @@ const handleDeleteConfirm = async () => {
           "El ANS ha sido eliminado correctamente"
         );
 
-        loadAns();
+        reloadData();
         handleDeleteCancel()
         return
       }
@@ -308,20 +344,12 @@ const handleDeleteConfirm = async () => {
   }
 };
 
-const loadAns = async () => {
-  try {
-    const response = await ansService.getAll()
-    if (response.data && response.data.results) {
-      ans.value = response.data.results
-    }
-  } catch (error) {
-    console.error("Error al cargar los ANS: ", error)
-    notification.error("Error", "No se pudieron cargar los ANS")
-  }
-}
+const reloadData = () => {
+  loadData(currentPage.value);
+};
 
 onMounted(() => {
-  loadAns();
+  loadData();
 })
 
 </script>
