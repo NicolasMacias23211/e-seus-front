@@ -52,15 +52,41 @@
         <div class="flex items-center gap-3 text-xs text-slate-600">
           <div
             class="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-md"
+            :title="
+              typeof ticket.ticket_ans === 'string'
+                ? ticket.ticket_ans
+                : `ANS ID: ${ticket.ticket_ans}`
+            "
           >
-            <MessageSquare class="h-3.5 w-3.5 text-slate-500" />
-            <span class="font-semibold">0</span>
+            <span
+              class="text-[10px] font-bold px-1.5 py-0.5 bg-gradient-to-r from-[#50bdeb] to-[#021C7D] text-white rounded shadow-sm"
+              >ANS</span
+            >
+            <span class="font-semibold truncate max-w-[80px]">{{
+              typeof ticket.ticket_ans === "string"
+                ? ticket.ticket_ans
+                : `ANS ${ticket.ticket_ans}`
+            }}</span>
           </div>
           <div
             class="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-md"
           >
-            <Clock class="h-3.5 w-3.5 text-slate-500" />
-            <span class="font-semibold">0h</span>
+            <svg
+              class="w-5 h-5 text-slate-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            <span class="font-semibold">{{
+              formatDate(ticket.estimated_closing_date)
+            }}</span>
           </div>
         </div>
         <div
@@ -82,15 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  AlertCircle,
-  CheckCircle,
-  Zap,
-  Wrench,
-  MessageSquare,
-  Clock,
-  User,
-} from "lucide-vue-next";
+import { AlertCircle, CheckCircle, Zap, Wrench, User } from "lucide-vue-next";
 import type { TicketShort } from "../models";
 
 interface Props {
@@ -125,15 +143,29 @@ const typeIcons: Record<string, { icon: any; color: string }> = {
   improvement: { icon: Wrench, color: "text-amber-500" },
 };
 
-// Helper to get ticket type by service name
 const getTicketTypeByName = (serviceName: string) => {
-  const nameMap: Record<string, keyof typeof typeIcons> = {
-    "Soporte Técnico": "bug",
-    Desarrollo: "feature",
-    Infraestructura: "improvement",
-    Consultoría: "task",
-  };
+  const nameMap: Record<string, keyof typeof typeIcons> = {};
   return nameMap[serviceName] || "task";
+};
+
+const formatDate = (dateString: string | null) => {
+  if (!dateString) return "Fecha pendiente";
+
+  try {
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    };
+
+    return date.toLocaleDateString("es-ES", options).replace(",", " •");
+  } catch (error) {
+    return "Fecha pendiente";
+  }
 };
 
 function openTicket() {

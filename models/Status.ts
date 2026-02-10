@@ -4,4 +4,5 @@ export interface Status {
   status_description: string;
   is_backlog: boolean;
   ordering: number;
+  is_completion: boolean;
 }

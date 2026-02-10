@@ -5,7 +5,7 @@ import type { ANS } from "./ANS";
 import type { Status } from "./Status";
 import type { Note } from "./Notes";
 import type { ReportedTime } from "./ReportedTime";
-import type {SubProgram} from "./SubProgram"
+import type { SubProgram } from "./SubProgram";
 import type { User } from "./User";
 
 // Interfaz completa que coincide con la respuesta del backend
@@ -68,4 +68,20 @@ export interface TicketShort {
   update_at?: string | null;
   closing_date?: string | null;
   sub_program_name?: string;
+}
+
+// Interfaz para actualización parcial de tickets
+export interface TicketUpdate {
+  ticket_title?: string;
+  ticket_description?: string;
+  ticket_attachments?: string;
+  ticket_service?: number;
+  ticket_priority?: string;
+  assigned_to?: string;
+  status_id?: number;
+  ticket_closing_code?: number;
+  closing_date?: string;
+  estimated_closing_date?: string;
+  sub_program_name?: string;
+  ticket_ans?: number;
 }
