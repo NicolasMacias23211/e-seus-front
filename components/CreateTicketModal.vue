@@ -726,7 +726,7 @@ import type { Program } from "../models/Program";
 import type { SubProgram } from "../models/SubProgram";
 import type { ANS } from "../models/ANS";
 import type { Status } from "../models/Status";
-import { ServiceService } from "../services/serviceService";
+import { RequestTypeService } from "../services/RequestTypeService";
 import { TicketPriorityService } from "../services/ticketPriorityService";
 import { ClientsService } from "../services/clientsService";
 import { ProgramsService } from "../services/programsService";
@@ -738,7 +738,7 @@ import { SessionStorageService } from "../services/SessionStorageService";
 import { FileUploadService } from "../services/fileUploadService";
 import ConfirmDialog from "./ConfirmDialog.vue";
 
-const serviceService = new ServiceService();
+const requestTypeService = new RequestTypeService();
 const priorityService = new TicketPriorityService();
 const clientsService = new ClientsService();
 const programsService = new ProgramsService();
@@ -818,7 +818,7 @@ const loadData = async () => {
       ansRes,
       statusRes,
     ] = await Promise.all([
-      serviceService.getAll(),
+      requestTypeService.getAll(),
       priorityService.getAll(),
       clientsService.getAll(),
       programsService.getAll(),

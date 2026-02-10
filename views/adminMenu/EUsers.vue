@@ -315,7 +315,7 @@ import { eUsersService } from "../../services/e-usersService";
 import type { EUser } from "../../models/EUser";
 import ConfirmDialog from "../../components/ConfirmDialog.vue";
 import { ClientsService } from "../../services/clientsService";
-import { ServiceService } from "../../services/serviceService";
+import { RequestTypeService } from "../../services/RequestTypeService";
 import { RolesService } from "../../services/rolesService";
 import type { Client } from "../../models/Client";
 import type { Service } from "../../models/Service";
@@ -326,7 +326,7 @@ const notification = useNotification();
 // Instancias de servicios
 const eusersService = new eUsersService();
 const clientsService = new ClientsService();
-const servicesService = new ServiceService();
+const servicesService = new RequestTypeService();
 const rolesService = new RolesService();
 
 // Arrays de datos

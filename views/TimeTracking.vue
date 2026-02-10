@@ -751,7 +751,7 @@ import {
   ChevronRight,
   Info,
 } from "lucide-vue-next";
-import type { Ticket } from "../models";
+import type { Ticket, TicketShort } from "../models";
 import type { ReportedTime } from "../models/ReportedTime";
 import { useNotification } from "../utils/useNotification";
 import { ReportedTimeService } from "../services/reportedTimeService";
@@ -788,9 +788,9 @@ interface TimeEntry {
 
 const timeEntries = ref<TimeEntry[]>([]);
 
-const availableTickets = ref<Ticket[]>([]);
+const availableTickets = ref<TicketShort[]>([]);
 
-let draggedTicket: Ticket | null = null;
+let draggedTicket: TicketShort | null = null;
 
 const saveTimers = new Map<string, number>();
 
@@ -904,7 +904,7 @@ const getEntriesForDay = (date: string | undefined) => {
   return timeEntries.value.filter((entry) => entry.date === date);
 };
 
-const handleDragStart = (event: DragEvent, ticket: Ticket) => {
+const handleDragStart = (event: DragEvent, ticket: TicketShort) => {
   draggedTicket = ticket;
   if (event.dataTransfer) {
     event.dataTransfer.effectAllowed = "copy";
@@ -1346,8 +1346,8 @@ const loadReportedTimes = async () => {
           const hours = parseInt(timeParts[0] || "0", 10);
           const minutes = parseInt(timeParts[1] || "0", 10);
           let dateStr: string;
-          if (rt.date_reported instanceof Date) {
-            dateStr = rt.date_reported.toISOString().split("T")[0];
+          if (typeof rt.date_reported === 'string') {
+            dateStr = rt.date_reported.split("T")[0];
           } else {
             dateStr = String(rt.date_reported).split("T")[0];
           }

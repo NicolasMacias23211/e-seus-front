@@ -1,5 +1,10 @@
 import { http, type PaginatedResponse, type ApiResponse } from "./http";
-import type { Ticket, TicketCreate } from "../models/Ticket";
+import type {
+  Ticket,
+  TicketCreate,
+  TicketShort,
+  TicketUpdate,
+} from "../models/Ticket";
 import { SessionStorageService } from "./SessionStorageService";
 
 const sessionStorage = new SessionStorageService();
@@ -7,8 +12,8 @@ const sessionStorage = new SessionStorageService();
 export class TicketsService {
   async GetTicketsByPerson(
     assigned_to: string,
-  ): Promise<ApiResponse<PaginatedResponse<Ticket>>> {
-    return await http.get<PaginatedResponse<Ticket>>(
+  ): Promise<ApiResponse<PaginatedResponse<TicketShort>>> {
+    return await http.get<PaginatedResponse<TicketShort>>(
       `/tickets/?assigned_to=${assigned_to}`,
     );
   }
@@ -49,5 +54,29 @@ export class TicketsService {
 
   async create(ticket: TicketCreate): Promise<ApiResponse<Ticket>> {
     return await http.post<Ticket, TicketCreate>("/tickets/", ticket);
+  }
+
+  async updateTicketStatus(
+    id_ticket: number,
+    status_id: number,
+  ): Promise<ApiResponse<Ticket>> {
+    return await http.patch<Ticket, { status_id: number }>(
+      `/tickets/${id_ticket}/`,
+      { status_id },
+    );
+  }
+
+  async updateTicket(
+    id_ticket: number,
+    data: TicketUpdate,
+  ): Promise<ApiResponse<Ticket>> {
+    return await http.patch<Ticket, TicketUpdate>(
+      `/tickets/${id_ticket}/`,
+      data,
+    );
+  }
+
+  async getTicketById(id_ticket: number): Promise<ApiResponse<Ticket>> {
+    return await http.get<Ticket>(`/tickets/${id_ticket}/`);
   }
 }

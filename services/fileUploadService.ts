@@ -122,6 +122,73 @@ export class FileUploadService {
   }
 
   /**
+   * Descarga un archivo con autenticación
+   * @param filename Nombre del archivo a descargar
+   * @returns Promesa con el resultado de la operación
+   */
+  async downloadFile(
+    filename: string,
+  ): Promise<{ success: boolean; message?: string }> {
+    try {
+      const token = this.sessionStorage.getAccessToken();
+      const headers: HeadersInit = {};
+
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(
+        `${env.apiBaseUrl}${this.baseUrl}/files?filename=${encodeURIComponent(filename)}`,
+        {
+          method: "GET",
+          headers,
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `Error al descargar archivo: ${response.status}`,
+        );
+      }
+
+      // Convertir la respuesta a blob
+      const blob = await response.blob();
+
+      // Crear URL temporal del blob
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      // Crear elemento <a> temporal para descargar
+      const link = document.createElement("a");
+      link.href = blobUrl;
+
+      // Extraer el nombre original del archivo (remover timestamp_random_)
+      const parts = filename.split("_");
+      const originalName =
+        parts.length >= 3 ? parts.slice(2).join("_") : filename;
+      link.download = originalName;
+
+      // Añadir al DOM, hacer clic y remover
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Liberar el URL del blob
+      window.URL.revokeObjectURL(blobUrl);
+
+      return {
+        success: true,
+      };
+    } catch (error: any) {
+      console.error("Error al descargar archivo:", error);
+      return {
+        success: false,
+        message: error.message || "Error al descargar archivo",
+      };
+    }
+  }
+
+  /**
    * Genera un nombre único para un archivo
    * @param originalName Nombre original del archivo
    * @returns Nombre único generado
