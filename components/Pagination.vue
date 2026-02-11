@@ -181,8 +181,8 @@ function goToPage(page: number) {
     recalculate()
 }
 
-function changePerPage(event: any) {
-    pagination.value.perPage = parseInt(event.target.value)
+function changePerPage(event: Event) {
+    pagination.value.perPage = parseInt((event.target as HTMLSelectElement).value)
     emit('change', pagination.value)
     recalculate()
 }
