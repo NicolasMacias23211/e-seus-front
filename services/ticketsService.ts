@@ -58,7 +58,7 @@ export class TicketsService {
     );
   }
 
-  async create(ticket: Ticket): Promise<ApiResponse<Ticket>> {
-    return await http.post<Ticket>(this.endpoint, ticket);
+  async create(ticket: TicketCreate): Promise<ApiResponse<Ticket>> {
+    return await http.post<Ticket, TicketCreate>("/tickets/", ticket);
   }
 }
