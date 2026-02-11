@@ -484,13 +484,13 @@ import type { Service } from "../models/Service";
 import type { TicketPriority } from "../models/TicketPriority";
 import type { TicketCreate } from "../models/Ticket";
 import { TicketsService } from "../services/ticketsService";
-import { ServiceService } from "../services/serviceService";
+import { RequestTypeService } from "../services/RequestTypeService";
 import { TicketPriorityService } from "../services/ticketPriorityService";
 import { useNotification } from "../utils/useNotification";
 
 const router = useRouter();
 const ticketsService = new TicketsService();
-const serviceService = new ServiceService();
+const requestTypeService = new RequestTypeService();
 const priorityService = new TicketPriorityService();
 const notification = useNotification();
 
@@ -518,7 +518,7 @@ const sortLabels = {
 // Función para cargar servicios
 const loadServices = async () => {
   try {
-    const response = await serviceService.getAll();
+    const response = await requestTypeService.getAll();
     if (response.success && response.data) {
       services.value = response.data.results;
     }

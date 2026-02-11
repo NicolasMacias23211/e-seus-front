@@ -5,20 +5,8 @@ import type { ANS } from "./ANS";
 import type { Status } from "./Status";
 import type { Note } from "./Notes";
 import type { ReportedTime } from "./ReportedTime";
-
-// Interfaz para el reporter (usuario externo)
-export interface Reporter {
-  network_user: string;
-  mail: string;
-  phone: string;
-}
-
-// Interfaz para el sub_program anidado
-export interface TicketSubProgram {
-  sub_program_name: string;
-  program_name_display: string;
-  program_name: string;
-}
+import type { SubProgram } from "./SubProgram";
+import type { User } from "./User";
 
 // Interfaz completa que coincide con la respuesta del backend
 export interface Ticket {
@@ -27,9 +15,9 @@ export interface Ticket {
   priority: TicketPriority;
   closing_code: ClosingCode | null;
   ans: ANS;
-  reporter: Reporter;
+  reporter: User;
   status: Status;
-  sub_program: TicketSubProgram;
+  sub_program: SubProgram;
   notes: Note[];
   reported_times: ReportedTime[];
   ticket_title: string;
@@ -61,4 +49,39 @@ export interface TicketCreate {
   sub_program_name: string;
   status_id: number;
   assigned_to?: string;
+}
+
+export interface TicketShort {
+  id_ticket: number;
+  ticket_title: string;
+  service_name: string;
+  priority_name: string;
+  status_name: string;
+  reporter_user_name: string;
+  assigned_to: string | null;
+  create_at: string;
+  estimated_closing_date: string | null;
+  ticket_description?: string;
+  ticket_attachments?: string | null;
+  ticket_closing_code?: number | null;
+  ticket_ans?: number | string | null;
+  update_at?: string | null;
+  closing_date?: string | null;
+  sub_program_name?: string;
+}
+
+// Interfaz para actualización parcial de tickets
+export interface TicketUpdate {
+  ticket_title?: string;
+  ticket_description?: string;
+  ticket_attachments?: string;
+  ticket_service?: number;
+  ticket_priority?: string;
+  assigned_to?: string;
+  status_id?: number;
+  ticket_closing_code?: number;
+  closing_date?: string;
+  estimated_closing_date?: string;
+  sub_program_name?: string;
+  ticket_ans?: number;
 }

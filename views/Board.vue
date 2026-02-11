@@ -24,16 +24,26 @@
             </div>
           </div>
           <div class="flex items-center gap-3">
-            <div class="relative">
-              <Search
-                class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"
-              />
-              <input
-                v-model="searchQuery"
-                type="search"
-                placeholder="Buscar tickets..."
-                class="pl-10 pr-4 py-2.5 w-64 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent transition-all"
-              />
+            <div class="relative flex items-center gap-2">
+              <div class="relative">
+                <Search
+                  class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"
+                />
+                <input
+                  v-model="searchQuery"
+                  type="text"
+                  placeholder="Buscar por ID de ticket..."
+                  @keyup.enter="searchTicketById"
+                  class="pl-10 pr-4 py-2.5 w-64 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent transition-all"
+                />
+              </div>
+              <button
+                @click="searchTicketById"
+                class="px-4 py-2.5 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white rounded-lg hover:shadow-lg transition-all text-sm font-medium"
+                title="Buscar ticket"
+              >
+                Buscar
+              </button>
             </div>
             <button
               class="p-2.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all text-slate-600"
@@ -225,6 +235,10 @@
                   v-else-if="modalAction === 'complete'"
                   class="w-5 h-5 text-white"
                 />
+                <Inbox
+                  v-else-if="modalAction === 'view'"
+                  class="w-5 h-5 text-white"
+                />
                 <LayoutGrid v-else class="w-5 h-5 text-white" />
               </div>
               <div>
@@ -233,8 +247,10 @@
                     modalAction === "delete"
                       ? "Eliminar Ticket"
                       : modalAction === "complete"
-                      ? "Completar Ticket"
-                      : "Actualizar Ticket"
+                        ? "Completar Ticket"
+                        : modalAction === "view"
+                          ? "Ver Ticket"
+                          : "Actualizar Ticket"
                   }}
                 </h3>
                 <p class="text-xs text-white/80">
@@ -251,10 +267,18 @@
                   v-model="editedTicket.status_name"
                   class="px-4 py-2 bg-white/95 border-2 border-white rounded-lg focus:ring-2 focus:ring-white focus:border-white transition-all font-semibold text-slate-700"
                 >
-                  <option :value="'Nuevo'">Nuevo</option>
-                  <option :value="'Pendiente'">Pendiente</option>
-                  <option :value="'En progreso'">En Progreso</option>
-                  <option :value="'En revisión'">En Revisión</option>
+                  <option
+                    v-for="status in Array.from(statusIdMap.values()).filter(
+                      (s) =>
+                        !s.is_backlog &&
+                        s.ordering !== null &&
+                        s.ordering !== undefined,
+                    )"
+                    :key="status.id_status"
+                    :value="status.status_name"
+                  >
+                    {{ status.status_name }}
+                  </option>
                 </select>
               </div>
               <button
@@ -320,54 +344,82 @@
                 />
               </svg>
               Archivos Adjuntos
+              <span
+                v-if="attachedFiles.length > 0"
+                class="ml-auto px-2 py-0.5 bg-[#50bdeb] text-white text-xs rounded-full"
+              >
+                {{ attachedFiles.length }}
+              </span>
             </label>
-            <div
-              v-if="editedTicket.ticket_attachments"
-              class="w-full px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg"
-            >
-              <div class="flex items-start gap-3">
-                <div class="p-2 bg-blue-100 rounded-lg">
-                  <svg
-                    class="w-6 h-6 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+
+            <div v-if="attachedFiles.length > 0" class="space-y-2">
+              <div
+                v-for="(file, index) in attachedFiles"
+                :key="index"
+                @click="downloadFile(file)"
+                class="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-lg hover:border-[#50bdeb] hover:shadow-md transition-all cursor-pointer group"
+              >
+                <div class="flex items-center gap-3">
+                  <div
+                    class="p-2 rounded-lg transition-all"
+                    :class="getFileTypeConfig(file).bgColor"
                   >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                    <svg
+                      class="w-6 h-6 transition-all"
+                      :class="getFileTypeConfig(file).color"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                       stroke-width="2"
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
-                </div>
-                <div class="flex-1">
-                  <p class="text-sm font-semibold text-slate-700">
-                    {{ editedTicket.ticket_attachments }}
-                  </p>
-                  <p class="text-xs text-slate-500 mt-1">
-                    Haga clic para descargar el archivo adjunto
-                  </p>
-                </div>
-                <button
-                  class="p-2 hover:bg-blue-100 rounded-lg transition-colors"
-                >
-                  <svg
-                    class="w-5 h-5 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        :d="getFileTypeConfig(file).icon"
+                      />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p
+                      class="text-sm font-semibold text-slate-700 truncate group-hover:text-[#021C7D] transition-colors"
+                    >
+                      {{ file.split("_").slice(2).join("_") || file }}
+                    </p>
+                    <p class="text-xs text-slate-500 flex items-center gap-2">
+                      <span
+                        class="px-1.5 py-0.5 rounded text-xs font-semibold"
+                        :class="[
+                          getFileTypeConfig(file).bgColor,
+                          getFileTypeConfig(file).color,
+                        ]"
+                      >
+                        {{ getFileTypeConfig(file).label }}
+                      </span>
+                      <span>•</span>
+                      <span>Haz clic para descargar</span>
+                    </p>
+                  </div>
+                  <div
+                    class="p-2 hover:bg-slate-100 rounded-lg transition-colors"
                   >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                    />
-                  </svg>
-                </button>
+                    <svg
+                      class="w-5 h-5 text-slate-400 group-hover:text-[#50bdeb] transition-colors"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                      />
+                    </svg>
+                  </div>
+                </div>
               </div>
             </div>
+
             <div
               v-else
               class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-center"
@@ -475,7 +527,7 @@
                         day: "numeric",
                         hour: "2-digit",
                         minute: "2-digit",
-                      }
+                      },
                     )
                   }}
                 </div>
@@ -483,32 +535,57 @@
               <div class="grid grid-cols-3 gap-4">
                 <div>
                   <label
-                    class="block text-sm font-semibold text-slate-700 mb-2"
+                    class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2"
                   >
-                    Cliente
+                    Sub-cliente
+                    <Lock
+                      v-if="!canEditFields"
+                      class="w-4 h-4 text-amber-600"
+                      title="Solo editable en estado inicial"
+                    />
                   </label>
                   <div class="relative">
                     <input
-                      v-model="clientSearch"
-                      @input="filterClients"
-                      @focus="showClientDropdown = true"
-                      @blur="hideClientDropdown"
+                      v-model="subProgramSearch"
+                      @input="
+                        filterSubPrograms();
+                        showSubProgramDropdown = true;
+                      "
+                      @focus="
+                        filterSubPrograms();
+                        showSubProgramDropdown = true;
+                      "
+                      @blur="hideSubProgramDropdown"
+                      :disabled="!canEditFields"
                       type="text"
-                      autocomplete="off"
-                      class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent transition-all"
-                      placeholder="Buscar cliente..."
+                      placeholder="Buscar sub-cliente..."
+                      :class="[
+                        'w-full px-4 py-2.5 border rounded-lg transition-all',
+                        canEditFields
+                          ? 'border-slate-300 focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent'
+                          : 'bg-slate-50 border-slate-200 text-slate-600 cursor-not-allowed',
+                      ]"
                     />
                     <div
-                      v-if="showClientDropdown && filteredClients.length > 0"
-                      class="absolute z-10 w-full mt-1 bg-white border-2 border-blue-200 rounded-lg shadow-xl max-h-48 overflow-y-auto"
+                      v-if="
+                        showSubProgramDropdown &&
+                        filteredSubPrograms.length > 0 &&
+                        canEditFields
+                      "
+                      class="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"
                     >
                       <div
-                        v-for="client in filteredClients"
-                        :key="client.name"
-                        @mousedown="selectClient(client)"
-                        class="px-4 py-2.5 hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-100 last:border-b-0 font-medium text-slate-700"
+                        v-for="subProgram in filteredSubPrograms"
+                        :key="subProgram.sub_program_name"
+                        @mousedown="selectSubProgram(subProgram)"
+                        class="px-4 py-2.5 hover:bg-[#50bdeb] hover:text-white cursor-pointer transition-colors border-b border-slate-100 last:border-b-0"
                       >
-                        {{ client.name }}
+                        <div class="font-medium">
+                          {{ subProgram.sub_program_name }}
+                        </div>
+                        <div class="text-xs opacity-75">
+                          {{ subProgram.program_name_display }}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -524,10 +601,14 @@
                     v-model="editedTicket.priority_name"
                     class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent transition-all"
                   >
-                    <option value="Baja">Baja</option>
-                    <option value="Media">Media</option>
-                    <option value="Alta">Alta</option>
-                    <option value="Urgente">Urgente</option>
+                    <option value="" disabled>Seleccione una prioridad</option>
+                    <option
+                      v-for="priority in prioritiesList"
+                      :key="priority.priority_name"
+                      :value="priority.priority_name"
+                    >
+                      {{ priority.priority_name }}
+                    </option>
                   </select>
                 </div>
                 <div>
@@ -536,120 +617,212 @@
                   >
                     Asignado a
                   </label>
-                  <input
-                    v-model="editedTicket.assigned_to"
-                    type="text"
-                    class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent transition-all"
-                    placeholder="Usuario asignado"
-                  />
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label
-                    class="block text-sm font-semibold text-slate-700 mb-2"
-                  >
-                    Servicio
-                  </label>
-                  <select
-                    v-model="editedTicket.service_name"
-                    class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent transition-all"
-                  >
-                    <option value="" disabled>Seleccione un servicio</option>
-                    <option
-                      v-for="service in servicesList"
-                      :key="service.id"
-                      :value="service.name"
+                  <div class="relative">
+                    <input
+                      v-model="assignedToSearch"
+                      @input="
+                        filterAssignedTo();
+                        showAssignedToDropdown = true;
+                      "
+                      @focus="
+                        filterAssignedTo();
+                        showAssignedToDropdown = true;
+                      "
+                      @blur="hideAssignedToDropdown"
+                      type="text"
+                      placeholder="Buscar usuario..."
+                      class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent transition-all"
+                    />
+                    <div
+                      v-if="
+                        showAssignedToDropdown && filteredAssignedTo.length > 0
+                      "
+                      class="absolute z-10 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
                     >
-                      {{ service.name }}
-                    </option>
-                  </select>
-                </div>
-                <div>
-                  <label
-                    class="block text-sm font-semibold text-slate-700 mb-2"
-                  >
-                    ANS (Acuerdo de Nivel de Servicio)
-                  </label>
-                  <input
-                    v-model="editedTicket.ticket_ans"
-                    type="text"
-                    class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent transition-all"
-                    placeholder="ANS"
-                    readonly
-                  />
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label
-                    class="block text-sm font-semibold text-slate-700 mb-2"
-                  >
-                    Fecha Estimada de Cierre
-                  </label>
-                  <input
-                    v-model="estimatedClosingDateStr"
-                    type="date"
-                    class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent transition-all"
-                  />
-                </div>
-                <div v-if="modalAction === 'complete'">
-                  <label
-                    class="block text-sm font-semibold text-slate-700 mb-2"
-                  >
-                    Código de Cierre
-                  </label>
-                  <input
-                    v-model.number="editedTicket.ticket_closing_code"
-                    type="number"
-                    class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent transition-all"
-                    placeholder="Código de cierre"
-                  />
-                </div>
-                <div v-else>
-                  <label
-                    class="block text-sm font-semibold text-slate-700 mb-2"
-                  >
-                    Reportar Tiempo
-                  </label>
-                  <div class="flex gap-2">
-                    <div class="flex-1">
-                      <div class="relative">
-                        <input
-                          v-model.number="reportedHours"
-                          type="number"
-                          min="0"
-                          class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent transition-all pr-8"
-                          placeholder="0"
-                        />
-                        <span
-                          class="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500"
-                          >H</span
+                      <div
+                        v-for="eUser in filteredAssignedTo"
+                        :key="eUser.network_user"
+                        @mousedown="selectAssignedTo(eUser)"
+                        class="px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-b-0"
+                      >
+                        <div class="font-semibold text-slate-700">
+                          {{ eUser.name }} {{ eUser.middle_name || "" }}
+                          {{ eUser.last_name }}
+                          {{ eUser.second_last_name || "" }}
+                        </div>
+                        <div
+                          class="text-xs text-slate-500 mt-1 flex items-center gap-3"
                         >
-                      </div>
-                    </div>
-                    <div class="flex-1">
-                      <div class="relative">
-                        <input
-                          v-model.number="reportedMinutes"
-                          type="number"
-                          min="0"
-                          max="59"
-                          class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent transition-all pr-8"
-                          placeholder="0"
-                        />
-                        <span
-                          class="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500"
-                          >M</span
-                        >
+                          <span>{{ eUser.network_user }}</span>
+                          <span v-if="eUser.email">• {{ eUser.email }}</span>
+                          <span
+                            v-if="eUser.rol_name"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full"
+                            >{{ eUser.rol_name }}</span
+                          >
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label
+                    class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2"
+                  >
+                    Servicio
+                    <Lock
+                      v-if="!canEditFields"
+                      class="w-4 h-4 text-amber-600"
+                      title="Solo editable en estado inicial"
+                    />
+                  </label>
+                  <select
+                    v-model="editedTicket.service_name"
+                    :disabled="!canEditFields"
+                    :class="[
+                      'w-full px-4 py-2.5 border rounded-lg transition-all',
+                      canEditFields
+                        ? 'border-slate-300 focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent'
+                        : 'bg-slate-50 border-slate-200 text-slate-600 cursor-not-allowed',
+                    ]"
+                  >
+                    <option value="" disabled>Seleccione un servicio</option>
+                    <option
+                      v-for="service in servicesList"
+                      :key="service.id_services"
+                      :value="service.service_name"
+                    >
+                      {{ service.service_name }}
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <label
+                    class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2"
+                  >
+                    ANS (Acuerdo de Nivel de Servicio)
+                    <Lock
+                      v-if="!canEditFields"
+                      class="w-4 h-4 text-amber-600"
+                      title="Solo editable en estado inicial"
+                    />
+                  </label>
+                  <select
+                    v-model="editedTicket.ticket_ans"
+                    :disabled="!canEditFields"
+                    :class="[
+                      'w-full px-4 py-2.5 border rounded-lg transition-all',
+                      canEditFields
+                        ? 'border-slate-300 focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent'
+                        : 'bg-slate-50 border-slate-200 text-slate-600 cursor-not-allowed',
+                    ]"
+                  >
+                    <option value="" disabled>Seleccione un ANS</option>
+                    <option
+                      v-for="ans in ansList"
+                      :key="ans.id_ans"
+                      :value="ans.id_ans"
+                    >
+                      {{ ans.ans_name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label
+                    class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2"
+                  >
+                    Fecha Estimada de Cierre
+                    <Lock
+                      v-if="!canEditEstimatedDate"
+                      class="w-4 h-4 text-amber-600"
+                      :title="
+                        isAnsNumeric
+                          ? 'Fecha calculada automáticamente según ANS'
+                          : 'Solo editable en estado inicial'
+                      "
+                    />
+                  </label>
+                  <input
+                    v-model="estimatedClosingDateStr"
+                    type="datetime-local"
+                    :disabled="!canEditEstimatedDate"
+                    :class="[
+                      'w-full px-4 py-2.5 border rounded-lg transition-all',
+                      canEditEstimatedDate
+                        ? 'border-slate-300 focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent'
+                        : 'bg-slate-50 border-slate-200 text-slate-600 cursor-not-allowed',
+                    ]"
+                  />
+                </div>
+                <div
+                  v-if="modalAction === 'complete' || modalAction === 'delete'"
+                >
+                  <label
+                    class="block text-sm font-semibold text-slate-700 mb-2"
+                  >
+                    Código de Cierre
+                  </label>
+                  <select
+                    v-model.number="editedTicket.ticket_closing_code"
+                    class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent transition-all"
+                  >
+                    <option :value="null" disabled>Seleccione un código</option>
+                    <option
+                      v-for="closingCode in closingCodesList"
+                      :key="closingCode.id_closing_code"
+                      :value="closingCode.id_closing_code"
+                    >
+                      {{ closingCode.closing_code_name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div v-if="modalAction !== 'view'">
+                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                  Reportar Tiempo
+                </label>
+                <div class="flex gap-2">
+                  <div class="flex-1">
+                    <div class="relative">
+                      <input
+                        v-model.number="reportedHours"
+                        type="number"
+                        min="0"
+                        class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent transition-all pr-8"
+                        placeholder="0"
+                      />
+                      <span
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500"
+                        >H</span
+                      >
+                    </div>
+                  </div>
+                  <div class="flex-1">
+                    <div class="relative">
+                      <input
+                        v-model.number="reportedMinutes"
+                        type="number"
+                        min="0"
+                        max="59"
+                        class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent transition-all pr-8"
+                        placeholder="0"
+                      />
+                      <span
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500"
+                        >M</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
               <CommentEditor
+                v-if="modalAction !== 'view'"
                 v-model="commentText"
                 label="Agregar Comentario"
                 placeholder="Escribe tu comentario aquí..."
@@ -679,7 +852,7 @@
               <div v-else class="space-y-4 max-h-96 overflow-y-auto pr-2">
                 <div
                   v-for="comment in ticketComments"
-                  :key="comment.idComment"
+                  :key="comment.id_note"
                   class="bg-slate-50 border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow"
                 >
                   <div class="flex items-start gap-3">
@@ -687,21 +860,23 @@
                       class="w-10 h-10 rounded-full bg-gradient-to-br from-[#021C7D] to-[#50bdeb] flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
                     >
                       {{
-                        comment.userName
-                          .split(" ")
-                          .map((n: string) => n[0])
-                          .join("")
-                          .toUpperCase()
+                        comment.network_user
+                          ? comment.network_user
+                              .split(" ")
+                              .map((n: string) => n[0])
+                              .join("")
+                              .toUpperCase()
+                          : "??"
                       }}
                     </div>
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center justify-between mb-1">
                         <span class="font-semibold text-slate-800">{{
-                          comment.userName
+                          comment.network_user || "Usuario desconocido"
                         }}</span>
                         <span class="text-xs text-slate-500">
                           {{
-                            new Date(comment.createAt).toLocaleDateString(
+                            new Date(comment.create_at).toLocaleDateString(
                               "es-ES",
                               {
                                 year: "numeric",
@@ -709,13 +884,13 @@
                                 day: "numeric",
                                 hour: "2-digit",
                                 minute: "2-digit",
-                              }
+                              },
                             )
                           }}
                         </span>
                       </div>
                       <p class="text-slate-700 text-sm leading-relaxed">
-                        {{ comment.comment }}
+                        {{ comment.note }}
                       </p>
                     </div>
                   </div>
@@ -747,7 +922,7 @@
               <div v-else class="space-y-3 max-h-96 overflow-y-auto pr-2">
                 <div
                   v-for="time in ticketReportedTimes"
-                  :key="time.idReportedTimes"
+                  :key="time.id_reported_times"
                   class="bg-slate-50 border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow"
                 >
                   <div class="flex items-center justify-between">
@@ -756,26 +931,28 @@
                         class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
                       >
                         {{
-                          time.userName
-                            .split(" ")
-                            .map((n: string) => n[0])
-                            .join("")
-                            .toUpperCase()
+                          time.network_user
+                            ? time.network_user
+                                .split(" ")
+                                .map((n: string) => n[0])
+                                .join("")
+                                .toUpperCase()
+                            : "??"
                         }}
                       </div>
                       <div>
                         <div class="font-semibold text-slate-800">
-                          {{ time.userName }}
+                          {{ time.network_user || "Usuario desconocido" }}
                         </div>
                         <div class="text-xs text-slate-500">
                           {{
-                            new Date(time.dateReported).toLocaleDateString(
+                            new Date(time.date_reported).toLocaleDateString(
                               "es-ES",
                               {
                                 year: "numeric",
                                 month: "short",
                                 day: "numeric",
-                              }
+                              },
                             )
                           }}
                         </div>
@@ -797,14 +974,22 @@
                           />
                         </svg>
                         <span class="text-2xl font-bold text-[#021C7D]">
-                          {{ time.reportedTime.split(":")[0] }}h
-                          {{ time.reportedTime.split(":")[1] }}m
+                          {{
+                            time.reported_time
+                              ? time.reported_time.split(":")[0]
+                              : "0"
+                          }}h
+                          {{
+                            time.reported_time
+                              ? time.reported_time.split(":")[1]
+                              : "0"
+                          }}m
                         </span>
                       </div>
                       <div class="text-xs text-slate-500 mt-1">
                         Reportado
                         {{
-                          new Date(time.createAt).toLocaleDateString("es-ES", {
+                          new Date(time.create_at).toLocaleDateString("es-ES", {
                             month: "short",
                             day: "numeric",
                             hour: "2-digit",
@@ -824,15 +1009,17 @@
                     <span class="text-2xl font-bold">
                       {{
                         (ticketReportedTimes.reduce((total, t) => {
-                          const [h, m] = t.reportedTime.split(":").map(Number);
+                          if (!t.reported_time) return total;
+                          const [h, m] = t.reported_time.split(":").map(Number);
                           return total + h * 60 + m;
                         }, 0) /
-                          60) |
-                          0
+                          60)
+                          | 0
                       }}h
                       {{
                         ticketReportedTimes.reduce((total, t) => {
-                          const [h, m] = t.reportedTime.split(":").map(Number);
+                          if (!t.reported_time) return total;
+                          const [h, m] = t.reported_time.split(":").map(Number);
                           return total + h * 60 + m;
                         }, 0) % 60
                       }}m
@@ -849,27 +1036,29 @@
         >
           <button
             @click="closeModal"
-            class="flex-1 px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-medium rounded-lg transition-colors"
+            :class="modalAction === 'view' ? 'flex-1' : 'flex-1'"
+            class="px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-medium rounded-lg transition-colors"
           >
-            Cancelar
+            {{ modalAction === "view" ? "Cerrar" : "Cancelar" }}
           </button>
           <button
+            v-if="modalAction !== 'view'"
             @click="confirmAction"
             class="flex-1 px-4 py-2.5 font-medium rounded-lg transition-colors"
             :class="
               modalAction === 'delete'
                 ? 'bg-red-600 hover:bg-red-700 text-white'
                 : modalAction === 'complete'
-                ? 'bg-green-600 hover:bg-green-700 text-white'
-                : 'bg-gradient-to-r from-[#021C7D] to-[#50bdeb] hover:opacity-90 text-white'
+                  ? 'bg-green-600 hover:bg-green-700 text-white'
+                  : 'bg-gradient-to-r from-[#021C7D] to-[#50bdeb] hover:opacity-90 text-white'
             "
           >
             {{
               modalAction === "delete"
-                ? "Eliminar"
+                ? "Denegar"
                 : modalAction === "complete"
-                ? "Completar"
-                : "Actualizar"
+                  ? "Completar"
+                  : "Actualizar"
             }}
           </button>
         </div>
@@ -879,7 +1068,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import TicketCard from "../components/TicketCard.vue";
 import CommentEditor from "../components/CommentEditor.vue";
 import {
@@ -890,23 +1079,56 @@ import {
   LayoutGrid,
   Trash2,
   CheckCircle2,
+  Lock,
 } from "lucide-vue-next";
-import type { Ticket } from "../models";
+import type {
+  TicketShort,
+  Note,
+  ANS,
+  Service,
+  Status,
+  Ticket,
+  SubProgram,
+  EUser,
+  TicketPriority,
+  TicketUpdate,
+  ClosingCode,
+} from "../models";
+import { RequestTypeService } from "../services/RequestTypeService";
 import { TicketsService } from "../services/ticketsService";
 import type { UserInfo } from "../models/login";
 import { SessionStorageService } from "../services/SessionStorageService";
 import { useNotification } from "../utils/useNotification";
+import { NotesService } from "../services/notesService";
+import { ClientsService } from "../services/clientsService";
+import { StatusService } from "../services/statusService";
+import { AnsService } from "../services/ansService";
+import { ReportedTimeService } from "../services/reportedTimeService";
+import { FileUploadService } from "../services/fileUploadService";
+import { SubProgramsService } from "../services/subProgramsService";
+import { eUsersService } from "../services/e-usersService";
+import { TicketPriorityService } from "../services/ticketPriorityService";
+import { ClosingCodeService } from "../services/closingCode";
+import { ProjectDateService } from "../services/projectDateService";
 
+const clientsService = new ClientsService();
 const notification = useNotification();
-
-type BoardStatus = "new" | "pending" | "in-progress" | "in-review";
-
+const ansService = new AnsService();
+const reportedTimeService = new ReportedTimeService();
+const fileUploadService = new FileUploadService();
+const requestTypeService = new RequestTypeService();
+const subProgramsService = new SubProgramsService();
+const eUsersServices = new eUsersService();
+const ticketPriorityService = new TicketPriorityService();
+const closingCodeService = new ClosingCodeService();
+const projectDateService = new ProjectDateService();
 const searchQuery = ref("");
 const isDeletingZone = ref(false);
 const isCompletingZone = ref(false);
-const draggedTicket = ref<Ticket | null>(null);
+const draggedTicket = ref<TicketShort | null>(null);
 const showModal = ref(false);
-const modalAction = ref<"move" | "delete" | "complete">("move");
+const notesService = new NotesService();
+const modalAction = ref<"move" | "delete" | "complete" | "view">("move");
 const targetStatus = ref<number | null>(null);
 const SessionStorageServiceInstance = new SessionStorageService();
 const CurrentUserInfo: UserInfo =
@@ -918,8 +1140,8 @@ const CurrentUserInfo: UserInfo =
     document: 0,
   };
 const TicketService = new TicketsService();
-
-const editedTicket = ref<Ticket>({
+const statusService = new StatusService();
+const editedTicket = ref<TicketShort>({
   id_ticket: 0,
   ticket_title: "",
   ticket_description: "",
@@ -927,10 +1149,10 @@ const editedTicket = ref<Ticket>({
   service_name: "",
   priority_name: "Media",
   ticket_closing_code: null,
-  ticket_ans: null,
+  ticket_ans: 0,
   reporter_user_name: "",
   create_at: new Date().toISOString(),
-  update_at: null,
+  update_at: "",
   assigned_to: null,
   closing_date: null,
   estimated_closing_date: null,
@@ -940,202 +1162,447 @@ const editedTicket = ref<Ticket>({
 
 const clientSearch = ref("");
 const showClientDropdown = ref(false);
-const filteredClients = ref<{ name: string }[]>([]);
-
-// Variables para el editor de comentarios
+const subProgramSearch = ref("");
+const showSubProgramDropdown = ref(false);
+const filteredSubPrograms = ref<SubProgram[]>([]);
+const assignedToSearch = ref("");
+const showAssignedToDropdown = ref(false);
+const filteredAssignedTo = ref<EUser[]>([]);
 const commentText = ref("");
-
-// Variables para reportar tiempo
 const reportedHours = ref(0);
 const reportedMinutes = ref(0);
-
-// Variables para tabs
 const activeTab = ref<"details" | "comments" | "time">("details");
+const ticketComments = ref<Note[]>([]);
+const fullTicket = ref<Ticket | null>(null);
 
-// Mock data para comentarios y tiempo reportado
-const ticketComments = ref<any[]>([
-  {
-    idComment: 1,
-    comment: "Se inició el análisis del problema",
-    createAt: new Date("2025-11-20T10:30:00"),
-    updateAt: null,
-    idTicket: 101,
-    userName: "Juan Pérez",
-  },
-  {
-    idComment: 2,
-    comment: "Ya tengo identificada la causa raíz del error",
-    createAt: new Date("2025-11-20T14:15:00"),
-    updateAt: null,
-    idTicket: 101,
-    userName: "Juan Pérez",
-  },
-]);
+const attachedFiles = computed(() => {
+  if (!fullTicket.value || !fullTicket.value.ticket_attachments) return [];
+  return fullTicket.value.ticket_attachments
+    .split(",")
+    .map((file) => file.trim())
+    .filter((file) => file.length > 0);
+});
 
-const ticketReportedTimes = ref<any[]>([
-  {
-    idReportedTimes: 1,
-    dateReported: new Date("2025-11-20"),
-    reportedTime: "02:30:00",
-    idTicket: 101,
-    createAt: new Date("2025-11-20T16:00:00"),
-    updateAt: null,
-    userName: "Juan Pérez",
-  },
-  {
-    idReportedTimes: 2,
-    dateReported: new Date("2025-11-21"),
-    reportedTime: "03:45:00",
-    idTicket: 101,
-    createAt: new Date("2025-11-21T18:00:00"),
-    updateAt: null,
-    userName: "María González",
-  },
-]);
+const getFileTypeConfig = (filename: string) => {
+  const extension = filename
+    .substring(filename.lastIndexOf(".") + 1)
+    .toLowerCase();
 
-const clientsList = ref([
-  { name: "Cliente Principal A" },
-  { name: "Cliente Principal B" },
-  { name: "Cliente Principal C" },
-  { name: "Cliente Tech Solutions" },
-  { name: "Cliente Global Corp" },
-]);
+  const configs: Record<
+    string,
+    { icon: string; color: string; bgColor: string; label: string }
+  > = {
+    pdf: {
+      icon: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6z M8 12h8 M8 16h8",
+      color: "text-red-600",
+      bgColor: "bg-red-50",
+      label: "PDF",
+    },
+    doc: {
+      icon: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6z M8 12h8 M8 16h5",
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+      label: "DOC",
+    },
+    docx: {
+      icon: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6z M8 12h8 M8 16h5",
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+      label: "DOCX",
+    },
+    xls: {
+      icon: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6z M8 10h8 M8 14h8 M8 18h8",
+      color: "text-green-600",
+      bgColor: "bg-green-50",
+      label: "XLS",
+    },
+    xlsx: {
+      icon: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6z M8 10h8 M8 14h8 M8 18h8",
+      color: "text-green-600",
+      bgColor: "bg-green-50",
+      label: "XLSX",
+    },
+    csv: {
+      icon: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6z M8 10h8 M8 14h8 M8 18h8",
+      color: "text-green-600",
+      bgColor: "bg-green-50",
+      label: "CSV",
+    },
+    txt: {
+      icon: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6z M8 12h8 M8 16h8",
+      color: "text-gray-600",
+      bgColor: "bg-gray-50",
+      label: "TXT",
+    },
+    jpg: {
+      icon: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M17 8l-5-5-5 5 M12 3v12",
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
+      label: "JPG",
+    },
+    jpeg: {
+      icon: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M17 8l-5-5-5 5 M12 3v12",
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
+      label: "JPEG",
+    },
+    png: {
+      icon: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M17 8l-5-5-5 5 M12 3v12",
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
+      label: "PNG",
+    },
+    zip: {
+      icon: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M7 10l5 5 5-5 M12 15V3",
+      color: "text-amber-600",
+      bgColor: "bg-amber-50",
+      label: "ZIP",
+    },
+    rar: {
+      icon: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M7 10l5 5 5-5 M12 15V3",
+      color: "text-amber-600",
+      bgColor: "bg-amber-50",
+      label: "RAR",
+    },
+  };
 
-const servicesList = ref([
-  { id: 1, name: "Soporte Técnico" },
-  { id: 2, name: "Desarrollo" },
-  { id: 3, name: "Infraestructura" },
-  { id: 4, name: "Consultoría" },
-]);
+  return (
+    configs[extension] || {
+      icon: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6z",
+      color: "text-slate-600",
+      bgColor: "bg-slate-50",
+      label: "FILE",
+    }
+  );
+};
 
-const ansList = ref([
-  { id: 1, name: "ANS 24h", description: "Respuesta en 24 horas" },
-  { id: 2, name: "ANS 48h", description: "Respuesta en 48 horas" },
-  { id: 3, name: "ANS 72h", description: "Respuesta en 72 horas" },
-  { id: 4, name: "ANS 1 semana", description: "Respuesta en 1 semana" },
-]);
+const downloadFile = async (filename: string) => {
+  try {
+    const result = await fileUploadService.downloadFile(filename);
+    if (!result.success) {
+      notification.error(
+        "Error",
+        result.message || "No se pudo descargar el archivo",
+      );
+    }
+  } catch (error) {
+    notification.error("Error", "Ocurrió un error al descargar el archivo");
+  }
+};
 
-// Computed para manejar la fecha estimada como string
+const ticketReportedTimes = ref<any[]>([]);
+const servicesList = ref<Service[]>([]);
+const ansList = ref<ANS[]>([]);
+const subProgramsList = ref<SubProgram[]>([]);
+const eUsersList = ref<EUser[]>([]);
+const prioritiesList = ref<TicketPriority[]>([]);
+const closingCodesList = ref<ClosingCode[]>([]);
+const modalDataLoaded = ref(false);
+
 const estimatedClosingDateStr = computed({
   get: () => {
     if (!editedTicket.value.estimated_closing_date) return "";
     const date = new Date(editedTicket.value.estimated_closing_date);
-    return date.toISOString().split("T")[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
   },
   set: (value: string) => {
-    editedTicket.value.estimated_closing_date = value || null;
+    if (!value) {
+      editedTicket.value.estimated_closing_date = null;
+      return;
+    }
+    const date = new Date(value);
+    editedTicket.value.estimated_closing_date = date.toISOString();
   },
 });
 
-const mockTickets = ref<Ticket[]>([]);
+const isFirstState = computed(() => {
+  if (!editedTicket.value.status_name) return true;
+  const currentStatus = Array.from(statusIdMap.value.values()).find(
+    (status) => status.status_name === editedTicket.value.status_name,
+  );
+
+  return currentStatus ? currentStatus.ordering === 1 : true;
+});
+
+const wasOriginallyInFirstState = computed(() => {
+  if (!draggedTicket.value?.status_name) return true;
+  const originalStatus = Array.from(statusIdMap.value.values()).find(
+    (status) => status.status_name === draggedTicket.value!.status_name,
+  );
+
+  return originalStatus ? originalStatus.ordering === 1 : true;
+});
+
+const canEditFields = computed(() => {
+  if (modalAction.value === "view") return false;
+
+  return wasOriginallyInFirstState.value;
+});
+
+const isAnsNumeric = computed(() => {
+  if (!editedTicket.value.ticket_ans) return false;
+  const currentAns = ansList.value.find(
+    (ans) => ans.id_ans === editedTicket.value.ticket_ans,
+  );
+  if (!currentAns) return false;
+  const ansName = currentAns.ans_name;
+  return /^\d+$/.test(ansName);
+});
+
+const canEditEstimatedDate = computed(() => {
+  return isFirstState.value && !isAnsNumeric.value;
+});
+
+const TicketsShort = ref<TicketShort[]>([]);
 CurrentUserInfo;
 
 const loadTickets = async () => {
   if (CurrentUserInfo.username === "") {
-    console.warn("Usuario no autenticado. No se pueden cargar los tickets.");
     return;
   }
   try {
     const response = await TicketService.GetTicketsByPerson(
-      CurrentUserInfo.username
+      CurrentUserInfo.username,
     );
     if (response.data && response.data.results) {
-      mockTickets.value = response.data.results.flat();
-      console.log("Tickets cargados:", mockTickets.value);
-      console.log("Estados encontrados:", [
-        ...new Set(mockTickets.value.map((t) => t.status_name)),
-      ]);
+      TicketsShort.value = response.data.results.flat();
     }
   } catch (error) {
-    console.error("Error al cargar tickets:", error);
     notification.error("Error", "No se pudieron cargar los tickets");
   }
 };
 
-onMounted(() => {
-  loadTickets();
-});
+const loadColumsByStatus = async () => {
+  try {
+    const statusRes = await statusService.getAll();
+    if (statusRes.success && statusRes.data?.results) {
+      const statuses = statusRes.data.results as Status[];
+      const boardStatuses = statuses
+        .filter(
+          (status) =>
+            !status.is_backlog &&
+            status.ordering !== null &&
+            status.ordering !== undefined,
+        )
+        .sort((a, b) => a.ordering - b.ordering);
 
-const columns = [
-  {
-    title: "Nuevos",
-    status: "new" as BoardStatus,
-    color: "bg-purple-500",
-    bgClass: "bg-purple-50/30",
-    statusId: 1,
-  },
-  {
-    title: "Pendiente",
-    status: "pending" as BoardStatus,
-    color: "bg-blue-500",
-    bgClass: "bg-blue-50/30",
-    statusId: 2,
-  },
-  {
-    title: "En Progreso",
-    status: "in-progress" as BoardStatus,
-    color: "bg-[#50bdeb]",
-    bgClass: "bg-cyan-50/30",
-    statusId: 3,
-  },
-  {
-    title: "En Revisión",
-    status: "in-review" as BoardStatus,
-    color: "bg-amber-500",
-    bgClass: "bg-amber-50/30",
-    statusId: 4,
-  },
-];
+      statusIdMap.value.clear();
+      statuses.forEach((status) => {
+        statusIdMap.value.set(status.id_status, status);
+      });
 
-const normalizeStatus = (status: string | null | undefined): string => {
-  if (!status) return "";
-  return status
-    .toLowerCase()
-    .trim()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+      columns.value = boardStatuses.map((status, index) => ({
+        title: status.status_name,
+        status: status.id_status.toString(),
+        color: columnColors[index % columnColors.length].color,
+        bgClass: columnColors[index % columnColors.length].bgClass,
+        statusId: status.id_status,
+      }));
+    }
+  } catch (error) {
+    notification.error(
+      "Error",
+      "No se pudieron cargar los estados del tablero",
+    );
+  }
 };
 
-const ticketsByStatus = computed(() => {
-  const statusMap = {
-    new: ["nuevo", "new"],
-    pending: ["pendiente", "pending"],
-    "in-progress": [
-      "en progreso",
-      "en proceso",
-      "in-progress",
-      "in progress",
-      "progreso",
-    ],
-    "in-review": [
-      "en revision",
-      "en revisión",
-      "revision",
-      "revisión",
-      "in-review",
-      "in review",
-    ],
-  };
+const loadAns = async () => {
+  try {
+    const response = await ansService.getAll();
+    if (response.data && response.data.results) {
+      ansList.value = response.data.results;
+    }
+  } catch (error) {
+    notification.error("Error", "No se pudieron cargar los ANS");
+  }
+};
 
-  const filterByStatus = (allowedStatuses: string[]) => {
-    return mockTickets.value.filter((t) => {
-      if (!t.status_name) return false;
-      const normalized = normalizeStatus(t.status_name);
-      return allowedStatuses.some(
-        (status) => normalizeStatus(status) === normalized
-      );
-    });
-  };
+const loadServices = async () => {
+  try {
+    const response = await requestTypeService.getAll();
+    if (response.success && response.data) {
+      servicesList.value = response.data.results;
+    }
+  } catch (err) {
+    notification.error("Error", "No se pudieron cargar los servicios");
+  }
+};
 
-  return {
-    new: filterByStatus(statusMap.new),
-    pending: filterByStatus(statusMap.pending),
-    "in-progress": filterByStatus(statusMap["in-progress"]),
-    "in-review": filterByStatus(statusMap["in-review"]),
-  };
+const loadSubPrograms = async () => {
+  try {
+    const response = await subProgramsService.getAll();
+    if (response.success && response.data?.results) {
+      subProgramsList.value = response.data.results;
+    }
+  } catch (error) {
+    notification.error("Error", "No se pudieron cargar los subprogramas");
+  }
+};
+
+const loadEUsers = async () => {
+  try {
+    const response = await eUsersServices.getAll();
+    if (response.success && response.data?.results) {
+      eUsersList.value = response.data.results;
+    }
+  } catch (error) {
+    notification.error("Error", "No se pudieron cargar los usuarios");
+  }
+};
+
+const loadPriorities = async () => {
+  try {
+    const response = await ticketPriorityService.getAll();
+    if (response.success && response.data?.results) {
+      prioritiesList.value = response.data.results;
+    }
+  } catch (error) {
+    notification.error("Error", "No se pudieron cargar las prioridades");
+  }
+};
+
+const loadClosingCodes = async () => {
+  try {
+    const response = await closingCodeService.getAll();
+    if (response.success && response.data?.results) {
+      closingCodesList.value = response.data.results;
+    }
+  } catch (error) {
+    notification.error("Error", "No se pudieron cargar los códigos de cierre");
+  }
+};
+
+const loadModalData = async () => {
+  if (modalDataLoaded.value) return;
+
+  try {
+    await Promise.all([
+      loadServices(),
+      loadSubPrograms(),
+      loadEUsers(),
+      loadPriorities(),
+      loadClosingCodes(),
+    ]);
+    modalDataLoaded.value = true;
+  } catch (error) {
+    notification.error(
+      "Error",
+      "No se pudieron cargar los datos necesarios para la edición del ticket",
+    );
+  }
+};
+
+const calculateEstimatedDateIfNeeded = async () => {
+  if (!isAnsNumeric.value || !fullTicket.value) return;
+
+  const currentAns = ansList.value.find(
+    (ans) => ans.id_ans === editedTicket.value.ticket_ans,
+  );
+
+  if (!currentAns) return;
+
+  try {
+    const ansHours = parseInt(currentAns.ans_name);
+    const dateCreation = fullTicket.value.create_at.split(".")[0];
+
+    const projectDateResponse = await projectDateService.findProjectDate(
+      ansHours,
+      dateCreation,
+    );
+
+    if (projectDateResponse.success && projectDateResponse.data) {
+      editedTicket.value.estimated_closing_date =
+        projectDateResponse.data.response;
+    }
+  } catch (error) {
+    notification.error(
+      "Error",
+      "No se pudo calcular la fecha estimada de cierre",
+    );
+  }
+};
+
+watch(
+  () => editedTicket.value.ticket_ans,
+  async (newAns, oldAns) => {
+    if (newAns !== oldAns && fullTicket.value) {
+      if (isAnsNumeric.value) {
+        await calculateEstimatedDateIfNeeded();
+      } else {
+        if (!fullTicket.value.estimated_closing_date) {
+          editedTicket.value.estimated_closing_date = null;
+        }
+      }
+    }
+  },
+);
+
+const columns = ref<
+  {
+    title: string;
+    status: string;
+    color: string;
+    bgClass: string;
+    statusId: number;
+  }[]
+>([]);
+
+const statusIdMap = ref<Map<number, Status>>(new Map());
+
+const columnColors = [
+  { color: "bg-purple-500", bgClass: "bg-purple-50/30" },
+  { color: "bg-blue-500", bgClass: "bg-blue-50/30" },
+  { color: "bg-cyan-500", bgClass: "bg-cyan-50/30" },
+  { color: "bg-amber-500", bgClass: "bg-amber-50/30" },
+  { color: "bg-green-500", bgClass: "bg-green-50/30" },
+  { color: "bg-pink-500", bgClass: "bg-pink-50/30" },
+  { color: "bg-indigo-500", bgClass: "bg-indigo-50/30" },
+  { color: "bg-red-500", bgClass: "bg-red-50/30" },
+];
+
+onMounted(() => {
+  loadColumsByStatus();
+  loadTickets();
+  loadAns();
 });
 
-const handleDragStart = (event: DragEvent, ticket: Ticket) => {
+const ticketsByStatus = computed(() => {
+  const result: Record<string, TicketShort[]> = {};
+  columns.value.forEach((column) => {
+    result[column.status] = [];
+  });
+
+  TicketsShort.value.forEach((ticket) => {
+    const matchingStatus = Array.from(statusIdMap.value.values()).find(
+      (status) =>
+        status.status_name.toLowerCase().trim() ===
+        ticket.status_name?.toLowerCase().trim(),
+    );
+
+    if (matchingStatus) {
+      const columnKey = matchingStatus.id_status.toString();
+      if (result[columnKey]) {
+        const enrichedTicket = { ...ticket };
+        const ans = ansList.value.find((a) => a.id_ans === ticket.ticket_ans);
+        if (ans) {
+          enrichedTicket.ticket_ans = ans.ans_name as any;
+        }
+
+        result[columnKey].push(enrichedTicket);
+      }
+    }
+  });
+
+  return result;
+});
+
+const handleDragStart = (event: DragEvent, ticket: TicketShort) => {
   draggedTicket.value = ticket;
   if (event.dataTransfer) {
     event.dataTransfer.effectAllowed = "move";
@@ -1144,153 +1611,915 @@ const handleDragStart = (event: DragEvent, ticket: Ticket) => {
 };
 
 const handleDragEnd = () => {
-  draggedTicket.value = null;
   isDeletingZone.value = false;
   isCompletingZone.value = false;
 };
 
-const handleDragEnter = (_statusId: number) => {
-  // Visual feedback for column hover
-};
+const handleDragEnter = (_statusId: number) => {};
 
-const handleDragLeave = (_statusId: number) => {
-  // Visual feedback cleanup
-};
+const handleDragLeave = (_statusId: number) => {};
 
-const handleDrop = (event: DragEvent, newStatusId: number) => {
+const handleDrop = async (event: DragEvent, newStatusId: number) => {
   event.preventDefault();
   if (!draggedTicket.value) return;
 
-  const statusMap: { [key: number]: string } = {
-    1: "Nuevo",
-    2: "Pendiente",
-    3: "En progreso",
-    4: "En Revisión",
-  };
+  const newStatus = statusIdMap.value.get(newStatusId);
+  if (!newStatus) {
+    notification.error("Error", "Estado no encontrado");
+    return;
+  }
 
   const oldStatusName = draggedTicket.value.status_name;
-  const newStatusName = statusMap[newStatusId];
+  const newStatusName = newStatus.status_name;
+
   if (oldStatusName !== newStatusName) {
-    targetStatus.value = newStatusId;
-    modalAction.value = "move";
-    editedTicket.value = { ...draggedTicket.value };
-    editedTicket.value.status_name = newStatusName;
-    clientSearch.value = draggedTicket.value.sub_program_name || "";
-    activeTab.value = "details";
-    showModal.value = true;
+    await loadModalData();
+
+    try {
+      const response = await TicketService.getTicketById(
+        draggedTicket.value.id_ticket,
+      );
+      if (response.success && response.data) {
+        fullTicket.value = response.data;
+
+        editedTicket.value = {
+          id_ticket: fullTicket.value.id_ticket,
+          ticket_title: fullTicket.value.ticket_title,
+          ticket_description: fullTicket.value.ticket_description,
+          ticket_attachments: fullTicket.value.ticket_attachments,
+          service_name: fullTicket.value.service?.service_name || "",
+          priority_name: fullTicket.value.priority?.priority_name || "Media",
+          ticket_closing_code: fullTicket.value.ticket_closing_code,
+          ticket_ans: fullTicket.value.ticket_ans,
+          reporter_user_name: fullTicket.value.reporter_user || "",
+          create_at: fullTicket.value.create_at,
+          update_at: fullTicket.value.update_at || "",
+          assigned_to: fullTicket.value.assigned_to,
+          closing_date: fullTicket.value.closing_date,
+          estimated_closing_date: fullTicket.value.estimated_closing_date,
+          status_name: newStatusName,
+          sub_program_name:
+            fullTicket.value.sub_program?.sub_program_name || "",
+        };
+
+        subProgramSearch.value =
+          editedTicket.value.sub_program_name || "No encontrado";
+
+        if (fullTicket.value && fullTicket.value.assigned_to) {
+          const assignedUser = eUsersList.value.find(
+            (u) => u.network_user === fullTicket.value!.assigned_to,
+          );
+          if (assignedUser) {
+            assignedToSearch.value =
+              `${assignedUser.name} ${assignedUser.middle_name || ""} ${assignedUser.last_name} ${assignedUser.second_last_name || ""}`
+                .trim()
+                .replace(/\s+/g, " ");
+          }
+        }
+
+        if (fullTicket.value.notes && fullTicket.value.notes.length > 0) {
+          ticketComments.value = fullTicket.value.notes;
+        } else {
+          ticketComments.value = [];
+        }
+
+        if (
+          fullTicket.value.reported_times &&
+          fullTicket.value.reported_times.length > 0
+        ) {
+          ticketReportedTimes.value = fullTicket.value.reported_times;
+        } else {
+          ticketReportedTimes.value = [];
+        }
+
+        targetStatus.value = newStatusId;
+        modalAction.value = "move";
+        activeTab.value = "details";
+
+        if (!editedTicket.value.estimated_closing_date) {
+          await calculateEstimatedDateIfNeeded();
+        }
+
+        showModal.value = true;
+      }
+    } catch (error) {
+      notification.error(
+        "Error",
+        "No se pudo cargar la información del ticket",
+      );
+    }
   }
 };
 
-const handleDropToDelete = (event: DragEvent) => {
+const handleDropToDelete = async (event: DragEvent) => {
   event.preventDefault();
   if (!draggedTicket.value) return;
+  const denyStatus = Array.from(statusIdMap.value.values()).find(
+    (status) =>
+      (status.ordering === null || status.ordering === undefined) &&
+      status.is_completion === false &&
+      status.is_backlog === false,
+  );
 
-  modalAction.value = "delete";
-  editedTicket.value = { ...draggedTicket.value };
-  clientSearch.value = draggedTicket.value.sub_program_name || "";
-  activeTab.value = "details";
-  showModal.value = true;
-  isDeletingZone.value = false;
-};
-
-const handleDropToComplete = (event: DragEvent) => {
-  event.preventDefault();
-  if (!draggedTicket.value) return;
-  modalAction.value = "complete";
-  editedTicket.value = { ...draggedTicket.value };
-  clientSearch.value = draggedTicket.value.sub_program_name || "";
-  activeTab.value = "details";
-  showModal.value = true;
-  isCompletingZone.value = false;
-};
-
-const confirmAction = () => {
-  if (!draggedTicket.value) return;
-
-  if (modalAction.value === "delete") {
-    const index = mockTickets.value.findIndex(
-      (t) => t.id_ticket === draggedTicket.value!.id_ticket
+  if (!denyStatus) {
+    notification.error(
+      "Error",
+      "No se encontró un estado de denegación configurado en el sistema",
     );
-    if (index !== -1) {
-      mockTickets.value.splice(index, 1);
+    isDeletingZone.value = false;
+    return;
+  }
+
+  await loadModalData();
+
+  try {
+    const response = await TicketService.getTicketById(
+      draggedTicket.value.id_ticket,
+    );
+    if (response.success && response.data) {
+      fullTicket.value = response.data;
+
+      editedTicket.value = {
+        id_ticket: fullTicket.value.id_ticket,
+        ticket_title: fullTicket.value.ticket_title,
+        ticket_description: fullTicket.value.ticket_description,
+        ticket_attachments: fullTicket.value.ticket_attachments,
+        service_name: fullTicket.value.service?.service_name || "",
+        priority_name: fullTicket.value.priority?.priority_name || "Media",
+        ticket_closing_code: fullTicket.value.ticket_closing_code,
+        ticket_ans: fullTicket.value.ticket_ans,
+        reporter_user_name: fullTicket.value.reporter_user || "",
+        create_at: fullTicket.value.create_at,
+        update_at: fullTicket.value.update_at || "",
+        assigned_to: fullTicket.value.assigned_to,
+        closing_date: fullTicket.value.closing_date,
+        estimated_closing_date: fullTicket.value.estimated_closing_date,
+        status_name: denyStatus.status_name,
+        sub_program_name: fullTicket.value.sub_program?.sub_program_name || "",
+      };
+
+      subProgramSearch.value =
+        editedTicket.value.sub_program_name || "No encontrado";
+
+      if (fullTicket.value && fullTicket.value.assigned_to) {
+        const assignedUser = eUsersList.value.find(
+          (u) => u.network_user === fullTicket.value!.assigned_to,
+        );
+        if (assignedUser) {
+          assignedToSearch.value =
+            `${assignedUser.name} ${assignedUser.middle_name || ""} ${assignedUser.last_name} ${assignedUser.second_last_name || ""}`
+              .trim()
+              .replace(/\s+/g, " ");
+        }
+      }
+
+      if (fullTicket.value.notes && fullTicket.value.notes.length > 0) {
+        ticketComments.value = fullTicket.value.notes;
+      } else {
+        ticketComments.value = [];
+      }
+
+      if (
+        fullTicket.value.reported_times &&
+        fullTicket.value.reported_times.length > 0
+      ) {
+        ticketReportedTimes.value = fullTicket.value.reported_times;
+      } else {
+        ticketReportedTimes.value = [];
+      }
+
+      targetStatus.value = denyStatus.id_status;
+      modalAction.value = "delete";
+      activeTab.value = "details";
+
+      if (!editedTicket.value.estimated_closing_date) {
+        await calculateEstimatedDateIfNeeded();
+      }
+
+      showModal.value = true;
+      isDeletingZone.value = false;
     }
-  } else if (modalAction.value === "complete") {
-    // Marcar como completado y actualizar con datos del formulario
-    const ticket = mockTickets.value.find(
-      (t) => t.id_ticket === draggedTicket.value!.id_ticket
+  } catch (error) {
+    notification.error("Error", "No se pudo cargar la información del ticket");
+  }
+};
+
+const handleDropToComplete = async (event: DragEvent) => {
+  event.preventDefault();
+  if (!draggedTicket.value) return;
+
+  const completionStatus = Array.from(statusIdMap.value.values()).find(
+    (status) => status.is_completion === true,
+  );
+
+  if (!completionStatus) {
+    notification.error(
+      "Error",
+      "No se encontró un estado de completado configurado en el sistema",
     );
-    if (ticket) {
-      // Actualizar con los datos editados
-      Object.assign(ticket, editedTicket.value);
-      ticket.closing_date = new Date().toISOString();
-      ticket.update_at = new Date().toISOString();
-      // Eliminar el ticket del board al completarlo
-      const index = mockTickets.value.findIndex(
-        (t) => t.id_ticket === draggedTicket.value!.id_ticket
+    isCompletingZone.value = false;
+    return;
+  }
+
+  await loadModalData();
+
+  try {
+    const response = await TicketService.getTicketById(
+      draggedTicket.value.id_ticket,
+    );
+    if (response.success && response.data) {
+      fullTicket.value = response.data;
+
+      editedTicket.value = {
+        id_ticket: fullTicket.value.id_ticket,
+        ticket_title: fullTicket.value.ticket_title,
+        ticket_description: fullTicket.value.ticket_description,
+        ticket_attachments: fullTicket.value.ticket_attachments,
+        service_name: fullTicket.value.service?.service_name || "",
+        priority_name: fullTicket.value.priority?.priority_name || "Media",
+        ticket_closing_code: fullTicket.value.ticket_closing_code,
+        ticket_ans: fullTicket.value.ticket_ans,
+        reporter_user_name: fullTicket.value.reporter_user || "",
+        create_at: fullTicket.value.create_at,
+        update_at: fullTicket.value.update_at || "",
+        assigned_to: fullTicket.value.assigned_to,
+        closing_date: fullTicket.value.closing_date,
+        estimated_closing_date: fullTicket.value.estimated_closing_date,
+        status_name: completionStatus.status_name,
+        sub_program_name: fullTicket.value.sub_program?.sub_program_name || "",
+      };
+
+      subProgramSearch.value =
+        editedTicket.value.sub_program_name || "No encontrado";
+
+      if (fullTicket.value && fullTicket.value.assigned_to) {
+        const assignedUser = eUsersList.value.find(
+          (u) => u.network_user === fullTicket.value!.assigned_to,
+        );
+        if (assignedUser) {
+          assignedToSearch.value =
+            `${assignedUser.name} ${assignedUser.middle_name || ""} ${assignedUser.last_name} ${assignedUser.second_last_name || ""}`
+              .trim()
+              .replace(/\s+/g, " ");
+        }
+      }
+
+      if (fullTicket.value.notes && fullTicket.value.notes.length > 0) {
+        ticketComments.value = fullTicket.value.notes;
+      } else {
+        ticketComments.value = [];
+      }
+
+      if (
+        fullTicket.value.reported_times &&
+        fullTicket.value.reported_times.length > 0
+      ) {
+        ticketReportedTimes.value = fullTicket.value.reported_times;
+      } else {
+        ticketReportedTimes.value = [];
+      }
+
+      targetStatus.value = completionStatus.id_status;
+      modalAction.value = "complete";
+      activeTab.value = "details";
+
+      if (!editedTicket.value.estimated_closing_date) {
+        await calculateEstimatedDateIfNeeded();
+      }
+
+      showModal.value = true;
+      isCompletingZone.value = false;
+    }
+  } catch (error) {
+    notification.error("Error", "No se pudo cargar la información del ticket");
+  }
+};
+
+const confirmAction = async () => {
+  if (!draggedTicket.value) {
+    return;
+  }
+
+  if (modalAction.value === "move") {
+    const missingFields: string[] = [];
+
+    if (
+      !editedTicket.value.service_name ||
+      editedTicket.value.service_name.trim() === ""
+    ) {
+      missingFields.push("Servicio");
+    }
+
+    if (!editedTicket.value.estimated_closing_date && !isAnsNumeric.value) {
+      missingFields.push("Fecha Estimada de Cierre");
+    }
+
+    if (
+      !editedTicket.value.assigned_to ||
+      editedTicket.value.assigned_to.trim() === ""
+    ) {
+      missingFields.push("Asignado a");
+    }
+    if (
+      !editedTicket.value.priority_name ||
+      editedTicket.value.priority_name.trim() === ""
+    ) {
+      missingFields.push("Prioridad");
+    }
+
+    if (missingFields.length > 0) {
+      notification.warning(
+        "Campos incompletos",
+        `Debes completar los siguientes campos antes de cambiar el estado: ${missingFields.join(", ")}`,
       );
-      if (index !== -1) {
-        mockTickets.value.splice(index, 1);
+      activeTab.value = "details";
+      return;
+    }
+  }
+
+  try {
+    if (modalAction.value === "delete") {
+      if (commentText.value.trim().length === 0) {
+        notification.warning(
+          "Comentario requerido",
+          "Debes agregar un comentario antes de denegar el ticket",
+        );
+        activeTab.value = "details";
+        return;
+      }
+
+      if (!editedTicket.value.ticket_closing_code) {
+        notification.warning(
+          "Código de cierre requerido",
+          "Debes seleccionar un código de cierre",
+        );
+        activeTab.value = "details";
+        return;
+      }
+
+      if (!targetStatus.value) {
+        notification.error(
+          "Error",
+          "No se pudo identificar el estado de denegación",
+        );
+        return;
+      }
+
+      const response = await TicketService.updateTicketStatus(
+        draggedTicket.value.id_ticket,
+        targetStatus.value,
+      );
+
+      if (response.success) {
+        if (reportedHours.value > 0 || reportedMinutes.value > 0) {
+          try {
+            const totalMinutes =
+              reportedHours.value * 60 + reportedMinutes.value;
+            const hours = Math.floor(totalMinutes / 60);
+            const minutes = totalMinutes % 60;
+            const reportedTimeStr = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`;
+
+            await reportedTimeService.createReportedTime({
+              date_reported: new Date().toISOString().split("T")[0],
+              id_ticket: draggedTicket.value.id_ticket,
+              network_user: CurrentUserInfo.username,
+              reported_time: reportedTimeStr,
+            });
+          } catch (error) {
+            notification.error(
+              "Advertencia",
+              "El ticket se denegó pero no se pudo guardar el tiempo reportado",
+            );
+          }
+        }
+
+        try {
+          await notesService.createNote({
+            note: commentText.value.trim(),
+            visible_to_client: false,
+            id_ticket: draggedTicket.value.id_ticket,
+            network_user: CurrentUserInfo.username,
+          });
+        } catch (error) {
+          notification.error(
+            "Advertencia",
+            "El ticket se denegó pero no se pudo guardar el comentario",
+          );
+        }
+
+        const index = TicketsShort.value.findIndex(
+          (t) => t.id_ticket === draggedTicket.value!.id_ticket,
+        );
+        if (index !== -1) {
+          TicketsShort.value.splice(index, 1);
+        }
+        notification.success("Éxito", "Ticket denegado correctamente");
+      } else {
+        notification.error("Error", "No se pudo denegar el ticket");
+      }
+    } else if (modalAction.value === "complete") {
+      if (commentText.value.trim().length === 0) {
+        notification.warning(
+          "Comentario requerido",
+          "Debes agregar un comentario antes de completar el ticket",
+        );
+        activeTab.value = "details";
+        return;
+      }
+
+      if (!editedTicket.value.ticket_closing_code) {
+        notification.warning(
+          "Código de cierre requerido",
+          "Debes seleccionar un código de cierre",
+        );
+        activeTab.value = "details";
+        return;
+      }
+
+      if (!targetStatus.value) {
+        notification.error(
+          "Error",
+          "No se pudo identificar el estado de completado",
+        );
+        return;
+      }
+
+      const response = await TicketService.updateTicketStatus(
+        draggedTicket.value.id_ticket,
+        targetStatus.value,
+      );
+
+      if (response.success) {
+        if (reportedHours.value > 0 || reportedMinutes.value > 0) {
+          try {
+            const totalMinutes =
+              reportedHours.value * 60 + reportedMinutes.value;
+            const hours = Math.floor(totalMinutes / 60);
+            const minutes = totalMinutes % 60;
+            const reportedTimeStr = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`;
+
+            await reportedTimeService.createReportedTime({
+              date_reported: new Date().toISOString().split("T")[0],
+              id_ticket: draggedTicket.value.id_ticket,
+              network_user: CurrentUserInfo.username,
+              reported_time: reportedTimeStr,
+            });
+          } catch (error) {
+            notification.error(
+              "Advertencia",
+              "El ticket se completó pero no se pudo guardar el tiempo reportado",
+            );
+          }
+        }
+
+        try {
+          await notesService.createNote({
+            note: commentText.value.trim(),
+            visible_to_client: false,
+            id_ticket: draggedTicket.value.id_ticket,
+            network_user: CurrentUserInfo.username,
+          });
+        } catch (error) {
+          notification.error(
+            "Advertencia",
+            "El ticket se completó pero no se pudo guardar el comentario",
+          );
+        }
+        const index = TicketsShort.value.findIndex(
+          (t) => t.id_ticket === draggedTicket.value!.id_ticket,
+        );
+        if (index !== -1) {
+          TicketsShort.value.splice(index, 1);
+        }
+        notification.success("Éxito", "Ticket completado correctamente");
+      } else {
+        notification.error("Error", "No se pudo completar el ticket");
+      }
+    } else if (modalAction.value === "move") {
+      if (commentText.value.trim().length === 0) {
+        notification.warning(
+          "Comentario requerido",
+          "Debes agregar un comentario antes de cambiar el estado del ticket",
+        );
+        activeTab.value = "details";
+        return;
+      }
+
+      const selectedStatus = Array.from(statusIdMap.value.values()).find(
+        (status) => status.status_name === editedTicket.value.status_name,
+      );
+
+      if (!selectedStatus) {
+        notification.error("Error", "Estado seleccionado no válido");
+        return;
+      }
+
+      const statusIdToUpdate = selectedStatus.id_status;
+
+      const currentStatus = Array.from(statusIdMap.value.values()).find(
+        (status) => status.status_name === draggedTicket.value!.status_name,
+      );
+
+      const wasInFirstState = currentStatus
+        ? currentStatus.ordering === 1
+        : false;
+
+      if (wasInFirstState) {
+        const updateData: TicketUpdate = {};
+
+        if (editedTicket.value.service_name) {
+          const service = servicesList.value.find(
+            (s) => s.service_name === editedTicket.value.service_name,
+          );
+          if (service) {
+            updateData.ticket_service = service.id_services;
+          }
+        }
+
+        if (editedTicket.value.sub_program_name) {
+          updateData.sub_program_name = editedTicket.value.sub_program_name;
+        }
+
+        if (editedTicket.value.ticket_ans != null) {
+          updateData.ticket_ans =
+            typeof editedTicket.value.ticket_ans === "number"
+              ? editedTicket.value.ticket_ans
+              : Number(editedTicket.value.ticket_ans);
+        }
+
+        if (editedTicket.value.priority_name) {
+          updateData.ticket_priority = editedTicket.value.priority_name;
+        }
+
+        if (editedTicket.value.assigned_to) {
+          updateData.assigned_to = editedTicket.value.assigned_to;
+        }
+
+        if (editedTicket.value.estimated_closing_date) {
+          updateData.estimated_closing_date =
+            editedTicket.value.estimated_closing_date;
+        }
+
+        const updateResponse = await TicketService.updateTicket(
+          draggedTicket.value.id_ticket,
+          updateData,
+        );
+
+        if (!updateResponse.success) {
+          notification.error(
+            "Error",
+            "No se pudieron actualizar los campos del ticket",
+          );
+          return;
+        }
+      }
+
+      const response = await TicketService.updateTicketStatus(
+        draggedTicket.value.id_ticket,
+        statusIdToUpdate,
+      );
+
+      if (response.success) {
+        const isNoLongerAssignedToMe =
+          editedTicket.value.assigned_to &&
+          editedTicket.value.assigned_to !== CurrentUserInfo.username;
+
+        if (isNoLongerAssignedToMe) {
+          const index = TicketsShort.value.findIndex(
+            (t) => t.id_ticket === draggedTicket.value!.id_ticket,
+          );
+          if (index !== -1) {
+            TicketsShort.value.splice(index, 1);
+          }
+        } else {
+          const ticket = TicketsShort.value.find(
+            (t) => t.id_ticket === draggedTicket.value!.id_ticket,
+          );
+          if (ticket) {
+            Object.assign(ticket, editedTicket.value);
+            ticket.update_at = new Date().toISOString();
+          }
+        }
+
+        if (reportedHours.value > 0 || reportedMinutes.value > 0) {
+          try {
+            const totalMinutes =
+              reportedHours.value * 60 + reportedMinutes.value;
+            const hours = Math.floor(totalMinutes / 60);
+            const minutes = totalMinutes % 60;
+            const reportedTimeStr = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`;
+
+            await reportedTimeService.createReportedTime({
+              date_reported: new Date().toISOString().split("T")[0],
+              id_ticket: draggedTicket.value.id_ticket,
+              network_user: CurrentUserInfo.username,
+              reported_time: reportedTimeStr,
+            });
+          } catch (error) {
+            notification.error(
+              "Advertencia",
+              "El ticket se actualizó pero no se pudo guardar el tiempo reportado",
+            );
+          }
+        }
+
+        if (commentText.value.trim().length > 0) {
+          try {
+            await notesService.createNote({
+              note: commentText.value.trim(),
+              visible_to_client: false,
+              id_ticket: draggedTicket.value.id_ticket,
+              network_user: CurrentUserInfo.username,
+            });
+          } catch (error) {
+            notification.error(
+              "Advertencia",
+              "El ticket se actualizó pero no se pudo guardar el comentario",
+            );
+          }
+        }
+
+        if (
+          reportedHours.value > 0 ||
+          reportedMinutes.value > 0 ||
+          commentText.value.trim().length > 0
+        ) {
+          try {
+            const ticketResponse = await TicketService.getTicketById(
+              draggedTicket.value.id_ticket,
+            );
+            if (ticketResponse.success && ticketResponse.data) {
+              fullTicket.value = ticketResponse.data;
+              if (fullTicket.value.notes) {
+                ticketComments.value = fullTicket.value.notes;
+              }
+              if (fullTicket.value.reported_times) {
+                ticketReportedTimes.value = fullTicket.value.reported_times;
+              }
+            }
+          } catch (error) {
+            notification.error(
+              "Advertencia",
+              "El ticket se actualizó pero no se pudieron recargar los datos recientes",
+            );
+          }
+        }
+
+        notification.success(
+          "Éxito",
+          "Estado del ticket actualizado correctamente",
+        );
+      } else {
+        notification.error(
+          "Error",
+          "No se pudo actualizar el estado del ticket",
+        );
       }
     }
-  } else if (modalAction.value === "move") {
-    // Actualizar ticket con los datos editados del formulario
-    const ticket = mockTickets.value.find(
-      (t) => t.id_ticket === draggedTicket.value!.id_ticket
-    );
-    if (ticket) {
-      Object.assign(ticket, editedTicket.value);
-      ticket.update_at = new Date().toISOString();
-    }
-  }
 
-  closeModal();
-  console.log("Ticket actualizado:", editedTicket.value);
+    closeModal();
+  } catch (error) {
+    notification.error(
+      "Error",
+      "Ocurrió un error al procesar la acción del ticket",
+    );
+  }
 };
 
 const closeModal = () => {
   showModal.value = false;
   draggedTicket.value = null;
+  fullTicket.value = null;
   targetStatus.value = null;
   modalAction.value = "move";
   clientSearch.value = "";
   showClientDropdown.value = false;
+  subProgramSearch.value = "";
+  showSubProgramDropdown.value = false;
+  assignedToSearch.value = "";
+  showAssignedToDropdown.value = false;
   activeTab.value = "details";
   commentText.value = "";
   reportedHours.value = 0;
   reportedMinutes.value = 0;
 };
 
-// Funciones para autocomplete de cliente
-const filterClients = () => {
-  const search = clientSearch.value.toLowerCase();
+const filterSubPrograms = () => {
+  const search = subProgramSearch.value.toLowerCase();
   if (search.length === 0) {
-    filteredClients.value = clientsList.value;
+    filteredSubPrograms.value = subProgramsList.value;
   } else {
-    filteredClients.value = clientsList.value.filter((client) =>
-      client.name.toLowerCase().includes(search)
+    filteredSubPrograms.value = subProgramsList.value.filter((subProgram) =>
+      subProgram.sub_program_name.toLowerCase().includes(search),
     );
   }
 };
 
-const selectClient = (client: { name: string }) => {
-  editedTicket.value.sub_program_name = client.name;
-  clientSearch.value = client.name;
-  showClientDropdown.value = false;
+const selectSubProgram = (subProgram: SubProgram) => {
+  editedTicket.value.sub_program_name = subProgram.sub_program_name;
+  subProgramSearch.value = subProgram.sub_program_name;
+  showSubProgramDropdown.value = false;
 };
 
-const hideClientDropdown = () => {
+const hideSubProgramDropdown = () => {
   setTimeout(() => {
-    showClientDropdown.value = false;
+    showSubProgramDropdown.value = false;
   }, 200);
 };
 
-// Función para abrir modal al hacer click en un ticket
-const openTicketModal = (ticket: Ticket) => {
+const filterAssignedTo = () => {
+  const search = assignedToSearch.value.toLowerCase();
+  if (search.length === 0) {
+    filteredAssignedTo.value = eUsersList.value;
+  } else {
+    filteredAssignedTo.value = eUsersList.value.filter((eUser) => {
+      const fullName =
+        `${eUser.name} ${eUser.middle_name || ""} ${eUser.last_name} ${eUser.second_last_name || ""}`.toLowerCase();
+      const networkUser = eUser.network_user.toLowerCase();
+      const email = (eUser.email || "").toLowerCase();
+      return (
+        fullName.includes(search) ||
+        networkUser.includes(search) ||
+        email.includes(search)
+      );
+    });
+  }
+};
+
+const selectAssignedTo = (eUser: EUser) => {
+  editedTicket.value.assigned_to = eUser.network_user;
+  assignedToSearch.value =
+    `${eUser.name} ${eUser.middle_name || ""} ${eUser.last_name} ${eUser.second_last_name || ""}`
+      .trim()
+      .replace(/\s+/g, " ");
+  showAssignedToDropdown.value = false;
+};
+
+const hideAssignedToDropdown = () => {
+  setTimeout(() => {
+    showAssignedToDropdown.value = false;
+  }, 200);
+};
+
+const searchTicketById = async () => {
+  const ticketId = parseInt(searchQuery.value.trim());
+
+  if (isNaN(ticketId) || ticketId <= 0) {
+    notification.warning(
+      "ID inválido",
+      "Por favor ingresa un número de ticket válido",
+    );
+    return;
+  }
+
+  try {
+    await loadModalData();
+
+    const response = await TicketService.getTicketById(ticketId);
+    if (response.success && response.data) {
+      fullTicket.value = response.data;
+
+      draggedTicket.value = {
+        id_ticket: fullTicket.value.id_ticket,
+        ticket_title: fullTicket.value.ticket_title,
+        ticket_description: fullTicket.value.ticket_description,
+        ticket_attachments: fullTicket.value.ticket_attachments,
+        service_name: fullTicket.value.service?.service_name || "",
+        priority_name: fullTicket.value.priority?.priority_name || "Media",
+        ticket_closing_code: fullTicket.value.ticket_closing_code,
+        ticket_ans: fullTicket.value.ticket_ans,
+        reporter_user_name: fullTicket.value.reporter_user || "",
+        create_at: fullTicket.value.create_at,
+        update_at: fullTicket.value.update_at || "",
+        assigned_to: fullTicket.value.assigned_to,
+        closing_date: fullTicket.value.closing_date,
+        estimated_closing_date: fullTicket.value.estimated_closing_date,
+        status_name: fullTicket.value.status?.status_name || "Nuevo",
+        sub_program_name: fullTicket.value.sub_program?.sub_program_name || "",
+      };
+
+      editedTicket.value = { ...draggedTicket.value };
+
+      subProgramSearch.value =
+        editedTicket.value.sub_program_name || "No encontrado";
+
+      if (fullTicket.value && fullTicket.value.assigned_to) {
+        const assignedUser = eUsersList.value.find(
+          (u) => u.network_user === fullTicket.value!.assigned_to,
+        );
+        if (assignedUser) {
+          assignedToSearch.value =
+            `${assignedUser.name} ${assignedUser.middle_name || ""} ${assignedUser.last_name} ${assignedUser.second_last_name || ""}`
+              .trim()
+              .replace(/\s+/g, " ");
+        }
+      }
+
+      if (fullTicket.value.notes && fullTicket.value.notes.length > 0) {
+        ticketComments.value = fullTicket.value.notes;
+      } else {
+        ticketComments.value = [];
+      }
+
+      if (
+        fullTicket.value.reported_times &&
+        fullTicket.value.reported_times.length > 0
+      ) {
+        ticketReportedTimes.value = fullTicket.value.reported_times;
+      } else {
+        ticketReportedTimes.value = [];
+      }
+
+      modalAction.value = "view";
+      activeTab.value = "details";
+      showModal.value = true;
+
+      searchQuery.value = "";
+    } else {
+      notification.error(
+        "Ticket no encontrado",
+        `No se encontró un ticket con el ID ${ticketId}`,
+      );
+    }
+  } catch (error) {
+    notification.error("Error", "Ocurrió un error al buscar el ticket");
+  }
+};
+
+const openTicketModal = async (ticket: TicketShort) => {
+  await loadModalData();
+
   draggedTicket.value = ticket;
   modalAction.value = "move";
-  editedTicket.value = { ...ticket };
-  clientSearch.value = ticket.sub_program_name || "";
   activeTab.value = "details";
-  showModal.value = true;
+
+  try {
+    const response = await TicketService.getTicketById(ticket.id_ticket);
+    if (response.success && response.data) {
+      fullTicket.value = response.data;
+
+      editedTicket.value = {
+        id_ticket: fullTicket.value.id_ticket,
+        ticket_title: fullTicket.value.ticket_title,
+        ticket_description: fullTicket.value.ticket_description,
+        ticket_attachments: fullTicket.value.ticket_attachments,
+        service_name: fullTicket.value.service?.service_name || "",
+        priority_name: fullTicket.value.priority?.priority_name || "Media",
+        ticket_closing_code: fullTicket.value.ticket_closing_code,
+        ticket_ans: fullTicket.value.ticket_ans,
+        reporter_user_name: fullTicket.value.reporter_user || "",
+        create_at: fullTicket.value.create_at,
+        update_at: fullTicket.value.update_at || "",
+        assigned_to: fullTicket.value.assigned_to,
+        closing_date: fullTicket.value.closing_date,
+        estimated_closing_date: fullTicket.value.estimated_closing_date,
+        status_name: fullTicket.value.status?.status_name || "Nuevo",
+        sub_program_name: fullTicket.value.sub_program?.sub_program_name || "",
+      };
+
+      subProgramSearch.value =
+        editedTicket.value.sub_program_name || "No encontrado";
+
+      if (fullTicket.value && fullTicket.value.assigned_to) {
+        const assignedUser = eUsersList.value.find(
+          (u) => u.network_user === fullTicket.value!.assigned_to,
+        );
+        if (assignedUser) {
+          assignedToSearch.value =
+            `${assignedUser.name} ${assignedUser.middle_name || ""} ${assignedUser.last_name} ${assignedUser.second_last_name || ""}`
+              .trim()
+              .replace(/\s+/g, " ");
+        }
+      }
+
+      if (fullTicket.value.notes && fullTicket.value.notes.length > 0) {
+        ticketComments.value = fullTicket.value.notes;
+      } else {
+        ticketComments.value = [];
+      }
+
+      if (
+        fullTicket.value.reported_times &&
+        fullTicket.value.reported_times.length > 0
+      ) {
+        ticketReportedTimes.value = fullTicket.value.reported_times;
+      } else {
+        ticketReportedTimes.value = [];
+      }
+
+      if (!editedTicket.value.estimated_closing_date) {
+        await calculateEstimatedDateIfNeeded();
+      }
+
+      showModal.value = true;
+    } else {
+      notification.error(
+        "Error",
+        "No se pudo cargar la información del ticket",
+      );
+    }
+  } catch (error) {
+    notification.error("Error", "No se pudo cargar el ticket");
+  }
 };
 </script>

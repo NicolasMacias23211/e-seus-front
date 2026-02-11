@@ -630,10 +630,13 @@
         <button
           type="submit"
           @click="handleSubmit"
-          :disabled="isSubmitting || isLoadingData"
+          :disabled="isSubmitting || isLoadingData || isUploadingFiles"
           class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:from-slate-400 disabled:to-slate-500"
         >
-          <span v-if="!isSubmitting" class="flex items-center gap-2">
+          <span
+            v-if="!isSubmitting && !isUploadingFiles"
+            class="flex items-center gap-2"
+          >
             <svg
               class="w-5 h-5"
               fill="none"
@@ -648,6 +651,29 @@
               />
             </svg>
             Crear Ticket
+          </span>
+          <span v-else-if="isUploadingFiles" class="flex items-center gap-2">
+            <svg
+              class="animate-spin h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Subiendo archivos...
           </span>
           <span v-else class="flex items-center gap-2">
             <svg
@@ -670,7 +696,7 @@
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
-            Creando...
+            Creando ticket...
           </span>
         </button>
       </div>
@@ -700,7 +726,7 @@ import type { Program } from "../models/Program";
 import type { SubProgram } from "../models/SubProgram";
 import type { ANS } from "../models/ANS";
 import type { Status } from "../models/Status";
-import { ServiceService } from "../services/serviceService";
+import { RequestTypeService } from "../services/RequestTypeService";
 import { TicketPriorityService } from "../services/ticketPriorityService";
 import { ClientsService } from "../services/clientsService";
 import { ProgramsService } from "../services/programsService";
@@ -709,9 +735,10 @@ import { AnsService } from "../services/ansService";
 import { StatusService } from "../services/statusService";
 import { TicketsService } from "../services/ticketsService";
 import { SessionStorageService } from "../services/SessionStorageService";
+import { FileUploadService } from "../services/fileUploadService";
 import ConfirmDialog from "./ConfirmDialog.vue";
 
-const serviceService = new ServiceService();
+const requestTypeService = new RequestTypeService();
 const priorityService = new TicketPriorityService();
 const clientsService = new ClientsService();
 const programsService = new ProgramsService();
@@ -720,6 +747,7 @@ const ansService = new AnsService();
 const statusService = new StatusService();
 const ticketsService = new TicketsService();
 const sessionStorage = new SessionStorageService();
+const fileUploadService = new FileUploadService();
 
 interface Props {
   modelValue: boolean;
@@ -751,6 +779,8 @@ const showSuccess = ref(false);
 const createdTicketId = ref<number | null>(null);
 const errorMessage = ref("");
 const showConfirmClose = ref(false);
+const isUploadingFiles = ref(false);
+const uploadedFileNames = ref<string[]>([]);
 
 const clientSearch = ref("");
 const programSearch = ref("");
@@ -788,7 +818,7 @@ const loadData = async () => {
       ansRes,
       statusRes,
     ] = await Promise.all([
-      serviceService.getAll(),
+      requestTypeService.getAll(),
       priorityService.getAll(),
       clientsService.getAll(),
       programsService.getAll(),
@@ -1013,13 +1043,29 @@ const handleSubmit = async () => {
       return;
     }
 
+    // Subir archivos si hay alguno
+    let fileNames: string[] = [];
+    if (uploadedFiles.value.length > 0) {
+      isUploadingFiles.value = true;
+      const uploadResponse = await fileUploadService.uploadFiles(
+        uploadedFiles.value,
+      );
+
+      if (uploadResponse.success && uploadResponse.data) {
+        fileNames = uploadResponse.data;
+        uploadedFileNames.value = fileNames;
+      } else {
+        errorMessage.value =
+          uploadResponse.message || "Error al subir los archivos";
+        return;
+      }
+      isUploadingFiles.value = false;
+    }
+
     const newTicket: TicketCreate = {
       ticket_title: form.ticketTitle,
       ticket_description: form.ticketDescription,
-      ticket_attachments:
-        uploadedFiles.value.length > 0
-          ? uploadedFiles.value.map((f) => f.name).join(", ")
-          : null,
+      ticket_attachments: fileNames.length > 0 ? fileNames.join(", ") : null,
       ticket_service: form.ticketService as number,
       ticket_priority: form.ticketPriority,
       ticket_ans: form.ticketAns as number,
@@ -1050,6 +1096,7 @@ const handleSubmit = async () => {
     console.error("Error:", error);
   } finally {
     isSubmitting.value = false;
+    isUploadingFiles.value = false;
   }
 };
 
@@ -1096,9 +1143,11 @@ const resetForm = () => {
   programSearch.value = "";
   subProgramSearch.value = "";
   uploadedFiles.value = [];
+  uploadedFileNames.value = [];
   showSuccess.value = false;
   createdTicketId.value = null;
   errorMessage.value = "";
+  isUploadingFiles.value = false;
 };
 
 watch(
