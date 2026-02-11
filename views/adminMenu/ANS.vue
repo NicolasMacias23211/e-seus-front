@@ -11,17 +11,13 @@
           <p class="text-xs text-slate-500">Acuerdos de Nivel de Servicio</p>
         </div>
       </div>
-      <button
-        @click="openCreateModal"
-        class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white rounded-lg hover:shadow-lg transition-all font-medium"
-      >
+      <button @click="openCreateModal"
+        class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white rounded-lg hover:shadow-lg transition-all font-medium">
         <Plus class="w-5 h-5" />
         Nuevo ANS
       </button>
     </div>
-    <div
-      class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden"
-    >
+    <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full">
           <thead class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white">
@@ -32,7 +28,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-200">
-            <tr v-for="(code, index) in ans" :key="index" class="hover:bg-blue-50 transition-colors">
+            <tr v-for="code in ans" :key="code.id_ans" class="hover:bg-blue-50 transition-colors">
               <td class="px-6 py-4 text-sm text-slate-700 font-medium">
                 {{ code.ans_name }}
               </td>
@@ -41,31 +37,27 @@
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center justify-center gap-2">
-                  <button
-                    @click="openEditModal(code)"
-                    class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all"
-                    title="Editar"
-                  >
+                  <button @click="openEditModal(code)"
+                    class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all" title="Editar">
                     <Edit2 class="w-4 h-4" />
                   </button>
-                  <button
-                    @click="confirmDelete(code)"
-                    class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all"
-                    title="Eliminar"
-                  >
+                  <button @click="confirmDelete(code)"
+                    class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all" title="Eliminar">
                     <Trash2 class="w-4 h-4" />
                   </button>
                 </div>
               </td>
             </tr>
             <tr v-if="ans.length === 0">
-              <td colspan="4" class="px-6 py-8 text-center text-slate-500">
+              <td colspan="3" class="px-6 py-8 text-center text-slate-500">
                 No hay ANS registrados
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      <Pagination :total-registers="total" @change="loadData" />
     </div>
     <Teleport to="body">
       <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
@@ -79,65 +71,36 @@
 
           <form @submit.prevent="handleSubmit" class="p-6 space-y-4">
             <div>
-              <input
-                id="ansId"
-                v-model.number="form.id_ans"
-                type="number"
-                required
-                hidden
-                :disabled="isEditing"
+              <input id="ansId" v-model.number="form.id_ans" type="number" required hidden :disabled="isEditing"
                 class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all disabled:bg-slate-100"
-                placeholder="ID del ANS"
-              />
+                placeholder="ID del ANS" />
             </div>
 
             <div>
-              <label
-                for="ansName"
-                class="block text-sm font-bold text-slate-700 mb-2"
-              >
+              <label for="ansName" class="block text-sm font-bold text-slate-700 mb-2">
                 Nombre del ANS <span class="text-red-500">*</span>
               </label>
-              <input
-                id="ansName"
-                v-model="form.ans_name"
-                type="text"
-                required
-                maxlength="45"
+              <input id="ansName" v-model="form.ans_name" type="text" required maxlength="45"
                 class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all"
-                placeholder="Ej: 24 horas, 48 horas"
-              />
+                placeholder="Ej: 24 horas, 48 horas" />
             </div>
 
             <div>
-              <label
-                for="ansDescription"
-                class="block text-sm font-bold text-slate-700 mb-2"
-              >
+              <label for="ansDescription" class="block text-sm font-bold text-slate-700 mb-2">
                 Descripción
               </label>
-              <textarea
-                id="ansDescription"
-                v-model="form.ans_description"
-                maxlength="100"
-                rows="3"
+              <textarea id="ansDescription" v-model="form.ans_description" maxlength="100" rows="3"
                 class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all resize-none"
-                placeholder="Descripción del ANS"
-              ></textarea>
+                placeholder="Descripción del ANS"></textarea>
             </div>
 
             <div class="flex gap-3 pt-4">
-              <button
-                type="button"
-                @click="closeModal"
-                class="flex-1 px-4 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 transition-all font-medium"
-              >
+              <button type="button" @click="closeModal"
+                class="flex-1 px-4 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 transition-all font-medium">
                 Cancelar
               </button>
-              <button
-                type="submit"
-                class="flex-1 px-4 py-3 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white rounded-xl hover:shadow-lg transition-all font-medium"
-              >
+              <button type="submit"
+                class="flex-1 px-4 py-3 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white rounded-xl hover:shadow-lg transition-all font-medium">
                 {{ isEditing ? "Actualizar" : "Crear" }}
               </button>
             </div>
@@ -145,15 +108,10 @@
         </div>
       </div>
     </Teleport>
-    <ConfirmDialog 
-      :is-visible="showConfirmDialog" 
-      type="delete" title="Confirmar Eliminación"
+    <ConfirmDialog :is-visible="showConfirmDialog" type="delete" title="Confirmar Eliminación"
       :message="`¿Está seguro de que desea eliminar el ANS '${ansToDelete?.ans_name}'?`"
-      details="Esta acción eliminará permanente el ANS del sistema"
-      confirm-text="Sí, eliminar"
-      cancel-text="Cancelar"
-      @confirm="handleDeleteConfirm"
-      @cancel="handleDeleteCancel"/>
+      details="Esta acción eliminará permanente el ANS del sistema" confirm-text="Sí, eliminar" cancel-text="Cancelar"
+      @confirm="handleDeleteConfirm" @cancel="handleDeleteCancel" />
   </div>
 </template>
 
@@ -164,11 +122,30 @@ import { useNotification } from "../../utils/useNotification";
 import { AnsService } from "../../services/ansService";
 import type { ANS } from "../../models/ANS";
 import ConfirmDialog from "../../components/ConfirmDialog.vue";
-
+import type { PaginationState } from "../../components/Pagination.vue";
+import Pagination from "../../components/Pagination.vue";
 
 const notification = useNotification();
 const ansService = new AnsService();
 const ans = ref<ANS[]>([]);
+const total = ref(0)
+
+const loadData = async (pagination?: PaginationState) => {
+  try {
+    const page = pagination?.currentPage ?? 1
+    const perPage = pagination?.perPage ?? 10
+    const response = await ansService.getAll(page, perPage)
+    if (response.data && response.data.results) {
+
+      ans.value = response.data.results
+      total.value = response.data.count
+    }
+  } catch (error) {
+    console.error("Error al cargar los códigos de cierre: ", error)
+    notification.error("Error", "No se pudieron cargar los códigos de cierre")
+  }
+}
+
 const showConfirmDialog = ref(false);
 const ansToDelete = ref<ANS | null>(null);
 const showModal = ref(false);
@@ -225,12 +202,12 @@ const create = async () => {
     })
 
     let response = await ansService.create(dataCreate);
-    if(response.success){
+    if (response.success) {
       notification.success(
         "¡Creado!",
         "El ANS ha sido creado correctamente"
       );
-      loadAns();
+      loadData();
       closeModal();
       return
     }
@@ -248,9 +225,9 @@ const create = async () => {
 const update = async () => {
   try {
     let data: ANS = ({
-        ans_name: form.ans_name,
-        ans_description: form.ans_description,
-      })
+      ans_name: form.ans_name,
+      ans_description: form.ans_description,
+    })
 
     let response = await ansService.update(data, form.id_ans)
     if (response.success) {
@@ -258,7 +235,7 @@ const update = async () => {
         "¡Actualizado!",
         "El ANS ha sido actualizado correctamente"
       );
-      loadAns();
+      loadData();
       closeModal();
       return
     }
@@ -293,7 +270,7 @@ const handleDeleteConfirm = async () => {
           "El ANS ha sido eliminado correctamente"
         );
 
-        loadAns();
+        loadData();
         handleDeleteCancel()
         return
       }
@@ -308,20 +285,8 @@ const handleDeleteConfirm = async () => {
   }
 };
 
-const loadAns = async () => {
-  try {
-    const response = await ansService.getAll()
-    if (response.data && response.data.results) {
-      ans.value = response.data.results
-    }
-  } catch (error) {
-    console.error("Error al cargar los ANS: ", error)
-    notification.error("Error", "No se pudieron cargar los ANS")
-  }
-}
-
 onMounted(() => {
-  loadAns();
+  loadData();
 })
 
 </script>
@@ -332,6 +297,7 @@ onMounted(() => {
     transform: scale(0.9);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
