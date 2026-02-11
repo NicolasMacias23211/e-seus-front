@@ -11,4 +11,16 @@ export class StatusService {
   async getById(id: number): Promise<ApiResponse<Status>> {
     return await http.get<Status>(`${this.endpoint}${id}/`);
   }
+
+  async create(status: Status): Promise<ApiResponse<Status>> {
+    return await http.post<Status>(this.endpoint, status);
+  }
+
+  async update(status: Status, id: number): Promise<ApiResponse<Status>> {
+    return await http.put<Status>(`${this.endpoint + id}/`, status);
+  }
+
+  async delete(id: number): Promise<ApiResponse<Status>> {
+    return await http.delete<Status>(this.endpoint + id + "/");
+  }
 }

@@ -1,5 +1,5 @@
 import { http, type PaginatedResponse, type ApiResponse } from "./http";
-import type { Ticket } from "../models/Ticket";
+import type { Ticket, TicketCreate } from "../models/Ticket";
 import { SessionStorageService } from "./SessionStorageService";
 
 const sessionStorage = new SessionStorageService();
@@ -13,6 +13,15 @@ export class TicketsService {
     return await http.get<PaginatedResponse<Ticket>>(
       `/tickets/?assigned_to=${assigned_to}`,
     );
+  }
+
+  async GetTicketByReporter(
+    reporter_user: string,
+  ): Promise<PaginatedResponse<Ticket>> {
+    const response = await http.get<PaginatedResponse<Ticket>>(
+      `${this.endpoint}?reporter_user__network_user=${reporter_user}`,
+    );
+    return response.data!;
   }
 
   getAllTicketsWithoutAssignment(): Promise<

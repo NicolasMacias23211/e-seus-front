@@ -918,7 +918,7 @@ const handleDrop = (event: DragEvent, date: string | undefined) => {
   if (isPastDate(date)) {
     notification.error(
       "Error",
-      "No se pueden agregar registros en fechas pasadas"
+      "No se pueden agregar registros en fechas pasadas",
     );
     draggedTicket = null;
     return;
@@ -951,7 +951,7 @@ const removeEntry = async (entryId: string, date: string) => {
   if (isPastDate(date)) {
     notification.error(
       "Error",
-      "No se pueden eliminar registros de fechas pasadas"
+      "No se pueden eliminar registros de fechas pasadas",
     );
     return;
   }
@@ -982,7 +982,7 @@ const confirmDelete = async () => {
         timeEntries.value.splice(index, 1);
         notification.success(
           "Eliminado",
-          `Tiempo del ticket #${ticketId} eliminado correctamente`
+          `Tiempo del ticket #${ticketId} eliminado correctamente`,
         );
       } catch (error: any) {
         console.error("Error al eliminar tiempo:", error);
@@ -990,12 +990,12 @@ const confirmDelete = async () => {
           timeEntries.value.splice(index, 1);
           notification.success(
             "Eliminado",
-            `Tiempo del ticket #${ticketId} eliminado correctamente`
+            `Tiempo del ticket #${ticketId} eliminado correctamente`,
           );
         } else {
           notification.error(
             "Error",
-            "No se pudo eliminar el registro del servidor"
+            "No se pudo eliminar el registro del servidor",
           );
         }
       }
@@ -1003,7 +1003,7 @@ const confirmDelete = async () => {
       timeEntries.value.splice(index, 1);
       notification.success(
         "Eliminado",
-        `Tiempo del ticket #${ticketId} eliminado`
+        `Tiempo del ticket #${ticketId} eliminado`,
       );
     }
 
@@ -1028,7 +1028,7 @@ const showAddModal = (date: string | undefined) => {
   if (isPastDate(date)) {
     notification.error(
       "Error",
-      "No se pueden agregar registros en fechas pasadas"
+      "No se pueden agregar registros en fechas pasadas",
     );
     return;
   }
@@ -1105,7 +1105,7 @@ const saveModalEntry = async () => {
     if (!timeResponse.success || !timeResponse.data) {
       notification.error(
         "Error",
-        "No se pudo crear el registro de tiempo reportado"
+        "No se pudo crear el registro de tiempo reportado",
       );
       return;
     }
@@ -1121,7 +1121,7 @@ const saveModalEntry = async () => {
       if (!noteResponse.success) {
         notification.warning(
           "Advertencia",
-          "El tiempo se guardó pero no se pudo crear el comentario"
+          "El tiempo se guardó pero no se pudo crear el comentario",
         );
       }
     }
@@ -1151,7 +1151,7 @@ const saveModalEntry = async () => {
     console.error("Error al guardar entrada:", error);
     notification.error(
       "Error",
-      "Ocurrió un error al guardar el tiempo reportado"
+      "Ocurrió un error al guardar el tiempo reportado",
     );
   }
 };
@@ -1197,19 +1197,19 @@ const saveEntry = async (entry: TimeEntry) => {
           date_reported: entry.date,
           id_ticket: entry.ticketId,
           network_user: userInfo.username,
-        }
+        },
       );
 
       if (response.success) {
         entry.isDirty = false;
         notification.success(
           "Guardado",
-          `Tiempo actualizado para ticket #${entry.ticketId}`
+          `Tiempo actualizado para ticket #${entry.ticketId}`,
         );
       } else {
         notification.error(
           "Error",
-          "No se pudo actualizar el tiempo reportado"
+          "No se pudo actualizar el tiempo reportado",
         );
       }
     } else {
@@ -1239,7 +1239,7 @@ const saveEntry = async (entry: TimeEntry) => {
 
         notification.success(
           "Guardado",
-          `Tiempo creado para ticket #${entry.ticketId}`
+          `Tiempo creado para ticket #${entry.ticketId}`,
         );
       } else {
         notification.error("Error", "No se pudo crear el tiempo reportado");
@@ -1255,7 +1255,7 @@ const saveEntry = async (entry: TimeEntry) => {
 
 const saveTimeEntries = async () => {
   const pendingEntries = timeEntries.value.filter(
-    (entry) => entry.isDirty || !entry.reportedTimeId
+    (entry) => entry.isDirty || !entry.reportedTimeId,
   );
 
   if (pendingEntries.length === 0) {
@@ -1271,7 +1271,7 @@ const saveTimeEntries = async () => {
 
   notification.success(
     "¡Éxito!",
-    `Se guardaron ${pendingEntries.length} registro(s) de tiempo`
+    `Se guardaron ${pendingEntries.length} registro(s) de tiempo`,
   );
 };
 
@@ -1335,7 +1335,7 @@ const loadReportedTimes = async () => {
     const response = await reportedTimeService.getReportedTimes(
       userInfo.username,
       dateAfter,
-      dateBefore
+      dateBefore,
     );
 
     if (response.success && response.data) {
@@ -1353,7 +1353,7 @@ const loadReportedTimes = async () => {
           }
 
           const ticket = availableTickets.value.find(
-            (t) => t.id_ticket === rt.id_ticket
+            (t) => t.id_ticket === rt.id_ticket,
           );
           const ticketTitle = ticket?.ticket_title || `Ticket #${rt.id_ticket}`;
 
