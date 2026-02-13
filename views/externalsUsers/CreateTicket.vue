@@ -6,10 +6,8 @@
     <div
       class="absolute inset-0 opacity-10 pointer-events-none"
       style="
-        background-image: linear-gradient(
-            rgba(80, 189, 235, 0.4) 1px,
-            transparent 1px
-          ),
+        background-image:
+          linear-gradient(rgba(80, 189, 235, 0.4) 1px, transparent 1px),
           linear-gradient(90deg, rgba(80, 189, 235, 0.4) 1px, transparent 1px);
         background-size: 30px 30px;
       "
@@ -160,7 +158,7 @@
       </div>
     </div>
 
-    <div class="w-full max-w-3xl relative z-10">
+    <div class="w-full max-w-4xl relative z-10">
       <div class="text-center mb-8">
         <div
           class="inline-block p-4 bg-white/10 rounded-2xl mb-4 backdrop-blur-sm border border-[#50bdeb]/30 shadow-lg shadow-[#50bdeb]/20"
@@ -185,387 +183,435 @@
           Crear Nuevo Ticket
         </h1>
         <p class="text-blue-100 text-lg font-medium">
-          Complete el formulario para reportar su solicitud
+          Complete el formulario paso a paso
         </p>
         <div
           class="mt-4 w-24 h-1 bg-gradient-to-r from-transparent via-[#50bdeb] to-transparent rounded-full mx-auto"
         ></div>
       </div>
 
+      <!-- Stepper Progress -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between relative">
+          <!-- Progress Line Background -->
+          <div
+            class="absolute top-6 left-0 right-0 h-1 bg-white/20 rounded-full"
+            style="z-index: 0"
+          ></div>
+          <!-- Progress Line Active -->
+          <div
+            class="absolute top-6 left-0 h-1 bg-gradient-to-r from-[#50bdeb] to-[#0538d4] rounded-full transition-all duration-500"
+            :style="{
+              width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%`,
+              zIndex: 1,
+            }"
+          ></div>
+
+          <!-- Steps -->
+          <div
+            v-for="step in steps"
+            :key="step.id"
+            class="relative flex flex-col items-center"
+            style="z-index: 2"
+          >
+            <div
+              class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 border-4 mb-2"
+              :class="
+                currentStep > step.id
+                  ? 'bg-gradient-to-br from-green-400 to-green-600 text-white border-green-300 shadow-lg shadow-green-500/50'
+                  : currentStep === step.id
+                    ? 'bg-gradient-to-br from-[#50bdeb] to-[#0538d4] text-white border-white shadow-xl shadow-[#50bdeb]/70 scale-110'
+                    : 'bg-white/10 text-white/50 border-white/30'
+              "
+            >
+              <svg
+                v-if="currentStep > step.id"
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="3"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              <span v-else>{{ step.id }}</span>
+            </div>
+            <span
+              class="text-xs font-semibold text-center max-w-[100px] transition-all"
+              :class="
+                currentStep === step.id
+                  ? 'text-white scale-105'
+                  : 'text-white/70'
+              "
+            >
+              {{ step.label }}
+            </span>
+          </div>
+        </div>
+      </div>
+
       <div
-        class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-[0_8px_32px_rgba(0,25,80,0.4)] p-8 border border-[#50bdeb]/20"
+        class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-[0_8px_32px_rgba(0,25,80,0.4)] p-8 border border-[#50bdeb]/20 min-h-[500px]"
       >
         <form @submit.prevent="handleSubmit">
-          <div class="mb-6">
-            <label
-              for="title"
-              class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2"
+          <!-- Step 1: Información Básica -->
+          <div v-show="currentStep === 1" class="step-content">
+            <h2
+              class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3"
             >
-              <svg
-                class="w-4 h-4 text-blue-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"
-                />
-                <path
-                  d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z"
-                />
-              </svg>
-              Título del Ticket <span class="text-red-500">*</span>
-            </label>
-            <input
-              id="title"
-              v-model="form.ticket_title"
-              type="text"
-              required
-              maxlength="45"
-              class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300"
-              placeholder="Ej: Error en el sistema de reportes"
-            />
-          </div>
+              <div class="p-2 bg-blue-100 rounded-lg">
+                <svg
+                  class="w-6 h-6 text-blue-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"
+                  />
+                </svg>
+              </div>
+              Información Básica
+            </h2>
 
-          <div class="mb-6">
-            <label
-              for="description"
-              class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2"
-            >
-              <svg
-                class="w-4 h-4 text-blue-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
-                  clip-rule="evenodd"
+            <div class="space-y-6">
+              <div>
+                <label
+                  for="title"
+                  class="block text-sm font-bold text-slate-700 mb-2"
+                >
+                  Título del Ticket <span class="text-red-500">*</span>
+                </label>
+                <input
+                  id="title"
+                  v-model="form.ticket_title"
+                  type="text"
+                  required
+                  maxlength="45"
+                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300"
+                  placeholder="Ej: Error en el sistema de reportes"
                 />
-              </svg>
-              Descripción <span class="text-red-500">*</span>
-            </label>
-            <textarea
-              id="description"
-              v-model="form.ticket_description"
-              required
-              maxlength="250"
-              rows="5"
-              class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none hover:border-blue-300"
-              placeholder="Describa detalladamente el problema o solicitud..."
-            ></textarea>
-            <div class="text-right text-sm text-slate-500 mt-1 font-medium">
-              {{ form.ticket_description.length }}/250 caracteres
+                <p class="text-xs text-slate-500 mt-1">
+                  {{ form.ticket_title.length }}/45 caracteres
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="description"
+                  class="block text-sm font-bold text-slate-700 mb-2"
+                >
+                  Descripción <span class="text-red-500">*</span>
+                </label>
+                <textarea
+                  id="description"
+                  v-model="form.ticket_description"
+                  required
+                  maxlength="250"
+                  rows="6"
+                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none hover:border-blue-300"
+                  placeholder="Describa detalladamente el problema o solicitud..."
+                ></textarea>
+                <p class="text-xs text-slate-500 mt-1">
+                  {{ form.ticket_description.length }}/250 caracteres
+                </p>
+              </div>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label
-                for="service"
-                class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2"
-              >
+          <!-- Step 2: Clasificación -->
+          <div v-show="currentStep === 2" class="step-content">
+            <h2
+              class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3"
+            >
+              <div class="p-2 bg-purple-100 rounded-lg">
                 <svg
-                  class="w-4 h-4 text-blue-600"
+                  class="w-6 h-6 text-purple-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"
+                  />
+                </svg>
+              </div>
+              Clasificación del Ticket
+            </h2>
+
+            <div class="space-y-6">
+              <div>
+                <label
+                  for="service"
+                  class="block text-sm font-bold text-slate-700 mb-2"
+                >
+                  Servicio <span class="text-red-500">*</span>
+                </label>
+                <select
+                  id="service"
+                  v-model="form.ticket_service"
+                  required
+                  :disabled="isLoadingData"
+                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white disabled:bg-slate-100"
+                >
+                  <option :value="null" disabled>Seleccione un servicio</option>
+                  <option
+                    v-for="service in services"
+                    :key="service.id_services"
+                    :value="service.id_services"
+                  >
+                    {{ service.service_name }}
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  for="priority"
+                  class="block text-sm font-bold text-slate-700 mb-2"
+                >
+                  Prioridad <span class="text-red-500">*</span>
+                </label>
+                <select
+                  id="priority"
+                  v-model="form.ticket_priority"
+                  required
+                  :disabled="isLoadingData"
+                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white disabled:bg-slate-100"
+                >
+                  <option value="" disabled>Seleccione una prioridad</option>
+                  <option
+                    v-for="priority in priorities"
+                    :key="priority.priority_name"
+                    :value="priority.priority_name"
+                  >
+                    {{ priority.priority_name }}
+                    <template v-if="priority.priority_description">
+                      - {{ priority.priority_description }}
+                    </template>
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  for="ans"
+                  class="block text-sm font-bold text-slate-700 mb-2"
+                >
+                  ANS <span class="text-red-500">*</span>
+                </label>
+                <select
+                  id="ans"
+                  v-model="form.ticket_ans"
+                  required
+                  :disabled="isLoadingData"
+                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white disabled:bg-slate-100"
+                >
+                  <option :value="null" disabled>Seleccione un ANS</option>
+                  <option
+                    v-for="ans in ansList"
+                    :key="ans.id_ans"
+                    :value="ans.id_ans"
+                  >
+                    {{ ans.ans_name }}
+                    <template v-if="ans.ans_description">
+                      - {{ ans.ans_description }}
+                    </template>
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Cliente y Programa -->
+          <div v-show="currentStep === 3" class="step-content">
+            <h2
+              class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3"
+            >
+              <div class="p-2 bg-green-100 rounded-lg">
+                <svg
+                  class="w-6 h-6 text-green-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"
+                  />
+                </svg>
+              </div>
+              Cliente y Programa
+            </h2>
+
+            <div class="space-y-6">
+              <div>
+                <label
+                  for="client"
+                  class="block text-sm font-bold text-slate-700 mb-2"
+                >
+                  Cliente <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <input
+                    id="client"
+                    v-model="clientSearch"
+                    @input="filterClients"
+                    @focus="showClientDropdown = true"
+                    @blur="hideClientDropdown"
+                    type="text"
+                    required
+                    autocomplete="off"
+                    class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300"
+                    placeholder="Buscar cliente..."
+                  />
+                  <div
+                    v-if="showClientDropdown && filteredClients.length > 0"
+                    class="absolute z-10 w-full mt-1 bg-white border-2 border-blue-200 rounded-xl shadow-xl max-h-60 overflow-y-auto"
+                  >
+                    <div
+                      v-for="client in filteredClients"
+                      :key="client.client_name"
+                      @mousedown.prevent="selectClient(client)"
+                      class="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-100 last:border-b-0 font-medium text-slate-700"
+                    >
+                      {{ client.client_name }}
+                    </div>
+                  </div>
+                  <div
+                    v-if="
+                      showClientDropdown &&
+                      clientSearch &&
+                      filteredClients.length === 0
+                    "
+                    class="absolute z-10 w-full mt-1 bg-white border-2 border-blue-200 rounded-xl shadow-xl p-4 text-slate-500 text-sm font-medium"
+                  >
+                    No se encontraron clientes
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  for="program"
+                  class="block text-sm font-bold text-slate-700 mb-2"
+                >
+                  Programa <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <input
+                    id="program"
+                    v-model="programSearch"
+                    @input="filterPrograms"
+                    @focus="showProgramDropdown = true"
+                    @blur="hideProgramDropdown"
+                    type="text"
+                    required
+                    autocomplete="off"
+                    :disabled="!form.client_name"
+                    class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:bg-slate-100 disabled:cursor-not-allowed hover:border-blue-300"
+                    placeholder="Buscar programa..."
+                  />
+                  <div
+                    v-if="showProgramDropdown && filteredPrograms.length > 0"
+                    class="absolute z-10 w-full mt-1 bg-white border-2 border-blue-200 rounded-xl shadow-xl max-h-60 overflow-y-auto"
+                  >
+                    <div
+                      v-for="program in filteredPrograms"
+                      :key="program.program_name"
+                      @mousedown.prevent="selectProgram(program)"
+                      class="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-100 last:border-b-0 font-medium text-slate-700"
+                    >
+                      {{ program.program_name }}
+                    </div>
+                  </div>
+                  <div
+                    v-if="
+                      showProgramDropdown &&
+                      programSearch &&
+                      filteredPrograms.length === 0
+                    "
+                    class="absolute z-10 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg p-4 text-slate-500 text-sm"
+                  >
+                    No se encontraron programas
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  for="subprogram"
+                  class="block text-sm font-bold text-slate-700 mb-2"
+                >
+                  Subprograma <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <input
+                    id="subprogram"
+                    v-model="subProgramSearch"
+                    @input="filterSubPrograms"
+                    @focus="showSubProgramDropdown = true"
+                    @blur="hideSubProgramDropdown"
+                    type="text"
+                    required
+                    autocomplete="off"
+                    :disabled="!form.program_name"
+                    class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:bg-slate-100 disabled:cursor-not-allowed hover:border-blue-300"
+                    placeholder="Buscar subprograma..."
+                  />
+                  <div
+                    v-if="
+                      showSubProgramDropdown && filteredSubPrograms.length > 0
+                    "
+                    class="absolute z-10 w-full mt-1 bg-white border-2 border-blue-200 rounded-xl shadow-xl max-h-60 overflow-y-auto"
+                  >
+                    <div
+                      v-for="subprogram in filteredSubPrograms"
+                      :key="subprogram.sub_program_name"
+                      @mousedown.prevent="selectSubProgram(subprogram)"
+                      class="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-100 last:border-b-0 font-medium text-slate-700"
+                    >
+                      {{ subprogram.sub_program_name }}
+                    </div>
+                  </div>
+                  <div
+                    v-if="
+                      showSubProgramDropdown &&
+                      subProgramSearch &&
+                      filteredSubPrograms.length === 0
+                    "
+                    class="absolute z-10 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg p-4 text-slate-500 text-sm"
+                  >
+                    No se encontraron subprogramas
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4: Archivos Adjuntos -->
+          <div v-show="currentStep === 4" class="step-content">
+            <h2
+              class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3"
+            >
+              <div class="p-2 bg-orange-100 rounded-lg">
+                <svg
+                  class="w-6 h-6 text-orange-600"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
                   <path
                     fill-rule="evenodd"
-                    d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"
+                    d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
                     clip-rule="evenodd"
                   />
-                  <path
-                    d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z"
-                  />
                 </svg>
-                Servicio <span class="text-red-500">*</span>
-              </label>
-              <select
-                id="service"
-                v-model="form.ticket_service"
-                required
-                :disabled="isLoadingData"
-                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white disabled:bg-slate-100"
-              >
-                <option value="" disabled>Seleccione un servicio</option>
-                <option
-                  v-for="service in services"
-                  :key="service.id_services"
-                  :value="service.id_services"
-                >
-                  {{ service.service_name }}
-                </option>
-              </select>
-            </div>
-
-            <div>
-              <label
-                for="priority"
-                class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2"
-              >
-                <svg
-                  class="w-4 h-4 text-blue-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"
-                  />
-                </svg>
-                Prioridad <span class="text-red-500">*</span>
-              </label>
-              <select
-                id="priority"
-                v-model="form.ticket_priority"
-                required
-                :disabled="isLoadingData"
-                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white disabled:bg-slate-100"
-              >
-                <option value="" disabled>Seleccione una prioridad</option>
-                <option
-                  v-for="priority in priorities"
-                  :key="priority.priority_name"
-                  :value="priority.priority_name"
-                >
-                  {{ priority.priority_name }}
-                  <template v-if="priority.priority_description">
-                    - {{ priority.priority_description }}
-                  </template>
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <div class="mb-6">
-            <label
-              for="client"
-              class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2"
-            >
-              <svg
-                class="w-4 h-4 text-blue-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"
-                />
-              </svg>
-              Cliente <span class="text-red-500">*</span>
-            </label>
-            <div class="relative">
-              <input
-                id="client"
-                v-model="clientSearch"
-                @input="filterClients"
-                @focus="showClientDropdown = true"
-                @blur="hideClientDropdown"
-                type="text"
-                required
-                autocomplete="off"
-                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300"
-                placeholder="Buscar cliente..."
-              />
-              <div
-                v-if="showClientDropdown && filteredClients.length > 0"
-                class="absolute z-10 w-full mt-1 bg-white border-2 border-blue-200 rounded-xl shadow-xl max-h-60 overflow-y-auto"
-              >
-                <div
-                  v-for="client in filteredClients"
-                  :key="client.client_name"
-                  @mousedown.prevent="selectClient(client)"
-                  class="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-100 last:border-b-0 font-medium text-slate-700"
-                >
-                  {{ client.client_name }}
-                </div>
               </div>
-              <div
-                v-if="
-                  showClientDropdown &&
-                  clientSearch &&
-                  filteredClients.length === 0
-                "
-                class="absolute z-10 w-full mt-1 bg-white border-2 border-blue-200 rounded-xl shadow-xl p-4 text-slate-500 text-sm font-medium"
-              >
-                No se encontraron clientes
-              </div>
-            </div>
-          </div>
+              Archivos Adjuntos (Opcional)
+            </h2>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label
-                for="program"
-                class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2"
-              >
-                <svg
-                  class="w-4 h-4 text-blue-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"
-                  />
-                </svg>
-                Programa <span class="text-red-500">*</span>
-              </label>
-              <div class="relative">
-                <input
-                  id="program"
-                  v-model="programSearch"
-                  @input="filterPrograms"
-                  @focus="showProgramDropdown = true"
-                  @blur="hideProgramDropdown"
-                  type="text"
-                  required
-                  autocomplete="off"
-                  :disabled="!form.client_name"
-                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:bg-slate-100 disabled:cursor-not-allowed hover:border-blue-300"
-                  placeholder="Buscar programa..."
-                />
-                <div
-                  v-if="showProgramDropdown && filteredPrograms.length > 0"
-                  class="absolute z-10 w-full mt-1 bg-white border-2 border-blue-200 rounded-xl shadow-xl max-h-60 overflow-y-auto"
-                >
-                  <div
-                    v-for="program in filteredPrograms"
-                    :key="program.program_name"
-                    @mousedown.prevent="selectProgram(program)"
-                    class="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-100 last:border-b-0 font-medium text-slate-700"
-                  >
-                    {{ program.program_name }}
-                  </div>
-                </div>
-                <div
-                  v-if="
-                    showProgramDropdown &&
-                    programSearch &&
-                    filteredPrograms.length === 0
-                  "
-                  class="absolute z-10 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg p-4 text-slate-500 text-sm"
-                >
-                  No se encontraron programas
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label
-                for="subprogram"
-                class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2"
-              >
-                <svg
-                  class="w-4 h-4 text-blue-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 2V5h1v1H5zM3 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zm2 2v-1h1v1H5zM13 4a1 1 0 00-1 1v3a1 1 0 001 1h3a1 1 0 001-1V5a1 1 0 00-1-1h-3zm1 2v1h1V6h-1z"
-                    clip-rule="evenodd"
-                  />
-                  <path
-                    d="M11 4a1 1 0 10-2 0v1a1 1 0 002 0V4zM10 7a1 1 0 011 1v1h2a1 1 0 110 2h-3a1 1 0 01-1-1V8a1 1 0 011-1zM16 9a1 1 0 100 2 1 1 0 000-2zM9 13a1 1 0 011-1h1a1 1 0 110 2v2a1 1 0 11-2 0v-3zM7 11a1 1 0 100-2H4a1 1 0 100 2h3zM17 13a1 1 0 01-1 1h-2a1 1 0 110-2h2a1 1 0 011 1zM16 17a1 1 0 100-2h-3a1 1 0 100 2h3z"
-                  />
-                </svg>
-                Subprograma <span class="text-red-500">*</span>
-              </label>
-              <div class="relative">
-                <input
-                  id="subprogram"
-                  v-model="subProgramSearch"
-                  @input="filterSubPrograms"
-                  @focus="showSubProgramDropdown = true"
-                  @blur="hideSubProgramDropdown"
-                  type="text"
-                  required
-                  autocomplete="off"
-                  :disabled="!form.program_name"
-                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:bg-slate-100 disabled:cursor-not-allowed hover:border-blue-300"
-                  placeholder="Buscar subprograma..."
-                />
-                <div
-                  v-if="
-                    showSubProgramDropdown && filteredSubPrograms.length > 0
-                  "
-                  class="absolute z-10 w-full mt-1 bg-white border-2 border-blue-200 rounded-xl shadow-xl max-h-60 overflow-y-auto"
-                >
-                  <div
-                    v-for="subprogram in filteredSubPrograms"
-                    :key="subprogram.sub_program_name"
-                    @mousedown.prevent="selectSubProgram(subprogram)"
-                    class="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-100 last:border-b-0 font-medium text-slate-700"
-                  >
-                    {{ subprogram.sub_program_name }}
-                  </div>
-                </div>
-                <div
-                  v-if="
-                    showSubProgramDropdown &&
-                    subProgramSearch &&
-                    filteredSubPrograms.length === 0
-                  "
-                  class="absolute z-10 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg p-4 text-slate-500 text-sm"
-                >
-                  No se encontraron subprogramas
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="mb-6">
-            <label
-              for="ans"
-              class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2"
-            >
-              <svg
-                class="w-4 h-4 text-blue-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              ANS <span class="text-red-500">*</span>
-            </label>
-            <select
-              id="ans"
-              v-model="form.ticket_ans"
-              required
-              :disabled="isLoadingData"
-              class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white disabled:bg-slate-100"
-            >
-              <option value="" disabled>Seleccione un ANS</option>
-              <option v-for="ans in ansList" :key="ans.id_ans" :value="ans.id_ans">
-                {{ ans.ans_name }}
-                <template v-if="ans.ans_description">
-                  - {{ ans.ans_description }}
-                </template>
-              </option>
-            </select>
-          </div>
-
-          <div class="mb-6">
-            <label
-              class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2"
-            >
-              <svg
-                class="w-4 h-4 text-blue-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              Archivos Adjuntos
-            </label>
             <div
-              class="border-2 border-dashed border-blue-300 rounded-xl p-8 text-center hover:border-blue-500 hover:bg-blue-50/30 transition-all bg-slate-50"
+              class="border-2 border-dashed border-blue-300 rounded-xl p-12 text-center hover:border-blue-500 hover:bg-blue-50/30 transition-all bg-slate-50"
             >
               <input
                 id="file-upload"
@@ -580,7 +626,7 @@
                 class="cursor-pointer flex flex-col items-center"
               >
                 <svg
-                  class="w-16 h-16 text-blue-400 mb-4"
+                  class="w-20 h-20 text-blue-400 mb-6"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -592,19 +638,23 @@
                     d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                   />
                 </svg>
-                <span class="text-base text-slate-700 font-bold mb-2"
+                <span class="text-lg text-slate-700 font-bold mb-3"
                   >Haga clic para seleccionar archivos</span
                 >
-                <span class="text-sm text-slate-500 mt-1"
+                <span class="text-base text-slate-500 mb-4"
                   >o arrastre y suelte aquí</span
                 >
                 <span
-                  class="text-xs text-slate-400 mt-3 bg-white px-4 py-2 rounded-full border border-slate-200"
+                  class="text-sm text-slate-400 bg-white px-6 py-3 rounded-full border-2 border-slate-200 font-semibold"
                   >PDF, DOC, XLS, IMG, TXT, ZIP (Máx. 10MB)</span
                 >
               </label>
             </div>
-            <div v-if="uploadedFiles.length > 0" class="mt-4 space-y-2">
+
+            <div v-if="uploadedFiles.length > 0" class="mt-6 space-y-3">
+              <p class="text-sm font-bold text-slate-700 mb-3">
+                Archivos seleccionados ({{ uploadedFiles.length }}):
+              </p>
               <div
                 v-for="(file, index) in uploadedFiles"
                 :key="index"
@@ -613,7 +663,7 @@
                 <div class="flex items-center space-x-3">
                   <div class="p-2 bg-blue-500 rounded-lg">
                     <svg
-                      class="w-5 h-5 text-white"
+                      class="w-6 h-6 text-white"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -655,21 +705,63 @@
                 </button>
               </div>
             </div>
+
+            <div
+              v-else
+              class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl text-center"
+            >
+              <p class="text-sm text-slate-600">
+                No hay archivos adjuntos. Puede continuar sin adjuntar archivos.
+              </p>
+            </div>
           </div>
-          <div class="flex gap-4 justify-end pt-4 border-t-2 border-slate-100">
+
+          <!-- Navigation Buttons -->
+          <div
+            class="flex justify-between items-center pt-6 mt-6 border-t-2 border-slate-100"
+          >
             <button
+              v-if="currentStep > 1"
+              type="button"
+              @click="previousStep"
+              class="px-6 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 hover:border-slate-400 transition-all font-bold shadow-sm flex items-center gap-2"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              Anterior
+            </button>
+            <button
+              v-else
               type="button"
               @click="handleCancel"
-              class="px-8 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 hover:border-slate-400 transition-all font-bold shadow-sm"
+              class="px-6 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 hover:border-slate-400 transition-all font-bold shadow-sm"
             >
               Cancelar
             </button>
-            <button
-              type="submit"
-              :disabled="isSubmitting"
-              class="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:from-slate-400 disabled:to-slate-500"
-            >
-              <span v-if="!isSubmitting" class="flex items-center gap-2">
+
+            <div class="flex items-center gap-3">
+              <span class="text-sm text-slate-600 font-medium">
+                Paso {{ currentStep }} de {{ totalSteps }}
+              </span>
+              <button
+                v-if="currentStep < totalSteps"
+                type="button"
+                @click="nextStep"
+                :disabled="!canProceedToNextStep"
+                class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                Siguiente
                 <svg
                   class="w-5 h-5"
                   fill="none"
@@ -680,40 +772,62 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    d="M5 13l4 4L19 7"
+                    d="M9 5l7 7-7 7"
                   />
                 </svg>
-                Crear Ticket
-              </span>
-              <span v-else class="flex items-center gap-2">
-                <svg
-                  class="animate-spin h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
+              </button>
+              <button
+                v-else
+                type="submit"
+                :disabled="isSubmitting || !canSubmit"
+                class="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                <span v-if="!isSubmitting" class="flex items-center gap-2">
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
                     stroke="currentColor"
-                    stroke-width="4"
-                  ></circle>
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Creando...
-              </span>
-            </button>
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  Crear Ticket
+                </span>
+                <span v-else class="flex items-center gap-2">
+                  <svg
+                    class="animate-spin h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Creando...
+                </span>
+              </button>
+            </div>
           </div>
         </form>
 
         <div
           v-if="showSuccess"
-          class="mt-6 p-5 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 text-green-800 rounded-xl shadow-lg flex items-center gap-3"
+          class="mt-6 p-5 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 text-green-800 rounded-xl shadow-lg flex items-center gap-3 animate-fade-in"
         >
           <div class="p-2 bg-green-500 rounded-full">
             <svg
@@ -741,7 +855,7 @@
 
         <div
           v-if="errorMessage"
-          class="mt-6 p-5 bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-300 text-red-800 rounded-xl shadow-lg flex items-center gap-3"
+          class="mt-6 p-5 bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-300 text-red-800 rounded-xl shadow-lg flex items-center gap-3 animate-fade-in"
         >
           <div class="p-2 bg-red-500 rounded-full">
             <svg
@@ -796,8 +910,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
-import type { Ticket } from "../../models/Ticket";
+import { ref, reactive, onMounted, computed } from "vue";
+import type { Ticket, TicketCreate } from "../../models/Ticket";
 import type { ANS } from "../../models/ANS";
 import type { Service } from "../../models/Service";
 import type { TicketPriority } from "../../models/TicketPriority";
@@ -806,7 +920,7 @@ import type { Program } from "../../models/Program";
 import type { SubProgram } from "../../models/SubProgram";
 import type { Status } from "../../models/Status";
 import { AnsService } from "../../services/ansService";
-import { ServiceService } from "../../services/serviceService";
+import { RequestTypeService } from "../../services/RequestTypeService";
 import { TicketPriorityService } from "../../services/ticketPriorityService";
 import { ClientsService } from "../../services/clientsService";
 import { StatusService } from "../../services/statusService";
@@ -817,7 +931,7 @@ import { ProgramsService } from "../../services/programService";
 import { SubProgramsService } from "../../services/subProgramService";
 
 const ansService = new AnsService();
-const serviceService = new ServiceService();
+const serviceService = new RequestTypeService();
 const priorityService = new TicketPriorityService();
 const clientsService = new ClientsService();
 const statusService = new StatusService();
@@ -830,26 +944,42 @@ const subProgramsService = new SubProgramsService();
 const subPrograms = ref<SubProgram[]>([]);
 const programs = ref<Program[]>([]);
 
-const form = reactive<Ticket>({
-  id_ticket: 0,
+// Stepper state
+const currentStep = ref(1);
+const totalSteps = 4;
+
+const steps = [
+  { id: 1, label: "Información Básica" },
+  { id: 2, label: "Clasificación" },
+  { id: 3, label: "Cliente y Programa" },
+  { id: 4, label: "Archivos" },
+];
+
+// Interfaz personalizada para el formulario de creación
+interface CreateTicketForm {
+  ticket_title: string;
+  ticket_description: string;
+  ticket_attachments: string | null;
+  ticket_service: number | null;
+  ticket_priority: string;
+  ticket_ans: number | null;
+  sub_program_name: string;
+  client_name: string;
+  program_name: string;
+  status_id: number;
+}
+
+const form = reactive<CreateTicketForm>({
   ticket_title: "",
   ticket_description: "",
   ticket_attachments: null,
-  ticket_service: "",
+  ticket_service: null,
   ticket_priority: "",
-  ticket_ans: "",
+  ticket_ans: null,
   sub_program_name: "",
-  reporter_user: "",
-  status_id: 0,  
-  estimated_closing_date: null,
-  service_name: "",
-  priority_name: "",
-  reporter_user_name: "",
   client_name: "",
   program_name: "",
-  status_name: "",
-  assigned_to: null,
-  create_at: "",
+  status_id: 0,
 });
 
 const isSubmitting = ref(false);
@@ -889,7 +1019,7 @@ const loadFormData = async () => {
     ]);
 
     if (statuses.value.length > 0) {
-      form.status_id = statuses.value[0].status_id;
+      form.status_id = statuses.value[0].id_status;
     }
   } catch (error) {
     console.error("Error al cargar datos del formulario:", error);
@@ -969,7 +1099,7 @@ const loadStatuses = async () => {
   try {
     const response = await statusService.getAll();
     if (response.success && response.data) {
-      statuses.value = (response.data.results || []).flat(); 
+      statuses.value = (response.data.results || []).flat();
     }
   } catch (error) {
     console.error("Error al cargar estados:", error);
@@ -982,7 +1112,7 @@ const filterClients = () => {
     filteredClients.value = clients.value;
   } else {
     filteredClients.value = clients.value.filter((client) =>
-      client.client_name.toLowerCase().includes(search)
+      client.client_name.toLowerCase().includes(search),
     );
   }
 };
@@ -991,7 +1121,7 @@ const selectClient = (client: Client) => {
   form.client_name = client.client_name;
   clientSearch.value = client.client_name;
   showClientDropdown.value = false;
-  
+
   form.program_name = "";
   form.sub_program_name = "";
   programSearch.value = "";
@@ -1007,14 +1137,14 @@ const hideClientDropdown = () => {
 const filterPrograms = () => {
   const search = programSearch.value.toLowerCase();
   const clientPrograms = programs.value.filter(
-    (p) =>  p.client_name === form.client_name
+    (p) => p.client_name === form.client_name,
   );
 
   if (search.length === 0) {
     filteredPrograms.value = clientPrograms;
   } else {
     filteredPrograms.value = clientPrograms.filter((program) =>
-      program.program_name.toLowerCase().includes(search)
+      program.program_name.toLowerCase().includes(search),
     );
   }
 };
@@ -1037,14 +1167,14 @@ const hideProgramDropdown = () => {
 const filterSubPrograms = () => {
   const search = subProgramSearch.value.toLowerCase();
   const programSubPrograms = subPrograms.value.filter(
-    (sp) => sp.program_name === form.program_name
+    (sp) => sp.program_name === form.program_name,
   );
 
   if (search.length === 0) {
     filteredSubPrograms.value = programSubPrograms;
   } else {
     filteredSubPrograms.value = programSubPrograms.filter((subprogram) =>
-      subprogram.sub_program_name.toLowerCase().includes(search)
+      subprogram.sub_program_name.toLowerCase().includes(search),
     );
   }
 };
@@ -1096,6 +1226,61 @@ const formatFileSize = (bytes: number): string => {
   return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
 };
 
+// Stepper navigation
+const nextStep = () => {
+  if (currentStep.value < totalSteps && canProceedToNextStep.value) {
+    currentStep.value++;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+};
+
+const previousStep = () => {
+  if (currentStep.value > 1) {
+    currentStep.value--;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+};
+
+// Computed properties for validation
+const canProceedToNextStep = computed(() => {
+  switch (currentStep.value) {
+    case 1:
+      return (
+        form.ticket_title.trim().length > 0 &&
+        form.ticket_description.trim().length > 0
+      );
+    case 2:
+      return (
+        form.ticket_service !== null &&
+        form.ticket_priority !== "" &&
+        form.ticket_ans !== null
+      );
+    case 3:
+      return (
+        form.client_name !== "" &&
+        form.program_name !== "" &&
+        form.sub_program_name !== ""
+      );
+    case 4:
+      return true; // Files are optional
+    default:
+      return false;
+  }
+});
+
+const canSubmit = computed(() => {
+  return (
+    form.ticket_title.trim().length > 0 &&
+    form.ticket_description.trim().length > 0 &&
+    form.ticket_service !== null &&
+    form.ticket_priority !== "" &&
+    form.ticket_ans !== null &&
+    form.client_name !== "" &&
+    form.program_name !== "" &&
+    form.sub_program_name !== ""
+  );
+});
+
 // Methods
 const handleSubmit = async () => {
   try {
@@ -1114,17 +1299,17 @@ const handleSubmit = async () => {
       return;
     }
 
-    if (!form.ticket_service) {
+    if (!form.ticket_service || form.ticket_service === 0) {
       errorMessage.value = "Debe seleccionar un servicio";
       return;
     }
 
-    if (!form.ticket_priority) {
+    if (!form.ticket_priority || form.ticket_priority === "") {
       errorMessage.value = "Debe seleccionar una prioridad";
       return;
     }
 
-    if (!form.ticket_ans) {
+    if (!form.ticket_ans || form.ticket_ans === 0) {
       errorMessage.value = "Debe seleccionar un ANS";
       return;
     }
@@ -1147,7 +1332,8 @@ const handleSubmit = async () => {
     const currentUser = sessionStorageService.getUserInfo();
 
     if (!currentUser) {
-      errorMessage.value = "No se pudo obtener la información del usuario. Por favor inicie sesión nuevamente.";
+      errorMessage.value =
+        "No se pudo obtener la información del usuario. Por favor inicie sesión nuevamente.";
       return;
     }
 
@@ -1160,39 +1346,33 @@ const handleSubmit = async () => {
 
     try {
       const userResult = await usersService.ensureUserExists(userData);
-      
+
       if (!userResult.success) {
-        errorMessage.value = "Error al validar/crear usuario. Por favor intente nuevamente.";
+        errorMessage.value =
+          "Error al validar/crear usuario. Por favor intente nuevamente.";
         return;
       }
     } catch (error: any) {
       console.error("Error al validar/crear usuario:", error);
-      errorMessage.value = `Error al validar usuario: ${error.message || 'Error desconocido'}`;
+      errorMessage.value = `Error al validar usuario: ${error.message || "Error desconocido"}`;
       return;
     }
 
-    const ticketData = {
-      id_ticket: form.id_ticket,
+    // Crear objeto que coincida con TicketCreate del backend
+    const ticketData: TicketCreate = {
       ticket_title: form.ticket_title,
       ticket_description: form.ticket_description,
-      ticket_attachments: uploadedFiles.value.length > 0
-        ? uploadedFiles.value.map((f) => f.name).join(", ")
-        : null,
-      ticket_service: form.ticket_service as number,
+      ticket_attachments:
+        uploadedFiles.value.length > 0
+          ? uploadedFiles.value.map((f) => f.name).join(", ")
+          : null,
+      ticket_service: form.ticket_service!,
       ticket_priority: form.ticket_priority,
-      ticket_ans: form.ticket_ans as number,
+      ticket_ans: form.ticket_ans!,
       sub_program_name: form.sub_program_name,
       reporter_user: currentUser.username,
-      status_id: 0,    
-      estimated_closing_date: form.estimated_closing_date || null,
-      service_name: '',
-      priority_name: '',
-      reporter_user_name: currentUser.full_name || currentUser.username,
-      client_name: form.client_name,
-      program_name: form.program_name,
-      status_name: '',
-      assigned_to: null,
-      create_at: '',
+      status_id: form.status_id || 1,
+      assigned_to: undefined,
     };
 
     try {
@@ -1210,15 +1390,17 @@ const handleSubmit = async () => {
       setTimeout(() => {
         resetForm();
       }, 3000);
-
     } catch (error: any) {
       console.error("Error al crear ticket:", error);
-      errorMessage.value = error.message || "Error al crear el ticket. Por favor intente nuevamente.";
+      errorMessage.value =
+        error.message ||
+        "Error al crear el ticket. Por favor intente nuevamente.";
     }
-
   } catch (error: any) {
     console.error("Error general:", error);
-    errorMessage.value = error.message || "Error al crear el ticket. Por favor intente nuevamente.";
+    errorMessage.value =
+      error.message ||
+      "Error al crear el ticket. Por favor intente nuevamente.";
   } finally {
     isSubmitting.value = false;
   }
@@ -1227,7 +1409,7 @@ const handleSubmit = async () => {
 const handleCancel = () => {
   if (
     confirm(
-      "¿Está seguro de que desea cancelar? Se perderán los datos ingresados."
+      "¿Está seguro de que desea cancelar? Se perderán los datos ingresados.",
     )
   ) {
     resetForm();
@@ -1237,14 +1419,14 @@ const handleCancel = () => {
 const resetForm = () => {
   form.ticket_title = "";
   form.ticket_description = "";
-  form.ticket_attachments = "";
-  form.ticket_service = "";
+  form.ticket_attachments = null;
+  form.ticket_service = null;
   form.ticket_priority = "";
-  form.ticket_ans = "";
+  form.ticket_ans = null;
   form.client_name = "";
   form.program_name = "";
   form.sub_program_name = "";
-  form.estimated_closing_date = "";
+  form.status_id = 0;
   clientSearch.value = "";
   programSearch.value = "";
   subProgramSearch.value = "";
@@ -1252,6 +1434,7 @@ const resetForm = () => {
   showSuccess.value = false;
   createdTicketId.value = null;
   errorMessage.value = "";
+  currentStep.value = 1;
 };
 
 onMounted(async () => {
@@ -1271,6 +1454,17 @@ onMounted(async () => {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -1326,6 +1520,10 @@ onMounted(async () => {
   animation: fadeIn 0.5s ease-out;
 }
 
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out;
+}
+
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
@@ -1340,5 +1538,9 @@ onMounted(async () => {
 
 .animate-particle-slow {
   animation: particle-slow 6s ease-in-out infinite;
+}
+
+.step-content {
+  animation: fadeIn 0.3s ease-out;
 }
 </style>
