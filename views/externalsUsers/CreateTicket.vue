@@ -1,669 +1,563 @@
 <template>
   <div
-    class="min-h-screen relative flex items-center justify-center p-4 overflow-hidden"
-    style="background: linear-gradient(135deg, #0538d4 0%, #001e5c 100%)"
+    class="min-h-screen relative p-6 overflow-hidden"
+    style="
+      background: linear-gradient(
+        135deg,
+        #1e3a8a 0%,
+        #0f172a 50%,
+        #1e1b4b 100%
+      );
+    "
   >
     <div
-      class="absolute inset-0 opacity-10 pointer-events-none"
+      class="absolute inset-0 opacity-[0.03] pointer-events-none"
       style="
         background-image:
-          linear-gradient(rgba(80, 189, 235, 0.4) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(80, 189, 235, 0.4) 1px, transparent 1px);
-        background-size: 30px 30px;
+          linear-gradient(rgba(59, 130, 246, 0.5) 1.5px, transparent 1.5px),
+          linear-gradient(
+            90deg,
+            rgba(59, 130, 246, 0.5) 1.5px,
+            transparent 1.5px
+          );
+        background-size: 50px 50px;
       "
     ></div>
-
     <div
-      class="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-transparent via-[#50bdeb] to-transparent opacity-80"
+      class="absolute inset-0 opacity-[0.05] pointer-events-none"
+      style="
+        background-image: radial-gradient(
+          circle,
+          rgba(96, 165, 250, 0.4) 1px,
+          transparent 1px
+        );
+        background-size: 20px 20px;
+      "
     ></div>
-    <div
-      class="absolute bottom-0 left-0 w-full h-3 bg-gradient-to-r from-transparent via-[#50bdeb] to-transparent opacity-80"
-    ></div>
-
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
       <div
-        class="absolute top-20 left-10 w-40 h-40 bg-[#50bdeb] rounded-full opacity-20 blur-3xl animate-pulse"
+        class="absolute -top-40 -left-40 w-96 h-96 bg-gradient-to-br from-blue-500/30 to-purple-600/30 rounded-full blur-3xl animate-float-orb"
       ></div>
       <div
-        class="absolute bottom-20 right-10 w-48 h-48 bg-[#50bdeb] rounded-full opacity-20 blur-3xl animate-pulse"
+        class="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-gradient-to-tl from-cyan-500/25 to-blue-600/25 rounded-full blur-3xl animate-float-orb-reverse"
+      ></div>
+      <div
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-full blur-3xl animate-pulse-slow"
+      ></div>
+      <div
+        class="absolute top-20 right-1/4 w-32 h-32 border border-blue-400/10 rounded-2xl rotate-12 animate-float-slow"
+      ></div>
+      <div
+        class="absolute bottom-32 left-1/4 w-24 h-24 border border-cyan-400/10 rounded-full animate-float"
+      ></div>
+      <div
+        class="absolute top-1/3 left-10 w-20 h-20 border-2 border-indigo-400/10 rounded-lg -rotate-12 animate-float-slow"
+      ></div>
+      <div
+        class="absolute bottom-1/4 right-20 w-28 h-28 border border-purple-400/10 rounded-3xl rotate-45 animate-float"
+      ></div>
+      <div
+        class="absolute top-0 left-1/4 w-px h-32 bg-gradient-to-b from-blue-400/20 to-transparent animate-fade-in-out"
+      ></div>
+      <div
+        class="absolute top-1/3 right-1/3 w-px h-40 bg-gradient-to-b from-cyan-400/20 to-transparent animate-fade-in-out"
         style="animation-delay: 1s"
       ></div>
       <div
-        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#0538d4] rounded-full opacity-10 blur-3xl"
-      ></div>
-
-      <div
-        class="absolute top-32 right-24 animate-float-slow"
-        style="animation-delay: 0.3s"
-      >
-        <div
-          class="w-16 h-16 border-2 border-white/15 rounded-xl rotate-45"
-        ></div>
-      </div>
-      <div
-        class="absolute bottom-40 left-20 animate-float"
-        style="animation-delay: 1.2s"
-      >
-        <div
-          class="w-20 h-20 border-2 border-white/10 rounded-lg -rotate-12"
-        ></div>
-      </div>
-      <div
-        class="absolute top-1/4 left-1/3 animate-float-slow"
+        class="absolute bottom-20 left-1/3 w-px h-36 bg-gradient-to-b from-indigo-400/20 to-transparent animate-fade-in-out"
         style="animation-delay: 2s"
-      >
-        <div class="w-12 h-12 bg-white/5 rounded-full"></div>
-      </div>
-      <div
-        class="absolute bottom-1/3 right-1/4 animate-float"
-        style="animation-delay: 0.8s"
-      >
-        <div
-          class="w-14 h-14 border-2 border-white/20 rounded-lg rotate-12"
-        ></div>
-      </div>
-
-      <div
-        class="absolute top-1/4 left-16 w-2 h-2 bg-white/40 rounded-full animate-particle"
-        style="animation-delay: 0.5s"
       ></div>
-      <div
-        class="absolute top-2/3 right-32 w-3 h-3 bg-[#50bdeb]/50 rounded-full animate-particle-slow"
-        style="animation-delay: 1.5s"
-      ></div>
-      <div
-        class="absolute bottom-1/4 left-1/4 w-2 h-2 bg-white/30 rounded-full animate-particle"
-        style="animation-delay: 2.3s"
-      ></div>
-      <div
-        class="absolute top-1/3 right-1/3 w-3 h-3 bg-white/25 rounded-full animate-particle-slow"
-        style="animation-delay: 0.8s"
-      ></div>
-      <div
-        class="absolute bottom-40 left-32 w-2 h-2 bg-[#50bdeb]/40 rounded-full animate-particle"
-        style="animation-delay: 1.8s"
-      ></div>
-
-      <div
-        class="absolute top-20 left-1/4 animate-float opacity-10"
-        style="animation-delay: 0.5s"
-      >
-        <svg
-          class="w-14 h-14 text-white"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm4 18H6V4h7v5h5v11z"
-          />
-          <path d="M8 12h8v2H8zm0 4h8v2H8zm0-8h2v2H8z" />
-        </svg>
-      </div>
-      <div
-        class="absolute bottom-32 right-1/4 animate-float-slow opacity-10"
-        style="animation-delay: 1.5s"
-      >
-        <svg
-          class="w-12 h-12 text-white"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"
-          />
-          <path d="M7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z" />
-        </svg>
-      </div>
-      <div
-        class="absolute top-1/2 right-20 animate-float opacity-10"
-        style="animation-delay: 2.2s"
-      >
-        <svg
-          class="w-10 h-10 text-white"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
-          />
-        </svg>
-      </div>
-      <div
-        class="absolute top-64 right-24 animate-float-slow opacity-10"
-        style="animation-delay: 0.9s"
-      >
-        <svg
-          class="w-16 h-16 text-white"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 00-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"
-          />
-        </svg>
-      </div>
-      <div
-        class="absolute bottom-1/4 left-1/3 animate-float opacity-10"
-        style="animation-delay: 1.7s"
-      >
-        <svg
-          class="w-11 h-11 text-white"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"
-          />
-        </svg>
-      </div>
     </div>
-
-    <div class="w-full max-w-4xl relative z-10">
+    <div
+      class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400/40 via-cyan-400/40 to-transparent"
+    ></div>
+    <div
+      class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-400/40 via-blue-400/40 to-transparent"
+    ></div>
+    <div class="max-w-7xl mx-auto relative z-10">
       <div class="text-center mb-8">
-        <div
-          class="inline-block p-4 bg-white/10 rounded-2xl mb-4 backdrop-blur-sm border border-[#50bdeb]/30 shadow-lg shadow-[#50bdeb]/20"
-        >
-          <svg
-            class="w-12 h-12 text-[#50bdeb]"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-        </div>
         <h1
-          class="text-4xl font-bold text-white mb-3 drop-shadow-lg tracking-wide"
+          class="text-5xl font-bold text-white mb-3 drop-shadow-2xl tracking-wide bg-gradient-to-r from-blue-200 via-cyan-200 to-blue-200 bg-clip-text text-transparent"
         >
-          Crear Nuevo Ticket
+          Gestión de Tickets
         </h1>
-        <p class="text-blue-100 text-lg font-medium">
-          Complete el formulario paso a paso
+        <p class="text-blue-200/90 text-lg font-medium drop-shadow-lg">
+          Aqui podras crear tickets al area de E-learning
         </p>
         <div
-          class="mt-4 w-24 h-1 bg-gradient-to-r from-transparent via-[#50bdeb] to-transparent rounded-full mx-auto"
+          class="mt-4 w-32 h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent rounded-full mx-auto shadow-lg shadow-blue-400/50"
         ></div>
       </div>
-
-      <!-- Stepper Progress -->
-      <div class="mb-8">
-        <div class="flex items-center justify-between relative">
-          <!-- Progress Line Background -->
-          <div
-            class="absolute top-6 left-0 right-0 h-1 bg-white/20 rounded-full"
-            style="z-index: 0"
-          ></div>
-          <!-- Progress Line Active -->
-          <div
-            class="absolute top-6 left-0 h-1 bg-gradient-to-r from-[#50bdeb] to-[#0538d4] rounded-full transition-all duration-500"
-            :style="{
-              width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%`,
-              zIndex: 1,
-            }"
-          ></div>
-
-          <!-- Steps -->
-          <div
-            v-for="step in steps"
-            :key="step.id"
-            class="relative flex flex-col items-center"
-            style="z-index: 2"
+      <div class="mb-6 flex justify-center">
+        <div
+          class="bg-white/5 backdrop-blur-xl rounded-2xl p-2 inline-flex gap-2 border border-white/10 shadow-2xl shadow-blue-500/10"
+        >
+          <button
+            @click="activeTab = 'create'"
+            :class="[
+              'px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2',
+              activeTab === 'create'
+                ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-500/50 scale-105'
+                : 'text-blue-200 hover:bg-white/10 hover:text-white',
+            ]"
           >
-            <div
-              class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 border-4 mb-2"
-              :class="
-                currentStep > step.id
-                  ? 'bg-gradient-to-br from-green-400 to-green-600 text-white border-green-300 shadow-lg shadow-green-500/50'
-                  : currentStep === step.id
-                    ? 'bg-gradient-to-br from-[#50bdeb] to-[#0538d4] text-white border-white shadow-xl shadow-[#50bdeb]/70 scale-110'
-                    : 'bg-white/10 text-white/50 border-white/30'
-              "
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <svg
-                v-if="currentStep > step.id"
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="3"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-              <span v-else>{{ step.id }}</span>
-            </div>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Crear Ticket
+          </button>
+          <button
+            @click="activeTab = 'list'"
+            :class="[
+              'px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2',
+              activeTab === 'list'
+                ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg shadow-purple-500/50 scale-105'
+                : 'text-blue-200 hover:bg-white/10 hover:text-white',
+            ]"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 10h16M4 14h16M4 18h16"
+              />
+            </svg>
+            Mis Tickets
             <span
-              class="text-xs font-semibold text-center max-w-[100px] transition-all"
-              :class="
-                currentStep === step.id
-                  ? 'text-white scale-105'
-                  : 'text-white/70'
-              "
+              v-if="tickets.length > 0"
+              class="px-2 py-0.5 bg-white/20 text-white text-xs rounded-full font-bold backdrop-blur-sm"
             >
-              {{ step.label }}
+              {{ tickets.length }}
             </span>
-          </div>
+          </button>
         </div>
       </div>
-
-      <div
-        class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-[0_8px_32px_rgba(0,25,80,0.4)] p-8 border border-[#50bdeb]/20 min-h-[500px]"
-      >
-        <form @submit.prevent="handleSubmit">
-          <!-- Step 1: Información Básica -->
-          <div v-show="currentStep === 1" class="step-content">
-            <h2
-              class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3"
-            >
-              <div class="p-2 bg-blue-100 rounded-lg">
-                <svg
-                  class="w-6 h-6 text-blue-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"
-                  />
-                </svg>
-              </div>
-              Información Básica
-            </h2>
-
-            <div class="space-y-6">
-              <div>
-                <label
-                  for="title"
-                  class="block text-sm font-bold text-slate-700 mb-2"
-                >
-                  Título del Ticket <span class="text-red-500">*</span>
-                </label>
-                <input
-                  id="title"
-                  v-model="form.ticket_title"
-                  type="text"
-                  required
-                  maxlength="45"
-                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300"
-                  placeholder="Ej: Error en el sistema de reportes"
-                />
-                <p class="text-xs text-slate-500 mt-1">
-                  {{ form.ticket_title.length }}/45 caracteres
-                </p>
-              </div>
-
-              <div>
-                <label
-                  for="description"
-                  class="block text-sm font-bold text-slate-700 mb-2"
-                >
-                  Descripción <span class="text-red-500">*</span>
-                </label>
-                <textarea
-                  id="description"
-                  v-model="form.ticket_description"
-                  required
-                  maxlength="250"
-                  rows="6"
-                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none hover:border-blue-300"
-                  placeholder="Describa detalladamente el problema o solicitud..."
-                ></textarea>
-                <p class="text-xs text-slate-500 mt-1">
-                  {{ form.ticket_description.length }}/250 caracteres
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Step 2: Clasificación -->
-          <div v-show="currentStep === 2" class="step-content">
-            <h2
-              class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3"
-            >
-              <div class="p-2 bg-purple-100 rounded-lg">
-                <svg
-                  class="w-6 h-6 text-purple-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"
-                  />
-                </svg>
-              </div>
-              Clasificación del Ticket
-            </h2>
-
-            <div class="space-y-6">
-              <div>
-                <label
-                  for="service"
-                  class="block text-sm font-bold text-slate-700 mb-2"
-                >
-                  Servicio <span class="text-red-500">*</span>
-                </label>
-                <select
-                  id="service"
-                  v-model="form.ticket_service"
-                  required
-                  :disabled="isLoadingData"
-                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white disabled:bg-slate-100"
-                >
-                  <option :value="null" disabled>Seleccione un servicio</option>
-                  <option
-                    v-for="service in services"
-                    :key="service.id_services"
-                    :value="service.id_services"
-                  >
-                    {{ service.service_name }}
-                  </option>
-                </select>
-              </div>
-
-              <div>
-                <label
-                  for="priority"
-                  class="block text-sm font-bold text-slate-700 mb-2"
-                >
-                  Prioridad <span class="text-red-500">*</span>
-                </label>
-                <select
-                  id="priority"
-                  v-model="form.ticket_priority"
-                  required
-                  :disabled="isLoadingData"
-                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white disabled:bg-slate-100"
-                >
-                  <option value="" disabled>Seleccione una prioridad</option>
-                  <option
-                    v-for="priority in priorities"
-                    :key="priority.priority_name"
-                    :value="priority.priority_name"
-                  >
-                    {{ priority.priority_name }}
-                    <template v-if="priority.priority_description">
-                      - {{ priority.priority_description }}
-                    </template>
-                  </option>
-                </select>
-              </div>
-
-              <div>
-                <label
-                  for="ans"
-                  class="block text-sm font-bold text-slate-700 mb-2"
-                >
-                  ANS <span class="text-red-500">*</span>
-                </label>
-                <select
-                  id="ans"
-                  v-model="form.ticket_ans"
-                  required
-                  :disabled="isLoadingData"
-                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white disabled:bg-slate-100"
-                >
-                  <option :value="null" disabled>Seleccione un ANS</option>
-                  <option
-                    v-for="ans in ansList"
-                    :key="ans.id_ans"
-                    :value="ans.id_ans"
-                  >
-                    {{ ans.ans_name }}
-                    <template v-if="ans.ans_description">
-                      - {{ ans.ans_description }}
-                    </template>
-                  </option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Step 3: Cliente y Programa -->
-          <div v-show="currentStep === 3" class="step-content">
-            <h2
-              class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3"
-            >
-              <div class="p-2 bg-green-100 rounded-lg">
-                <svg
-                  class="w-6 h-6 text-green-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"
-                  />
-                </svg>
-              </div>
-              Cliente y Programa
-            </h2>
-
-            <div class="space-y-6">
-              <div>
-                <label
-                  for="client"
-                  class="block text-sm font-bold text-slate-700 mb-2"
-                >
-                  Cliente <span class="text-red-500">*</span>
-                </label>
-                <div class="relative">
-                  <input
-                    id="client"
-                    v-model="clientSearch"
-                    @input="filterClients"
-                    @focus="showClientDropdown = true"
-                    @blur="hideClientDropdown"
-                    type="text"
-                    required
-                    autocomplete="off"
-                    class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300"
-                    placeholder="Buscar cliente..."
-                  />
-                  <div
-                    v-if="showClientDropdown && filteredClients.length > 0"
-                    class="absolute z-10 w-full mt-1 bg-white border-2 border-blue-200 rounded-xl shadow-xl max-h-60 overflow-y-auto"
-                  >
-                    <div
-                      v-for="client in filteredClients"
-                      :key="client.client_name"
-                      @mousedown.prevent="selectClient(client)"
-                      class="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-100 last:border-b-0 font-medium text-slate-700"
-                    >
-                      {{ client.client_name }}
-                    </div>
-                  </div>
-                  <div
-                    v-if="
-                      showClientDropdown &&
-                      clientSearch &&
-                      filteredClients.length === 0
-                    "
-                    class="absolute z-10 w-full mt-1 bg-white border-2 border-blue-200 rounded-xl shadow-xl p-4 text-slate-500 text-sm font-medium"
-                  >
-                    No se encontraron clientes
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label
-                  for="program"
-                  class="block text-sm font-bold text-slate-700 mb-2"
-                >
-                  Programa <span class="text-red-500">*</span>
-                </label>
-                <div class="relative">
-                  <input
-                    id="program"
-                    v-model="programSearch"
-                    @input="filterPrograms"
-                    @focus="showProgramDropdown = true"
-                    @blur="hideProgramDropdown"
-                    type="text"
-                    required
-                    autocomplete="off"
-                    :disabled="!form.client_name"
-                    class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:bg-slate-100 disabled:cursor-not-allowed hover:border-blue-300"
-                    placeholder="Buscar programa..."
-                  />
-                  <div
-                    v-if="showProgramDropdown && filteredPrograms.length > 0"
-                    class="absolute z-10 w-full mt-1 bg-white border-2 border-blue-200 rounded-xl shadow-xl max-h-60 overflow-y-auto"
-                  >
-                    <div
-                      v-for="program in filteredPrograms"
-                      :key="program.program_name"
-                      @mousedown.prevent="selectProgram(program)"
-                      class="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-100 last:border-b-0 font-medium text-slate-700"
-                    >
-                      {{ program.program_name }}
-                    </div>
-                  </div>
-                  <div
-                    v-if="
-                      showProgramDropdown &&
-                      programSearch &&
-                      filteredPrograms.length === 0
-                    "
-                    class="absolute z-10 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg p-4 text-slate-500 text-sm"
-                  >
-                    No se encontraron programas
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label
-                  for="subprogram"
-                  class="block text-sm font-bold text-slate-700 mb-2"
-                >
-                  Subprograma <span class="text-red-500">*</span>
-                </label>
-                <div class="relative">
-                  <input
-                    id="subprogram"
-                    v-model="subProgramSearch"
-                    @input="filterSubPrograms"
-                    @focus="showSubProgramDropdown = true"
-                    @blur="hideSubProgramDropdown"
-                    type="text"
-                    required
-                    autocomplete="off"
-                    :disabled="!form.program_name"
-                    class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:bg-slate-100 disabled:cursor-not-allowed hover:border-blue-300"
-                    placeholder="Buscar subprograma..."
-                  />
-                  <div
-                    v-if="
-                      showSubProgramDropdown && filteredSubPrograms.length > 0
-                    "
-                    class="absolute z-10 w-full mt-1 bg-white border-2 border-blue-200 rounded-xl shadow-xl max-h-60 overflow-y-auto"
-                  >
-                    <div
-                      v-for="subprogram in filteredSubPrograms"
-                      :key="subprogram.sub_program_name"
-                      @mousedown.prevent="selectSubProgram(subprogram)"
-                      class="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-100 last:border-b-0 font-medium text-slate-700"
-                    >
-                      {{ subprogram.sub_program_name }}
-                    </div>
-                  </div>
-                  <div
-                    v-if="
-                      showSubProgramDropdown &&
-                      subProgramSearch &&
-                      filteredSubPrograms.length === 0
-                    "
-                    class="absolute z-10 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg p-4 text-slate-500 text-sm"
-                  >
-                    No se encontraron subprogramas
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Step 4: Archivos Adjuntos -->
-          <div v-show="currentStep === 4" class="step-content">
-            <h2
-              class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3"
-            >
-              <div class="p-2 bg-orange-100 rounded-lg">
-                <svg
-                  class="w-6 h-6 text-orange-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </div>
-              Archivos Adjuntos (Opcional)
-            </h2>
-
-            <div
-              class="border-2 border-dashed border-blue-300 rounded-xl p-12 text-center hover:border-blue-500 hover:bg-blue-50/30 transition-all bg-slate-50"
-            >
-              <input
-                id="file-upload"
-                type="file"
-                multiple
-                @change="handleFileUpload"
-                class="hidden"
-                accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.txt,.zip"
-              />
-              <label
-                for="file-upload"
-                class="cursor-pointer flex flex-col items-center"
-              >
-                <svg
-                  class="w-20 h-20 text-blue-400 mb-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                  />
-                </svg>
-                <span class="text-lg text-slate-700 font-bold mb-3"
-                  >Haga clic para seleccionar archivos</span
-                >
-                <span class="text-base text-slate-500 mb-4"
-                  >o arrastre y suelte aquí</span
-                >
-                <span
-                  class="text-sm text-slate-400 bg-white px-6 py-3 rounded-full border-2 border-slate-200 font-semibold"
-                  >PDF, DOC, XLS, IMG, TXT, ZIP (Máx. 10MB)</span
-                >
-              </label>
-            </div>
-
-            <div v-if="uploadedFiles.length > 0" class="mt-6 space-y-3">
-              <p class="text-sm font-bold text-slate-700 mb-3">
-                Archivos seleccionados ({{ uploadedFiles.length }}):
-              </p>
+      <div v-show="activeTab === 'create'" class="animate-fade-in">
+        <div class="max-w-4xl mx-auto">
+          <div class="mb-8">
+            <div class="flex items-center justify-between relative">
               <div
-                v-for="(file, index) in uploadedFiles"
-                :key="index"
-                class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-slate-50 rounded-xl border-2 border-blue-100 hover:border-blue-300 transition-all"
+                class="absolute top-6 left-0 right-0 h-1 bg-white/10 rounded-full backdrop-blur-sm"
+                style="z-index: 0"
+              ></div>
+              <div
+                class="absolute top-6 left-0 h-1 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 rounded-full transition-all duration-500 shadow-lg shadow-blue-400/50"
+                :style="{
+                  width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%`,
+                  zIndex: 1,
+                }"
+              ></div>
+              <div
+                v-for="step in steps"
+                :key="step.id"
+                class="relative flex flex-col items-center"
+                style="z-index: 2"
               >
-                <div class="flex items-center space-x-3">
-                  <div class="p-2 bg-blue-500 rounded-lg">
+                <div
+                  class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 border-4 mb-2"
+                  :class="
+                    currentStep > step.id
+                      ? 'bg-gradient-to-br from-green-400 to-emerald-500 text-white border-green-300 shadow-lg shadow-green-500/50'
+                      : currentStep === step.id
+                        ? 'bg-gradient-to-br from-blue-500 to-cyan-500 text-white border-white shadow-2xl shadow-blue-500/70 scale-110'
+                        : 'bg-white/5 text-white/50 border-white/20 backdrop-blur-sm'
+                  "
+                >
+                  <svg
+                    v-if="currentStep > step.id"
+                    class="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="3"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  <span v-else>{{ step.id }}</span>
+                </div>
+                <span
+                  class="text-xs font-semibold text-center max-w-[100px] transition-all"
+                  :class="
+                    currentStep === step.id
+                      ? 'text-white scale-105'
+                      : 'text-white/70'
+                  "
+                >
+                  {{ step.label }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="bg-white/98 backdrop-blur-xl rounded-2xl shadow-[0_20px_60px_rgba(59,130,246,0.3)] p-8 border border-white/20 min-h-[500px] hover:shadow-[0_20px_60px_rgba(59,130,246,0.4)] transition-shadow duration-300"
+          >
+            <form @submit.prevent="handleSubmit">
+              <div v-show="currentStep === 1" class="step-content">
+                <h2
+                  class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3"
+                >
+                  <div class="p-2 bg-blue-100 rounded-lg">
                     <svg
-                      class="w-6 h-6 text-white"
+                      class="w-6 h-6 text-blue-600"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"
+                      />
+                    </svg>
+                  </div>
+                  Información Básica
+                </h2>
+
+                <div class="space-y-6">
+                  <div>
+                    <label
+                      for="title"
+                      class="block text-sm font-bold text-slate-700 mb-2"
+                    >
+                      Título del Ticket <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="title"
+                      v-model="form.ticket_title"
+                      type="text"
+                      required
+                      maxlength="45"
+                      class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300"
+                      placeholder="Ej: Error en el sistema de reportes"
+                    />
+                    <p class="text-xs text-slate-500 mt-1">
+                      {{ form.ticket_title.length }}/45 caracteres
+                    </p>
+                  </div>
+
+                  <div>
+                    <label
+                      for="description"
+                      class="block text-sm font-bold text-slate-700 mb-2"
+                    >
+                      Descripción <span class="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      id="description"
+                      v-model="form.ticket_description"
+                      required
+                      maxlength="250"
+                      rows="6"
+                      class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none hover:border-blue-300"
+                      placeholder="Describa detalladamente el problema o solicitud..."
+                    ></textarea>
+                    <p class="text-xs text-slate-500 mt-1">
+                      {{ form.ticket_description.length }}/250 caracteres
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 2: Clasificación -->
+              <div v-show="currentStep === 2" class="step-content">
+                <h2
+                  class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3"
+                >
+                  <div class="p-2 bg-purple-100 rounded-lg">
+                    <svg
+                      class="w-6 h-6 text-purple-600"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"
+                      />
+                    </svg>
+                  </div>
+                  Clasificación del Ticket
+                </h2>
+
+                <div class="space-y-6">
+                  <div>
+                    <label
+                      for="service"
+                      class="block text-sm font-bold text-slate-700 mb-2"
+                    >
+                      Servicio <span class="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="service"
+                      v-model="form.ticket_service"
+                      required
+                      :disabled="isLoadingData"
+                      class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white disabled:bg-slate-100"
+                    >
+                      <option :value="null" disabled>
+                        Seleccione un servicio
+                      </option>
+                      <option
+                        v-for="service in services"
+                        :key="service.id_services"
+                        :value="service.id_services"
+                      >
+                        {{ service.service_name }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label
+                      for="priority"
+                      class="block text-sm font-bold text-slate-700 mb-2"
+                    >
+                      Prioridad <span class="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="priority"
+                      v-model="form.ticket_priority"
+                      required
+                      :disabled="isLoadingData"
+                      class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white disabled:bg-slate-100"
+                    >
+                      <option value="" disabled>
+                        Seleccione una prioridad
+                      </option>
+                      <option
+                        v-for="priority in priorities"
+                        :key="priority.priority_name"
+                        :value="priority.priority_name"
+                      >
+                        {{ priority.priority_name }}
+                        <template v-if="priority.priority_description">
+                          - {{ priority.priority_description }}
+                        </template>
+                      </option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label
+                      for="ans"
+                      class="block text-sm font-bold text-slate-700 mb-2"
+                    >
+                      ANS <span class="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="ans"
+                      v-model="form.ticket_ans"
+                      required
+                      :disabled="isLoadingData"
+                      class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300 bg-white disabled:bg-slate-100"
+                    >
+                      <option :value="null" disabled>Seleccione un ANS</option>
+                      <option
+                        v-for="ans in ansList"
+                        :key="ans.id_ans"
+                        :value="ans.id_ans"
+                      >
+                        {{ ans.ans_name }}
+                        <template v-if="ans.ans_description">
+                          - {{ ans.ans_description }}
+                        </template>
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 3: Cliente y Programa -->
+              <div v-show="currentStep === 3" class="step-content">
+                <h2
+                  class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3"
+                >
+                  <div class="p-2 bg-green-100 rounded-lg">
+                    <svg
+                      class="w-6 h-6 text-green-600"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"
+                      />
+                    </svg>
+                  </div>
+                  Cliente y Programa
+                </h2>
+
+                <div class="space-y-6">
+                  <div>
+                    <label
+                      for="client"
+                      class="block text-sm font-bold text-slate-700 mb-2"
+                    >
+                      Cliente <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                      <input
+                        id="client"
+                        v-model="clientSearch"
+                        @input="filterClients"
+                        @focus="showClientDropdown = true"
+                        @blur="hideClientDropdown"
+                        type="text"
+                        required
+                        autocomplete="off"
+                        class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300"
+                        placeholder="Buscar cliente..."
+                      />
+                      <div
+                        v-if="showClientDropdown && filteredClients.length > 0"
+                        class="absolute z-10 w-full mt-1 bg-white border-2 border-blue-200 rounded-xl shadow-xl max-h-60 overflow-y-auto"
+                      >
+                        <div
+                          v-for="client in filteredClients"
+                          :key="client.client_name"
+                          @mousedown.prevent="selectClient(client)"
+                          class="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-100 last:border-b-0 font-medium text-slate-700"
+                        >
+                          {{ client.client_name }}
+                        </div>
+                      </div>
+                      <div
+                        v-if="
+                          showClientDropdown &&
+                          clientSearch &&
+                          filteredClients.length === 0
+                        "
+                        class="absolute z-10 w-full mt-1 bg-white border-2 border-blue-200 rounded-xl shadow-xl p-4 text-slate-500 text-sm font-medium"
+                      >
+                        No se encontraron clientes
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      for="program"
+                      class="block text-sm font-bold text-slate-700 mb-2"
+                    >
+                      Programa <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                      <input
+                        id="program"
+                        v-model="programSearch"
+                        @input="filterPrograms"
+                        @focus="showProgramDropdown = true"
+                        @blur="hideProgramDropdown"
+                        type="text"
+                        required
+                        autocomplete="off"
+                        :disabled="!form.client_name"
+                        class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:bg-slate-100 disabled:cursor-not-allowed hover:border-blue-300"
+                        placeholder="Buscar programa..."
+                      />
+                      <div
+                        v-if="
+                          showProgramDropdown && filteredPrograms.length > 0
+                        "
+                        class="absolute z-10 w-full mt-1 bg-white border-2 border-blue-200 rounded-xl shadow-xl max-h-60 overflow-y-auto"
+                      >
+                        <div
+                          v-for="program in filteredPrograms"
+                          :key="program.program_name"
+                          @mousedown.prevent="selectProgram(program)"
+                          class="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-100 last:border-b-0 font-medium text-slate-700"
+                        >
+                          {{ program.program_name }}
+                        </div>
+                      </div>
+                      <div
+                        v-if="
+                          showProgramDropdown &&
+                          programSearch &&
+                          filteredPrograms.length === 0
+                        "
+                        class="absolute z-10 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg p-4 text-slate-500 text-sm"
+                      >
+                        No se encontraron programas
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      for="subprogram"
+                      class="block text-sm font-bold text-slate-700 mb-2"
+                    >
+                      Subprograma <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                      <input
+                        id="subprogram"
+                        v-model="subProgramSearch"
+                        @input="filterSubPrograms"
+                        @focus="showSubProgramDropdown = true"
+                        @blur="hideSubProgramDropdown"
+                        type="text"
+                        required
+                        autocomplete="off"
+                        :disabled="!form.program_name"
+                        class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:bg-slate-100 disabled:cursor-not-allowed hover:border-blue-300"
+                        placeholder="Buscar subprograma..."
+                      />
+                      <div
+                        v-if="
+                          showSubProgramDropdown &&
+                          filteredSubPrograms.length > 0
+                        "
+                        class="absolute z-10 w-full mt-1 bg-white border-2 border-blue-200 rounded-xl shadow-xl max-h-60 overflow-y-auto"
+                      >
+                        <div
+                          v-for="subprogram in filteredSubPrograms"
+                          :key="subprogram.sub_program_name"
+                          @mousedown.prevent="selectSubProgram(subprogram)"
+                          class="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-100 last:border-b-0 font-medium text-slate-700"
+                        >
+                          {{ subprogram.sub_program_name }}
+                        </div>
+                      </div>
+                      <div
+                        v-if="
+                          showSubProgramDropdown &&
+                          subProgramSearch &&
+                          filteredSubPrograms.length === 0
+                        "
+                        class="absolute z-10 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg p-4 text-slate-500 text-sm"
+                      >
+                        No se encontraron subprogramas
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 4: Archivos Adjuntos -->
+              <div v-show="currentStep === 4" class="step-content">
+                <h2
+                  class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3"
+                >
+                  <div class="p-2 bg-orange-100 rounded-lg">
+                    <svg
+                      class="w-6 h-6 text-orange-600"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -674,20 +568,125 @@
                       />
                     </svg>
                   </div>
-                  <div>
-                    <p class="text-sm font-bold text-slate-800">
-                      {{ file.name }}
-                    </p>
-                    <p class="text-xs text-slate-500 font-medium">
-                      {{ formatFileSize(file.size) }}
-                    </p>
+                  Archivos Adjuntos (Opcional)
+                </h2>
+
+                <div
+                  class="border-2 border-dashed border-blue-300 rounded-xl p-12 text-center hover:border-blue-500 hover:bg-blue-50/30 transition-all bg-slate-50"
+                >
+                  <input
+                    id="file-upload"
+                    type="file"
+                    multiple
+                    @change="handleFileUpload"
+                    class="hidden"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.txt,.zip"
+                  />
+                  <label
+                    for="file-upload"
+                    class="cursor-pointer flex flex-col items-center"
+                  >
+                    <svg
+                      class="w-20 h-20 text-blue-400 mb-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                      />
+                    </svg>
+                    <span class="text-lg text-slate-700 font-bold mb-3"
+                      >Haga clic para seleccionar archivos</span
+                    >
+                    <span class="text-base text-slate-500 mb-4"
+                      >o arrastre y suelte aquí</span
+                    >
+                    <span
+                      class="text-sm text-slate-400 bg-white px-6 py-3 rounded-full border-2 border-slate-200 font-semibold"
+                      >PDF, DOC, XLS, IMG, TXT, ZIP (Máx. 10MB)</span
+                    >
+                  </label>
+                </div>
+
+                <div v-if="uploadedFiles.length > 0" class="mt-6 space-y-3">
+                  <p class="text-sm font-bold text-slate-700 mb-3">
+                    Archivos seleccionados ({{ uploadedFiles.length }}):
+                  </p>
+                  <div
+                    v-for="(file, index) in uploadedFiles"
+                    :key="index"
+                    class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-slate-50 rounded-xl border-2 border-blue-100 hover:border-blue-300 transition-all"
+                  >
+                    <div class="flex items-center space-x-3">
+                      <div class="p-2 bg-blue-500 rounded-lg">
+                        <svg
+                          class="w-6 h-6 text-white"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                      <div>
+                        <p class="text-sm font-bold text-slate-800">
+                          {{ file.name }}
+                        </p>
+                        <p class="text-xs text-slate-500 font-medium">
+                          {{ formatFileSize(file.size) }}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      @click="removeFile(index)"
+                      class="p-2 text-red-500 hover:text-white hover:bg-red-500 rounded-lg transition-all"
+                      title="Eliminar archivo"
+                    >
+                      <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
                   </div>
                 </div>
+
+                <div
+                  v-else
+                  class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl text-center"
+                >
+                  <p class="text-sm text-slate-600">
+                    No hay archivos adjuntos. Puede continuar sin adjuntar
+                    archivos.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Navigation Buttons -->
+              <div
+                class="flex justify-between items-center pt-6 mt-6 border-t-2 border-slate-100"
+              >
                 <button
+                  v-if="currentStep > 1"
                   type="button"
-                  @click="removeFile(index)"
-                  class="p-2 text-red-500 hover:text-white hover:bg-red-500 rounded-lg transition-all"
-                  title="Eliminar archivo"
+                  @click="previousStep"
+                  class="px-6 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 hover:border-slate-400 transition-all font-bold shadow-sm flex items-center gap-2"
                 >
                   <svg
                     class="w-5 h-5"
@@ -699,71 +698,131 @@
                       stroke-linecap="round"
                       stroke-linejoin="round"
                       stroke-width="2"
-                      d="M6 18L18 6M6 6l12 12"
+                      d="M15 19l-7-7 7-7"
                     />
                   </svg>
+                  Anterior
                 </button>
+                <button
+                  v-else
+                  type="button"
+                  @click="handleCancel"
+                  class="px-6 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 hover:border-slate-400 transition-all font-bold shadow-sm"
+                >
+                  Cancelar
+                </button>
+
+                <div class="flex items-center gap-3">
+                  <span class="text-sm text-slate-600 font-medium">
+                    Paso {{ currentStep }} de {{ totalSteps }}
+                  </span>
+                  <button
+                    v-if="currentStep < totalSteps"
+                    type="button"
+                    @click="nextStep"
+                    :disabled="!canProceedToNextStep"
+                    class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    Siguiente
+                    <svg
+                      class="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    v-else
+                    type="submit"
+                    :disabled="isSubmitting || !canSubmit || isUploadingFiles"
+                    class="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    <span
+                      v-if="!isSubmitting && !isUploadingFiles"
+                      class="flex items-center gap-2"
+                    >
+                      <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      Crear Ticket
+                    </span>
+                    <span
+                      v-else-if="isUploadingFiles"
+                      class="flex items-center gap-2"
+                    >
+                      <svg
+                        class="animate-spin h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          class="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="4"
+                        ></circle>
+                        <path
+                          class="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Subiendo archivos...
+                    </span>
+                    <span v-else class="flex items-center gap-2">
+                      <svg
+                        class="animate-spin h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          class="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="4"
+                        ></circle>
+                        <path
+                          class="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Creando...
+                    </span>
+                  </button>
+                </div>
               </div>
-            </div>
+            </form>
 
             <div
-              v-else
-              class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl text-center"
+              v-if="showSuccess"
+              class="mt-6 p-5 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 text-green-800 rounded-xl shadow-lg flex items-center gap-3 animate-fade-in"
             >
-              <p class="text-sm text-slate-600">
-                No hay archivos adjuntos. Puede continuar sin adjuntar archivos.
-              </p>
-            </div>
-          </div>
-
-          <!-- Navigation Buttons -->
-          <div
-            class="flex justify-between items-center pt-6 mt-6 border-t-2 border-slate-100"
-          >
-            <button
-              v-if="currentStep > 1"
-              type="button"
-              @click="previousStep"
-              class="px-6 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 hover:border-slate-400 transition-all font-bold shadow-sm flex items-center gap-2"
-            >
-              <svg
-                class="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-              Anterior
-            </button>
-            <button
-              v-else
-              type="button"
-              @click="handleCancel"
-              class="px-6 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 hover:border-slate-400 transition-all font-bold shadow-sm"
-            >
-              Cancelar
-            </button>
-
-            <div class="flex items-center gap-3">
-              <span class="text-sm text-slate-600 font-medium">
-                Paso {{ currentStep }} de {{ totalSteps }}
-              </span>
-              <button
-                v-if="currentStep < totalSteps"
-                type="button"
-                @click="nextStep"
-                :disabled="!canProceedToNextStep"
-                class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                Siguiente
+              <div class="p-2 bg-green-500 rounded-full">
                 <svg
-                  class="w-5 h-5"
+                  class="w-6 h-6 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -772,19 +831,190 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    d="M9 5l7 7-7 7"
+                    d="M5 13l4 4L19 7"
                   />
                 </svg>
-              </button>
-              <button
-                v-else
-                type="submit"
-                :disabled="isSubmitting || !canSubmit"
-                class="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              </div>
+              <div>
+                <p class="font-bold text-lg">¡Ticket creado exitosamente!</p>
+                <p class="text-sm font-medium">
+                  ID del Ticket:
+                  <span class="font-bold">{{ createdTicketId }}</span>
+                </p>
+              </div>
+            </div>
+
+            <div
+              v-if="errorMessage"
+              class="mt-6 p-5 bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-300 text-red-800 rounded-xl shadow-lg flex items-center gap-3 animate-fade-in"
+            >
+              <div class="p-2 bg-red-500 rounded-full">
+                <svg
+                  class="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p class="font-bold text-lg">Error</p>
+                <p class="text-sm font-medium">{{ errorMessage }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vista de Mis Tickets -->
+      <div v-show="activeTab === 'list'" class="animate-fade-in">
+        <!-- Panel de Estadísticas -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div
+            class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105 border border-blue-500/20"
+          >
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-blue-50 text-sm font-semibold mb-1">
+                  Total Tickets
+                </p>
+                <p class="text-4xl font-bold">{{ ticketStats.total }}</p>
+              </div>
+              <div
+                class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center"
               >
-                <span v-if="!isSubmitting" class="flex items-center gap-2">
+                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                  <path
+                    fill-rule="evenodd"
+                    d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105 border border-indigo-500/20"
+          >
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-indigo-50 text-sm font-semibold mb-1">
+                  En Proceso
+                </p>
+                <p class="text-4xl font-bold">
+                  {{ ticketStats.enProceso }}
+                </p>
+              </div>
+              <div
+                class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center"
+              >
+                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="bg-gradient-to-br from-sky-500 to-sky-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105 border border-sky-400/20"
+          >
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sky-50 text-sm font-semibold mb-1">Pendientes</p>
+                <p class="text-4xl font-bold">
+                  {{ ticketStats.pendientes }}
+                </p>
+              </div>
+              <div
+                class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center"
+              >
+                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="bg-gradient-to-br from-cyan-600 to-teal-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105 border border-cyan-500/20"
+          >
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-cyan-50 text-sm font-semibold mb-1">
+                  Completados
+                </p>
+                <p class="text-4xl font-bold">
+                  {{ ticketStats.completados }}
+                </p>
+              </div>
+              <div
+                class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center"
+              >
+                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Lista de Tickets -->
+          <div class="lg:col-span-2">
+            <div
+              class="bg-white/98 backdrop-blur-xl rounded-2xl shadow-[0_20px_60px_rgba(59,130,246,0.3)] border border-white/20 overflow-hidden"
+            >
+              <!-- Header con búsqueda y filtros -->
+              <div class="bg-gradient-to-r from-blue-700 to-blue-500 p-6">
+                <h2
+                  class="text-2xl font-bold text-white mb-4 flex items-center gap-3"
+                >
+                  <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                    <path
+                      fill-rule="evenodd"
+                      d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  Mis Tickets
+                  <span
+                    class="ml-auto px-4 py-1.5 bg-white/20 backdrop-blur-sm text-white text-sm font-bold rounded-full"
+                  >
+                    {{ filteredTickets.length }} de {{ tickets.length }}
+                  </span>
+                </h2>
+
+                <!-- Búsqueda -->
+                <div class="relative mb-4">
+                  <input
+                    v-model="ticketSearchQuery"
+                    type="text"
+                    placeholder="Buscar por título, descripción o ID..."
+                    class="w-full px-5 py-3 pl-12 bg-white/95 backdrop-blur-sm border-2 border-white/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-white focus:border-white text-slate-800 placeholder-slate-400 font-medium shadow-lg"
+                  />
                   <svg
-                    class="w-5 h-5"
+                    class="w-6 h-6 absolute left-4 top-3.5 text-slate-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -793,346 +1023,683 @@
                       stroke-linecap="round"
                       stroke-linejoin="round"
                       stroke-width="2"
-                      d="M5 13l4 4L19 7"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                     />
                   </svg>
-                  Crear Ticket
-                </span>
-                <span v-else class="flex items-center gap-2">
-                  <svg
-                    class="animate-spin h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
+                </div>
+
+                <!-- Filtros -->
+                <div class="flex flex-wrap gap-3">
+                  <select
+                    v-model="selectedStatusFilter"
+                    class="px-4 py-2 bg-white/95 backdrop-blur-sm border-2 border-white/50 rounded-xl text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-white shadow-lg text-sm"
                   >
-                    <circle
-                      class="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
+                    <option :value="null">Todos los estados</option>
+                    <option
+                      v-for="status in statuses"
+                      :key="status.id_status"
+                      :value="status.id_status"
+                    >
+                      {{ status.status_name }}
+                    </option>
+                  </select>
+
+                  <select
+                    v-model="selectedPriorityFilter"
+                    class="px-4 py-2 bg-white/95 backdrop-blur-sm border-2 border-white/50 rounded-xl text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-white shadow-lg text-sm"
+                  >
+                    <option :value="null">Todas las prioridades</option>
+                    <option
+                      v-for="priority in uniquePriorities"
+                      :key="priority"
+                      :value="priority"
+                    >
+                      {{ priority }}
+                    </option>
+                  </select>
+
+                  <button
+                    v-if="
+                      ticketSearchQuery ||
+                      selectedStatusFilter ||
+                      selectedPriorityFilter
+                    "
+                    @click="clearFilters"
+                    class="px-4 py-2 bg-white/95 backdrop-blur-sm border-2 border-white/50 rounded-xl text-slate-700 font-semibold hover:bg-red-50 transition-all shadow-lg text-sm flex items-center gap-2"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
                       stroke="currentColor"
-                      stroke-width="4"
-                    ></circle>
-                    <path
-                      class="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Creando...
-                </span>
-              </button>
-            </div>
-          </div>
-        </form>
-
-        <div
-          v-if="showSuccess"
-          class="mt-6 p-5 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 text-green-800 rounded-xl shadow-lg flex items-center gap-3 animate-fade-in"
-        >
-          <div class="p-2 bg-green-500 rounded-full">
-            <svg
-              class="w-6 h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-          <div>
-            <p class="font-bold text-lg">¡Ticket creado exitosamente!</p>
-            <p class="text-sm font-medium">
-              ID del Ticket:
-              <span class="font-bold">{{ createdTicketId }}</span>
-            </p>
-          </div>
-        </div>
-
-        <div
-          v-if="errorMessage"
-          class="mt-6 p-5 bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-300 text-red-800 rounded-xl shadow-lg flex items-center gap-3 animate-fade-in"
-        >
-          <div class="p-2 bg-red-500 rounded-full">
-            <svg
-              class="w-6 h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </div>
-          <div>
-            <p class="font-bold text-lg">Error</p>
-            <p class="text-sm font-medium">{{ errorMessage }}</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="text-center mt-8">
-        <div
-          class="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full text-white border border-[#50bdeb]/30 shadow-lg hover:bg-white/15 transition-all"
-        >
-          <svg
-            class="w-5 h-5 text-[#50bdeb]"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <p class="font-medium tracking-wide">
-            ¿Necesita ayuda? Contacte al equipo de soporte
-          </p>
-        </div>
-
-        <div
-          class="mt-6 w-32 h-1 bg-gradient-to-r from-transparent via-[#50bdeb] to-transparent rounded-full mx-auto"
-        ></div>
-      </div>
-    </div>
-  </div>
-
-    <div
-      class="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-transparent via-[#50bdeb] to-transparent opacity-80">
-    </div>
-    <div
-      class="absolute bottom-0 left-0 w-full h-3 bg-gradient-to-r from-transparent via-[#50bdeb] to-transparent opacity-80">
-    </div>
-
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-      <div class="absolute top-20 left-10 w-40 h-40 bg-[#50bdeb] rounded-full opacity-20 blur-3xl animate-pulse"></div>
-      <div class="absolute bottom-20 right-10 w-48 h-48 bg-[#50bdeb] rounded-full opacity-20 blur-3xl animate-pulse"
-        style="animation-delay: 1s"></div>
-    </div>
-
-    <div class="relative z-10 p-6">
-      <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-8">
-          <div
-            class="inline-block p-4 bg-white/10 rounded-2xl mb-4 backdrop-blur-sm border border-[#50bdeb]/30 shadow-lg shadow-[#50bdeb]/20">
-            <List class="w-12 h-12 text-[#50bdeb]" />
-          </div>
-          <h1 class="text-4xl font-bold text-white mb-3 drop-shadow-lg tracking-wide">
-            Mis Tickets
-          </h1>
-          <p class="text-blue-100 text-lg font-medium">
-            Consulta el estado y registros de tus solicitudes
-          </p>
-          <div
-            class="mt-4 w-24 h-1 bg-gradient-to-r from-transparent via-[#50bdeb] to-transparent rounded-full mx-auto">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Lista de Tickets -->
-          <div
-            class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-[0_8px_32px_rgba(0,25,80,0.4)] p-6 border border-[#50bdeb]/20">
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-                <FileText class="w-6 h-6 text-blue-600" />
-                Lista de Tickets
-              </h2>
-              <span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full">
-                {{ tickets.length }} tickets
-              </span>
-            </div>
-
-            <div v-if="tickets.length === 0" class="text-center py-12">
-              <Inbox class="w-16 h-16 mx-auto mb-4 text-slate-300" />
-              <p class="text-slate-500 text-lg">No hay tickets creados aún</p>
-            </div>
-
-            <div v-else class="space-y-3 max-h-[calc(100vh-280px)] overflow-y-auto pr-2">
-              <div v-for="ticket in tickets" :key="ticket.id_ticket" @click="selectTicket(ticket)" :class="[
-                'p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-lg',
-                selectedTicket?.id_ticket === ticket.id_ticket
-                  ? 'bg-blue-50 border-blue-500 shadow-md'
-                  : 'bg-white border-slate-200 hover:border-blue-300',
-              ]">
-                <div class="flex items-start justify-between gap-3">
-                  <div class="flex-1 min-w-0">
-                    <h3 class="font-bold text-slate-800 mb-1 truncate">
-                      {{ ticket.ticket_title }}
-                    </h3>
-                    <div class="flex items-center gap-3 text-xs text-slate-500 mb-2">
-                      <span class="flex items-center gap-1">
-                        <Calendar class="w-3 h-3" />
-                        {{ formatDate(ticket.create_at) }}
-                      </span>
-                      <span class="flex items-center gap-1">
-                        <Clock class="w-3 h-3" />
-                        {{ formatTime(ticket.create_at) }}
-                      </span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <span :class="[
-                        'px-3 py-1 text-xs font-bold rounded-full',
-                        getStatusClass(ticket.status_id),
-                      ]">
-                        {{ getStatusName(ticket.status_id) }}
-                      </span>
-                      <span :class="[
-                        'px-3 py-1 text-xs font-bold rounded-full'
-                      ]">
-                        {{ ticket.ticket_priority }}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="flex-shrink-0">
-                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-                      <MessageSquare :class="[
-                        'w-5 h-5',
-                        getTicketComments(ticket.id_ticket).length > 0
-                          ? 'text-blue-600'
-                          : 'text-slate-400',
-                      ]" />
-                    </div>
-                    <span v-if="getTicketComments(ticket.id_ticket).length > 0"
-                      class="block text-center text-xs font-bold text-blue-600 mt-1">
-                      {{ getTicketComments(ticket.id_ticket).length }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Detalle del Ticket y Comentarios -->
-          <div
-            class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-[0_8px_32px_rgba(0,25,80,0.4)] p-6 border border-[#50bdeb]/20">
-            <div v-if="!selectedTicket" class="flex flex-col items-center justify-center h-full py-12">
-              <div class="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-                <ArrowLeft class="w-10 h-10 text-slate-400" />
-              </div>
-              <p class="text-slate-500 text-lg text-center">
-                Selecciona un ticket para ver sus detalles y comentarios
-              </p>
-            </div>
-
-            <div v-else class="h-full flex flex-col">
-              <div class="mb-6">
-                <div class="flex items-center justify-between mb-4">
-                  <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-                    <FileText class="w-6 h-6 text-blue-600" />
-                    Detalles del Ticket
-                  </h2>
-                  <span class="text-sm text-slate-500">
-                    #{{ selectedTicket.id_ticket }}
-                  </span>
-                </div>
-
-                <div class="space-y-4">
-                  <div>
-                    <h3 class="font-bold text-lg text-slate-800 mb-2">
-                      {{ selectedTicket.ticket_title }}
-                    </h3>
-                    <p class="text-slate-600 text-sm leading-relaxed">
-                      {{ selectedTicket.ticket_description }}
-                    </p>
-                  </div>
-
-                  <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-200">
-                    <div>
-                      <span class="text-xs font-semibold text-slate-500 block mb-1">
-                        Estado
-                      </span>
-                      <span :class="[
-                        'px-3 py-1 text-xs font-bold rounded-full inline-block',
-                        getStatusClass(selectedTicket.status_id),
-                      ]">
-                        {{ getStatusName(selectedTicket.status_id) }}
-                      </span>
-                    </div>
-                    <div>
-                      <span class="text-xs font-semibold text-slate-500 block mb-1">
-                        Prioridad
-                      </span>
-                      <span :class="[
-                        'px-3 py-1 text-xs font-bold rounded-full inline-block',
-                        selectedTicket.ticket_priority
-                      ]">
-                        {{ selectedTicket.ticket_priority }}
-                      </span>
-                    </div>
-                    <div>
-                      <span class="text-xs font-semibold text-slate-500 block mb-1">
-                        Fecha de Creación
-                      </span>
-                      <span class="text-sm text-slate-700 font-medium">
-                        {{ formatDate(selectedTicket.create_at) }}
-                      </span>
-                    </div>
-                    <div>
-                      <span class="text-xs font-semibold text-slate-500 block mb-1">
-                        Hora
-                      </span>
-                      <span class="text-sm text-slate-700 font-medium">
-                        {{ formatTime(selectedTicket.create_at) }}
-                      </span>
-                    </div>
-                  </div>
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                    Limpiar filtros
+                  </button>
                 </div>
               </div>
 
-              <div class="flex-1 border-t border-slate-200 pt-6">
-                <div class="flex items-center justify-between mb-4">
-                  <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-                    <MessageSquare class="w-5 h-5 text-blue-600" />
-                    Comentarios
-                  </h3>
-                  <span v-if="getTicketComments(selectedTicket.id_ticket).length > 0"
-                    class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
-                    {{ getTicketComments(selectedTicket.id_ticket).length }}
-                    comentarios
-                  </span>
-                </div>
-
-                <div v-if="getTicketComments(selectedTicket.id_ticket).length === 0" class="text-center py-8">
-                  <MessageSquare class="w-12 h-12 mx-auto mb-3 text-slate-300" />
-                  <p class="text-slate-500">
-                    Este ticket no tiene comentarios aún
+              <!-- Lista de tickets -->
+              <div class="p-6">
+                <div v-if="tickets.length === 0" class="text-center py-12">
+                  <div
+                    class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl flex items-center justify-center"
+                  >
+                    <svg
+                      class="w-12 h-12 text-slate-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                      />
+                    </svg>
+                  </div>
+                  <p class="text-slate-500 text-lg font-semibold mb-2">
+                    No hay tickets creados aún
+                  </p>
+                  <p class="text-slate-400 text-sm">
+                    Crea tu primer ticket usando el botón "Crear Ticket"
                   </p>
                 </div>
 
-                <div v-else class="space-y-4 max-h-[calc(100vh-580px)] overflow-y-auto pr-2">
-                  <div v-for="note in getTicketComments(
-                    selectedTicket.id_ticket
-                  )" :key="note.id_note"
-                    class="bg-slate-50 border border-slate-200 rounded-xl p-4 hover:shadow-md transition-shadow">
-                    <div class="flex items-start gap-3">
+                <div
+                  v-else-if="filteredTickets.length === 0"
+                  class="text-center py-12"
+                >
+                  <div
+                    class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-3xl flex items-center justify-center"
+                  >
+                    <svg
+                      class="w-12 h-12 text-blue-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
+                  <p class="text-slate-500 text-lg font-semibold mb-2">
+                    No se encontraron tickets
+                  </p>
+                  <p class="text-slate-400 text-sm">
+                    Intenta ajustar los filtros de búsqueda
+                  </p>
+                </div>
+
+                <div
+                  v-else
+                  class="space-y-4 max-h-[calc(100vh-480px)] overflow-y-auto pr-2"
+                >
+                  <div
+                    v-for="ticket in filteredTickets"
+                    :key="ticket.id_ticket"
+                    @click="
+                      selectTicket(ticket);
+                      detailTab = 'info';
+                    "
+                    :class="[
+                      'group relative p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300',
+                      selectedTicket?.id_ticket === ticket.id_ticket
+                        ? 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-500 shadow-lg scale-[1.02]'
+                        : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-md hover:scale-[1.01]',
+                    ]"
+                  >
+                    <!-- Indicador de selección -->
+                    <div
+                      v-if="selectedTicket?.id_ticket === ticket.id_ticket"
+                      class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-16 bg-gradient-to-b from-blue-500 to-cyan-500 rounded-r-full"
+                    ></div>
+
+                    <div class="flex items-start gap-4">
+                      <!-- ID Badge -->
                       <div
-                        class="w-10 h-10 rounded-full bg-gradient-to-br from-[#021C7D] to-[#50bdeb] flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
-                        {{ getUserInitials(note.network_user) }}
+                        :class="[
+                          'flex-shrink-0 w-16 h-16 rounded-2xl flex flex-col items-center justify-center font-bold border-2 transition-all',
+                          selectedTicket?.id_ticket === ticket.id_ticket
+                            ? 'bg-gradient-to-br from-blue-500 to-cyan-500 text-white border-blue-400 shadow-lg shadow-blue-500/50'
+                            : 'bg-gradient-to-br from-slate-100 to-slate-200 text-slate-600 border-slate-300 group-hover:from-blue-100 group-hover:to-cyan-100 group-hover:text-blue-600',
+                        ]"
+                      >
+                        <span class="text-[10px] opacity-70">ID</span>
+                        <span class="text-lg leading-none">{{
+                          ticket.id_ticket
+                        }}</span>
                       </div>
+
+                      <!-- Contenido del ticket -->
                       <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between mb-1">
-                          <span class="font-bold text-slate-800 text-sm">
-                            {{ note.network_user }}
+                        <h3
+                          class="font-bold text-slate-800 mb-2 text-base leading-tight"
+                        >
+                          {{ ticket.ticket_title }}
+                        </h3>
+                        <p
+                          class="text-slate-600 text-sm mb-3 line-clamp-2 leading-relaxed"
+                        >
+                          {{ ticket.ticket_description }}
+                        </p>
+
+                        <!-- Tags y meta información -->
+                        <div class="flex flex-wrap items-center gap-2 mb-3">
+                          <span
+                            :class="[
+                              'px-3 py-1 text-xs font-bold rounded-lg border-2',
+                              getStatusClass(ticket.status_id),
+                            ]"
+                          >
+                            {{ getStatusName(ticket.status_id) }}
                           </span>
-                          <span class="text-xs text-slate-500">
-                            {{ formatDate(note.create_at) }} -
-                            {{ formatTime(note.create_at) }}
+                          <span
+                            :class="[
+                              'px-3 py-1 text-xs font-bold rounded-lg border-2',
+                              getPriorityClass(ticket.ticket_priority),
+                            ]"
+                          >
+                            {{ ticket.ticket_priority }}
+                          </span>
+                          <span
+                            v-if="
+                              getTicketComments(ticket.id_ticket).length > 0
+                            "
+                            class="px-3 py-1 text-xs font-bold rounded-lg border-2 bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1"
+                          >
+                            <svg
+                              class="w-3 h-3"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"
+                              />
+                              <path
+                                d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z"
+                              />
+                            </svg>
+                            {{ getTicketComments(ticket.id_ticket).length }}
                           </span>
                         </div>
-                        <p class="text-slate-700 text-sm leading-relaxed">
-                          {{ note.note }}
-                        </p>
+
+                        <!-- Fecha y hora -->
+                        <div
+                          class="flex items-center gap-4 text-xs text-slate-500"
+                        >
+                          <span class="flex items-center gap-1.5">
+                            <svg
+                              class="w-3.5 h-3.5"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fill-rule="evenodd"
+                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                clip-rule="evenodd"
+                              />
+                            </svg>
+                            {{ formatDate(ticket.create_at) }}
+                          </span>
+                          <span class="flex items-center gap-1.5">
+                            <svg
+                              class="w-3.5 h-3.5"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                                clip-rule="evenodd"
+                              />
+                            </svg>
+                            {{ formatTime(ticket.create_at) }}
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- Flecha indicadora -->
+                      <div class="flex-shrink-0">
+                        <div
+                          :class="[
+                            'w-8 h-8 rounded-lg flex items-center justify-center transition-all',
+                            selectedTicket?.id_ticket === ticket.id_ticket
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-slate-100 text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-500',
+                          ]"
+                        >
+                          <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel de Detalles del Ticket -->
+          <div class="lg:col-span-1">
+            <div
+              class="bg-white/98 backdrop-blur-xl rounded-2xl shadow-[0_20px_60px_rgba(59,130,246,0.3)] border border-white/20 overflow-hidden sticky top-6"
+            >
+              <div
+                v-if="!selectedTicket"
+                class="flex flex-col items-center justify-center py-20 px-6"
+              >
+                <div
+                  class="w-32 h-32 rounded-3xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center mb-6 animate-pulse-slow"
+                >
+                  <svg
+                    class="w-16 h-16 text-slate-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
+                    />
+                  </svg>
+                </div>
+                <p
+                  class="text-slate-600 text-lg font-semibold text-center mb-2"
+                >
+                  Selecciona un ticket
+                </p>
+                <p class="text-slate-400 text-sm text-center">
+                  Haz clic en cualquier ticket de la lista para ver sus detalles
+                  completos
+                </p>
+              </div>
+
+              <div v-else class="h-full flex flex-col">
+                <!-- Header del ticket -->
+                <div
+                  class="bg-gradient-to-r from-blue-800 to-blue-900 p-6 text-white"
+                >
+                  <div class="flex items-start justify-between mb-3">
+                    <div
+                      class="flex-1 w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm flex flex-col items-center justify-center border border-white/20"
+                    >
+                      <span class="text-xs opacity-70 font-semibold"
+                        >TICKET</span
+                      >
+                      <span class="text-2xl font-bold leading-none">
+                        #{{ selectedTicket.id_ticket }}
+                      </span>
+                    </div>
+                    <button
+                      @click="selectedTicket = null"
+                      class="p-2 hover:bg-white/10 rounded-lg transition-all"
+                      title="Cerrar"
+                    >
+                      <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <h2 class="text-xl font-bold leading-tight mb-3">
+                    {{ selectedTicket.ticket_title }}
+                  </h2>
+                  <div class="flex flex-wrap gap-2">
+                    <span
+                      :class="[
+                        'px-3 py-1.5 text-xs font-bold rounded-lg border-2',
+                        getStatusClass(selectedTicket.status_id),
+                      ]"
+                    >
+                      {{ getStatusName(selectedTicket.status_id) }}
+                    </span>
+                    <span
+                      :class="[
+                        'px-3 py-1.5 text-xs font-bold rounded-lg border-2',
+                        getPriorityClass(selectedTicket.ticket_priority),
+                      ]"
+                    >
+                      {{ selectedTicket.ticket_priority }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Tabs de navegación -->
+                <div
+                  class="flex border-b-2 border-slate-100 bg-slate-50/50 px-2"
+                >
+                  <button
+                    @click="detailTab = 'info'"
+                    :class="[
+                      'flex-1 py-3 px-4 font-bold text-sm transition-all relative',
+                      detailTab === 'info'
+                        ? 'text-blue-600'
+                        : 'text-slate-500 hover:text-slate-700',
+                    ]"
+                  >
+                    <span class="flex items-center justify-center gap-2">
+                      <svg
+                        class="w-4 h-4"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                      Información
+                    </span>
+                    <div
+                      v-if="detailTab === 'info'"
+                      class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-t-full"
+                    ></div>
+                  </button>
+                  <button
+                    @click="detailTab = 'comments'"
+                    :class="[
+                      'flex-1 py-3 px-4 font-bold text-sm transition-all relative',
+                      detailTab === 'comments'
+                        ? 'text-blue-600'
+                        : 'text-slate-500 hover:text-slate-700',
+                    ]"
+                  >
+                    <span class="flex items-center justify-center gap-2">
+                      <svg
+                        class="w-4 h-4"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"
+                        />
+                        <path
+                          d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z"
+                        />
+                      </svg>
+                      Comentarios
+                      <span
+                        v-if="
+                          getTicketComments(selectedTicket.id_ticket).length > 0
+                        "
+                        class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-bold"
+                      >
+                        {{ getTicketComments(selectedTicket.id_ticket).length }}
+                      </span>
+                    </span>
+                    <div
+                      v-if="detailTab === 'comments'"
+                      class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-t-full"
+                    ></div>
+                  </button>
+                </div>
+
+                <!-- Contenido de los tabs -->
+                <div class="flex-1 overflow-y-auto">
+                  <!-- Tab Información -->
+                  <div v-show="detailTab === 'info'" class="p-6 space-y-6">
+                    <!-- Descripción -->
+                    <div>
+                      <h3
+                        class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 flex items-center gap-2"
+                      >
+                        <svg
+                          class="w-4 h-4"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                        Descripción
+                      </h3>
+                      <p
+                        class="text-slate-700 leading-relaxed bg-slate-50 rounded-xl p-4 border border-slate-200"
+                      >
+                        {{ selectedTicket.ticket_description }}
+                      </p>
+                    </div>
+
+                    <!-- Detalles técnicos -->
+                    <div class="space-y-4">
+                      <h3
+                        class="text-xs font-bold text-slate-500 uppercase tracking-wide flex items-center gap-2"
+                      >
+                        <svg
+                          class="w-4 h-4"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                          <path
+                            fill-rule="evenodd"
+                            d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                        Detalles del Ticket
+                      </h3>
+
+                      <div
+                        class="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl p-4 border border-slate-200 space-y-3"
+                      >
+                        <div class="flex items-start justify-between">
+                          <div class="flex items-center gap-2">
+                            <div
+                              class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center"
+                            >
+                              <svg
+                                class="w-4 h-4 text-blue-700"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                  clip-rule="evenodd"
+                                />
+                              </svg>
+                            </div>
+                            <div>
+                              <p class="text-xs text-slate-500 font-semibold">
+                                Fecha de Creación
+                              </p>
+                              <p class="text-sm text-slate-800 font-bold">
+                                {{ formatDate(selectedTicket.create_at) }} -
+                                {{ formatTime(selectedTicket.create_at) }}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="flex items-start justify-between">
+                          <div class="flex items-center gap-2">
+                            <div
+                              class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center"
+                            >
+                              <svg
+                                class="w-4 h-4 text-indigo-700"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                  clip-rule="evenodd"
+                                />
+                              </svg>
+                            </div>
+                            <div>
+                              <p class="text-xs text-slate-500 font-semibold">
+                                Fecha Estimada de Cierre
+                              </p>
+                              <p class="text-sm text-slate-800 font-bold">
+                                {{
+                                  selectedTicket.estimated_closing_date
+                                    ? formatDate(
+                                        selectedTicket.estimated_closing_date,
+                                      )
+                                    : "No definida"
+                                }}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Tab Comentarios -->
+                  <div v-show="detailTab === 'comments'" class="p-6">
+                    <div
+                      v-if="
+                        getTicketComments(selectedTicket.id_ticket).length === 0
+                      "
+                      class="text-center py-12"
+                    >
+                      <div
+                        class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center"
+                      >
+                        <svg
+                          class="w-10 h-10 text-slate-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                          />
+                        </svg>
+                      </div>
+                      <p class="text-slate-600 font-semibold mb-1">
+                        Sin comentarios
+                      </p>
+                      <p class="text-slate-400 text-sm">
+                        Este ticket aún no tiene comentarios
+                      </p>
+                    </div>
+
+                    <!-- Timeline de comentarios -->
+                    <div v-else class="space-y-4">
+                      <div class="relative">
+                        <!-- Línea vertical del timeline -->
+                        <div
+                          class="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-300 via-sky-200 to-transparent"
+                        ></div>
+
+                        <!-- Comentarios -->
+                        <div
+                          v-for="(note, index) in getTicketComments(
+                            selectedTicket.id_ticket,
+                          )"
+                          :key="note.id_note"
+                          class="relative pl-16 pb-8 last:pb-0 group"
+                        >
+                          <!-- Avatar con efecto -->
+                          <div
+                            class="absolute left-0 top-0 w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white font-bold shadow-lg group-hover:scale-110 transition-transform border-4 border-white"
+                          >
+                            {{ getUserInitials(note.network_user) }}
+                          </div>
+
+                          <!-- Contenido del comentario -->
+                          <div
+                            class="bg-gradient-to-br from-white to-slate-50 rounded-2xl p-4 border-2 border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all"
+                          >
+                            <div class="flex items-center justify-between mb-2">
+                              <span
+                                class="font-bold text-slate-800 text-sm flex items-center gap-2"
+                              >
+                                {{ note.network_user }}
+                                <span
+                                  class="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold"
+                                >
+                                  #{{ index + 1 }}
+                                </span>
+                              </span>
+                            </div>
+                            <p
+                              class="text-slate-700 text-sm leading-relaxed mb-3"
+                            >
+                              {{ note.note }}
+                            </p>
+                            <div class="flex items-center gap-3 text-xs">
+                              <span
+                                class="flex items-center gap-1 text-slate-500"
+                              >
+                                <svg
+                                  class="w-3.5 h-3.5"
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path
+                                    fill-rule="evenodd"
+                                    d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                    clip-rule="evenodd"
+                                  />
+                                </svg>
+                                {{ formatDate(note.create_at) }}
+                              </span>
+                              <span
+                                class="flex items-center gap-1 text-slate-500"
+                              >
+                                <svg
+                                  class="w-3.5 h-3.5"
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path
+                                    fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                                    clip-rule="evenodd"
+                                  />
+                                </svg>
+                                {{ formatTime(note.create_at) }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1143,6 +1710,7 @@
         </div>
       </div>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -1167,7 +1735,7 @@ import { SubProgramsService } from "../../services/subProgramService";
 import type { Note } from "../../models/Notes";
 import { NotesService } from "../../services/notesService";
 import { SessionStorageService } from "../../services/SessionStorageService";
-
+import { FileUploadService } from "../../services/fileUploadService";
 
 const ansService = new AnsService();
 const serviceService = new RequestTypeService();
@@ -1177,6 +1745,7 @@ const statusService = new StatusService();
 const usersService = new UsersService();
 const programsService = new ProgramsService();
 const subProgramsService = new SubProgramsService();
+const fileUploadService = new FileUploadService();
 const isSubmitting = ref(false);
 const showSuccess = ref(false);
 const createdTicketId = ref<number | null>(null);
@@ -1191,6 +1760,8 @@ const filteredClients = ref<Client[]>([]);
 const filteredPrograms = ref<Program[]>([]);
 const filteredSubPrograms = ref<SubProgram[]>([]);
 const uploadedFiles = ref<File[]>([]);
+const isUploadingFiles = ref(false);
+const uploadedFileNames = ref<string[]>([]);
 const services = ref<Service[]>([]);
 const priorities = ref<TicketPriority[]>([]);
 const statuses = ref<Status[]>([]);
@@ -1208,8 +1779,12 @@ const notesService = new NotesService();
 const sessionStorageService = new SessionStorageService();
 const tickets = ref<Ticket[]>([]);
 const notes = ref<Note[]>([]);
+const activeTab = ref<"create" | "list">("create");
+const ticketSearchQuery = ref("");
+const selectedStatusFilter = ref<number | null>(null);
+const selectedPriorityFilter = ref<string | null>(null);
+const detailTab = ref<"info" | "comments">("info");
 let statusMap: Record<number, string>;
-
 
 const loadMyTickets = async () => {
   isLoading.value = true;
@@ -1247,7 +1822,9 @@ const loadTicketNotes = async (ticketId: number) => {
       const ticketNotes = response.data.results;
 
       ticketNotes.forEach((note: Note) => {
-        const existingIndex = notes.value.findIndex(n => n.id_note === note.id_note);
+        const existingIndex = notes.value.findIndex(
+          (n) => n.id_note === note.id_note,
+        );
         if (existingIndex >= 0) {
           notes.value[existingIndex] = note;
         } else {
@@ -1259,7 +1836,6 @@ const loadTicketNotes = async (ticketId: number) => {
     console.error("Error al cargar notas:", error);
   }
 };
-
 
 const selectTicket = async (ticket: Ticket) => {
   selectedTicket.value = ticket;
@@ -1282,11 +1858,11 @@ const getStatusName = (statusId: number) => {
 
 const getStatusClass = (statusId: number) => {
   const classMap: Record<number, string> = {
-    1: "bg-purple-100 text-purple-700",
+    1: "bg-indigo-100 text-indigo-700",
     2: "bg-blue-100 text-blue-700",
-    3: "bg-cyan-100 text-cyan-700",
+    3: "bg-sky-100 text-sky-700",
     4: "bg-amber-100 text-amber-700",
-    5: "bg-green-100 text-green-700",
+    5: "bg-cyan-100 text-cyan-700",
   };
   return classMap[statusId] || "bg-slate-100 text-slate-700";
 };
@@ -1316,6 +1892,22 @@ const getUserInitials = (name: string | number) => {
     .join("")
     .toUpperCase()
     .substring(0, 2);
+};
+
+const clearFilters = () => {
+  ticketSearchQuery.value = "";
+  selectedStatusFilter.value = null;
+  selectedPriorityFilter.value = null;
+};
+
+const getPriorityClass = (priority: string) => {
+  const classMap: Record<string, string> = {
+    Alta: "bg-orange-100 text-orange-700 border-orange-200",
+    Media: "bg-sky-100 text-sky-700 border-sky-200",
+    Baja: "bg-cyan-100 text-cyan-700 border-cyan-200",
+    Urgente: "bg-red-100 text-red-700 border-red-200",
+  };
+  return classMap[priority] || "bg-slate-100 text-slate-700 border-slate-200";
 };
 const steps = [
   { id: 1, label: "Información Básica" },
@@ -1365,7 +1957,10 @@ const loadFormData = async () => {
     ]);
 
     if (statuses.value.length > 0) {
-      form.status_id = statuses.value[0].id_status;
+      const initialStatus = statuses.value.find((s) => s.ordering === 1);
+      if (initialStatus) {
+        form.status_id = initialStatus.id_status;
+      }
     }
   } catch (error) {
     console.error("Error al cargar datos del formulario:", error);
@@ -1622,6 +2217,86 @@ const canSubmit = computed(() => {
   );
 });
 
+const filteredTickets = computed(() => {
+  let result = tickets.value;
+
+  // Filtrar por búsqueda
+  if (ticketSearchQuery.value.trim()) {
+    const query = ticketSearchQuery.value.toLowerCase();
+    result = result.filter(
+      (ticket) =>
+        ticket.ticket_title.toLowerCase().includes(query) ||
+        ticket.ticket_description.toLowerCase().includes(query) ||
+        ticket.id_ticket.toString().includes(query),
+    );
+  }
+
+  // Filtrar por estado
+  if (selectedStatusFilter.value !== null) {
+    result = result.filter(
+      (ticket) => ticket.status_id === selectedStatusFilter.value,
+    );
+  }
+
+  // Filtrar por prioridad
+  if (selectedPriorityFilter.value !== null) {
+    result = result.filter(
+      (ticket) => ticket.ticket_priority === selectedPriorityFilter.value,
+    );
+  }
+
+  return result;
+});
+
+const ticketStats = computed(() => {
+  const total = tickets.value.length;
+
+  // Contar tickets en proceso (ordering != null)
+  const enProceso = tickets.value.filter((ticket) => {
+    const estado = statuses.value.find((s) => s.id_status === ticket.status_id);
+    return estado && estado.ordering != null;
+  }).length;
+
+  // Contar tickets completados (is_complete === true)
+  const completados = tickets.value.filter((ticket) => {
+    const estado = statuses.value.find((s) => s.id_status === ticket.status_id);
+    return estado && estado.is_completion === true;
+  }).length;
+
+  // Contar tickets pendientes (que no están en proceso ni completados)
+  const pendientes = tickets.value.filter((ticket) => {
+    const estado = statuses.value.find((s) => s.id_status === ticket.status_id);
+    if (!estado) return false;
+
+    const esEnProceso = estado.ordering != null;
+    const esCompletado = estado.is_completion === true;
+
+    return !esEnProceso && !esCompletado;
+  }).length;
+
+  const byStatus = tickets.value.reduce(
+    (acc, ticket) => {
+      acc[ticket.status_id] = (acc[ticket.status_id] || 0) + 1;
+      return acc;
+    },
+    {} as Record<number, number>,
+  );
+
+  const byPriority = tickets.value.reduce(
+    (acc, ticket) => {
+      acc[ticket.ticket_priority] = (acc[ticket.ticket_priority] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
+  return { total, enProceso, completados, pendientes, byStatus, byPriority };
+});
+
+const uniquePriorities = computed(() => {
+  return Array.from(new Set(tickets.value.map((t) => t.ticket_priority)));
+});
+
 // Methods
 const handleSubmit = async () => {
   try {
@@ -1699,20 +2374,36 @@ const handleSubmit = async () => {
       return;
     }
 
+    // Subir archivos si hay alguno
+    let fileNames: string[] = [];
+    if (uploadedFiles.value.length > 0) {
+      isUploadingFiles.value = true;
+      const uploadResponse = await fileUploadService.uploadFiles(
+        uploadedFiles.value,
+      );
+
+      if (uploadResponse.success && uploadResponse.data) {
+        fileNames = uploadResponse.data;
+        uploadedFileNames.value = fileNames;
+      } else {
+        errorMessage.value =
+          uploadResponse.message || "Error al subir los archivos";
+        return;
+      }
+      isUploadingFiles.value = false;
+    }
+
     // Crear objeto que coincida con TicketCreate del backend
     const ticketData: TicketCreate = {
       ticket_title: form.ticket_title,
       ticket_description: form.ticket_description,
-      ticket_attachments:
-        uploadedFiles.value.length > 0
-          ? uploadedFiles.value.map((f) => f.name).join(", ")
-          : null,
+      ticket_attachments: fileNames.length > 0 ? fileNames.join(", ") : null,
       ticket_service: form.ticket_service!,
       ticket_priority: form.ticket_priority,
       ticket_ans: form.ticket_ans!,
       sub_program_name: form.sub_program_name,
       reporter_user: currentUser.username,
-      status_id: form.status_id || 1,
+      status_id: form.status_id,
       assigned_to: undefined,
     };
 
@@ -1727,9 +2418,13 @@ const handleSubmit = async () => {
       createdTicketId.value = ticketResult.data.id_ticket || null;
       showSuccess.value = true;
 
+      // Recargar lista de tickets
+      await loadMyTickets();
+
       setTimeout(() => {
         resetForm();
-      }, 3000);
+        activeTab.value = "list";
+      }, 2000);
     } catch (error: any) {
       console.error("Error al crear ticket:", error);
       errorMessage.value =
@@ -1743,6 +2438,7 @@ const handleSubmit = async () => {
       "Error al crear el ticket. Por favor intente nuevamente.";
   } finally {
     isSubmitting.value = false;
+    isUploadingFiles.value = false;
   }
 };
 
@@ -1771,10 +2467,12 @@ const resetForm = () => {
   programSearch.value = "";
   subProgramSearch.value = "";
   uploadedFiles.value = [];
+  uploadedFileNames.value = [];
   showSuccess.value = false;
   createdTicketId.value = null;
   errorMessage.value = "";
   currentStep.value = 1;
+  isUploadingFiles.value = false;
 };
 
 onMounted(async () => {
@@ -1786,7 +2484,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Animaciones sutiles */
+/* Animaciones mejoradas */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -1829,6 +2527,54 @@ onMounted(async () => {
   }
 }
 
+@keyframes float-orb {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+@keyframes float-orb-reverse {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-30px, 30px) scale(0.9);
+  }
+  66% {
+    transform: translate(20px, -20px) scale(1.1);
+  }
+}
+
+@keyframes pulse-slow {
+  0%,
+  100% {
+    opacity: 0.1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.15;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes fade-in-out {
+  0%,
+  100% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
 @keyframes particle {
   0% {
     transform: translateY(0) scale(1);
@@ -1866,11 +2612,27 @@ onMounted(async () => {
 }
 
 .animate-float {
-  animation: float 6s ease-in-out infinite;
+  animation: float 8s ease-in-out infinite;
 }
 
 .animate-float-slow {
-  animation: float-slow 8s ease-in-out infinite;
+  animation: float-slow 10s ease-in-out infinite;
+}
+
+.animate-float-orb {
+  animation: float-orb 20s ease-in-out infinite;
+}
+
+.animate-float-orb-reverse {
+  animation: float-orb-reverse 25s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 8s ease-in-out infinite;
+}
+
+.animate-fade-in-out {
+  animation: fade-in-out 4s ease-in-out infinite;
 }
 
 .animate-particle {
