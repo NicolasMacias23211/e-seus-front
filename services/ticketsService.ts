@@ -4,12 +4,14 @@ import type {
   TicketCreate,
   TicketShort,
   TicketUpdate,
+  TicketList
 } from "../models/Ticket";
 import { SessionStorageService } from "./SessionStorageService";
 
 const sessionStorage = new SessionStorageService();
 
 export class TicketsService {
+  private endpoint = "/tickets/";
   async GetTicketsByPerson(
     assigned_to: string,
   ): Promise<ApiResponse<PaginatedResponse<TicketShort>>> {
@@ -18,10 +20,12 @@ export class TicketsService {
     );
   }
 
-  getAllTicketsWithoutAssignment(): Promise<
-    ApiResponse<PaginatedResponse<Ticket>>
-  > {
-    return http.get<PaginatedResponse<Ticket>>("/tickets");
+
+  // async getAllPaginated(page: number , pageSize: number): Promise<ApiResponse<PaginatedResponse<ANS>>> {
+  //     return await http.get<PaginatedResponse<ANS>>(
+
+  async getAllTicketsWithoutAssignment(page: number, pageSize: number): Promise<ApiResponse<PaginatedResponse<TicketList>>> {
+    return await http.get<PaginatedResponse<TicketList>>(`${this.endpoint}?assigned_to__isnull=true&page=${page}&page_size=${pageSize}`);
   }
 
   async getBacklogTickets(params?: {
