@@ -57,7 +57,11 @@
         </table>
       </div>
 
-      <Pagination :total-registers="total" @change="loadData" />
+      <Pagination 
+        :total-registers="total"
+        :items-count="itemsCount" 
+        @change="loadData" 
+      />
     </div>
     <Teleport to="body">
       <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
@@ -129,16 +133,17 @@ const notification = useNotification();
 const ansService = new AnsService();
 const ans = ref<ANS[]>([]);
 const total = ref(0)
+const itemsCount = ref(0)
 
 const loadData = async (pagination?: PaginationState) => {
   try {
     const page = pagination?.currentPage ?? 1
     const perPage = pagination?.perPage ?? 10
-    const response = await ansService.getAll(page, perPage)
+    const response = await ansService.getAllPaginated(page, perPage)
     if (response.data && response.data.results) {
-
       ans.value = response.data.results
       total.value = response.data.count
+      itemsCount.value = response.data.results.length
     }
   } catch (error) {
     console.error("Error al cargar los códigos de cierre: ", error)

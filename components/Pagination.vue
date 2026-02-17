@@ -28,7 +28,7 @@
             <div>
                 <p class="text-sm text-gray-300 text-center">
                     Showing
-                    {{ pagination.perPage }}
+                    {{ props.itemsCount }}
                     <span class="font-medium"></span>
                     of
                     <span class="font-medium"></span>
@@ -104,7 +104,8 @@ import { ref, computed, watch } from 'vue';
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 
 const props = defineProps<{
-    totalRegisters: number
+    totalRegisters: number,
+    itemsCount: number
 }>()
 
 const emit = defineEmits<{
