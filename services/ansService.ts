@@ -5,7 +5,11 @@ import { http, type ApiResponse, type PaginatedResponse} from "./http";
 export class AnsService {
   private endpoint = "/ans/";
 
-  async getAll(page: number , pageSize: number): Promise<ApiResponse<PaginatedResponse<ANS>>> {
+  async getAll(): Promise<ApiResponse<PaginatedResponse<ANS>>> {
+    return await http.get<PaginatedResponse<ANS>>(this.endpoint);
+  }
+
+  async getAllPaginated(page: number , pageSize: number): Promise<ApiResponse<PaginatedResponse<ANS>>> {
     return await http.get<PaginatedResponse<ANS>>(
       `${this.endpoint}?page=${page}&page_size=${pageSize}`
     );
