@@ -20,7 +20,6 @@ export class TicketsService {
       `/tickets/?assigned_to=${assigned_to}`,
     );
   }
-
   async getAllTicketsWithoutAssignment(page: number, pageSize: number, text: string = '', id_ans?: number | null, time_elapsed: string = '', before: boolean = false): Promise<ApiResponse<PaginatedResponse<TicketList>>> {
     if (before) {
       return await http.get<PaginatedResponse<TicketList>>(
@@ -30,6 +29,14 @@ export class TicketsService {
     return await http.get<PaginatedResponse<TicketList>>(
       `${this.endpoint}?assigned_to__isnull=true&ticket_ans=${id_ans || ''}&create_at_after=${time_elapsed}&search=${text}&page=${page}&page_size=${pageSize}`
     );
+
+  async GetTicketByReporter(
+    reporter_user: string,
+  ): Promise<PaginatedResponse<Ticket>> {
+    const response = await http.get<PaginatedResponse<Ticket>>(
+      `${this.endpoint}?reporter_user__network_user=${reporter_user}`,
+    );
+    return response.data!;
   }
 
   async getBacklogTickets(params?: {
