@@ -61,23 +61,24 @@
       <div class="flex flex-wrap gap-3 items-center">
         <div class="flex-1 min-w-[250px] relative">
           <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-          <input type="text" placeholder="Buscar por ID, título o descripción..."
+          <input v-model="serchFilters.search" @input="handleSearch" type="text"
+            placeholder="Buscar por ID, título o descripción..."
             class="w-full pl-10 pr-4 py-2.5 border-2 border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#50bdeb] transition-colors" />
         </div>
 
-        <select
+        <select v-model="serchFilters.ans" @change="handleSearch" placeholder="ANS"
           class="px-4 py-2.5 border-2 border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-nonefocus:border-[#50bdeb] transition-colors">
-          <option value="">ANS</option>
+          <option value="" selected>ANS</option>
           <option v-for="ans in filterAns" :value="ans.ans_name">{{ ans.ans_name === "Programado" ? ans.ans_name :
             ans.ans_name + " horas" }} </option>
         </select>
 
-        <select
+        <select v-model="serchFilters.time_elapsed" @change="handleSearch"
           class="px-4 py-2.5 border-2 border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-none focus:border-[#50bdeb] transition-colors">
-          <option value="">Tiempo en cola</option>
-          <option value="reciente">Menos de 1h</option>
-          <option value="medio">1-3 horas</option>
-          <option value="critico">Más de 3h</option>
+          <option value="" selected>Tiempo en cola</option>
+          <option value="1">Menos de 1h</option>
+          <option value="3">Menos de 3h</option>
+          <option value="+3">Más de 3h</option>
         </select>
       </div>
     </div>
@@ -123,17 +124,27 @@
               </div>
             </td>
             <td class="px-6 py-4">
-              <span v-if="ticket.ans" class="px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 w-fit">
-                {{ ticket.ans !== 'Programado' ? ticket.ans + " h" : ticket.ans }}
-              </span>
+              <div
+                class="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 w-fit"
+                :class="getClass(ticket)[0]">
+                <div class="w-3 h-3 rounded-full" :class="getClass(ticket)[1]"></div>
+                <span v-if="ticket.ans" :class="getClass(ticket)[0]">
+                  {{ ticket.ans !== 'Programado' ? ticket.ans + " h" : ticket.ans }}
+                </span>
+              </div>
             </td>
             <td class="px-6 py-4">
-              <div class="flex items-center gap-2">
-                <div class="w-2 h-2 rounded-full" :class="{
-                  'bg-red-500': ticket.isCritical,
+              <div
+                class="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 w-fit"
+                :class="{
+                  'bg-red-100 text-red-700': ticket.isCritical,
+                }">
+                <div class="w-3 h-3 rounded-full" :class="{
+                  'bg-red-500 animate-pulse': ticket.isCritical && !ticket.isExpired,
+                  'bg-red-800': ticket.isExpired,
                   'bg-green-500': !ticket.isCritical,
                 }"></div>
-                <span class="text-slate-7200 font-bold text-sm">
+                <span>
                   {{ ticket.hour_elapsed }} h {{ ticket.minute_elapsed }} m
                 </span>
               </div>
@@ -160,6 +171,7 @@ import {
   List,
   Plus,
   Search,
+  RefreshCw
 } from "lucide-vue-next";
 import { ref, reactive, onMounted } from "vue";
 import { TicketsService } from "../services/ticketsService";
@@ -167,8 +179,13 @@ import { AnsService } from "../services/ansService";
 import type { TicketList } from "../models/Ticket";
 import type { ANS } from "../models/ANS";
 import Pagination, { PaginationState } from "../components/Pagination.vue";
-import { time } from "node:console";
-
+import { parseBackendDate, formatDateISOS } from "../utils/Date";
+interface loadDataParams {
+  search?: string;
+  id_ans?: number;
+  time_elapsed?: string;
+  before?: boolean;
+}
 
 const ansService = new AnsService();
 const ticketService = new TicketsService();
@@ -179,6 +196,17 @@ const itemsCount = ref(0);
 const filterAns = ref<ANS[]>([]);
 const ticketsCritial = ref(0);
 const ticketsExpired = ref(0);
+const loadDataParams = ref<loadDataParams>({
+  search: '',
+  id_ans: undefined,
+  time_elapsed: '',
+  before: false,
+});
+const serchFilters = ref({
+  search: "",
+  ans: "",
+  time_elapsed: "",
+})
 
 const loadAns = async () => {
   try {
@@ -198,21 +226,14 @@ const loadAllTickets = async () => {
       allTickets.value = response.data.results;
     }
     ticketsCritial.value = 0;
+    ticketsExpired.value = 0;
     allTickets.value.forEach(ticket => {
-      if (filterAns.value[ticket.ticket_ans]) {
-        ticket.ans = filterAns.value[ticket.ticket_ans].ans_name;
-      }
-      let time_elapsed = calculateTimeInElapsed(ticket);
-      if (isCriticalTime(parseInt(ticket.ans), time_elapsed[0], time_elapsed[1])) {
+      setTicketInformationValidate(ticket);
+      if (ticket.isCritical) {
         ticketsCritial.value += 1;
       }
-      if (ticket.estimated_closing_date) {
-        const estimatedDate = new Date(ticket.estimated_closing_date);
-        estimatedDate.setHours(estimatedDate.getHours() + 5);
-        const now = new Date();
-        if (now >= estimatedDate) {
-          ticketsExpired.value += 1;
-        }
+      if (ticket.isExpired) {
+        ticketsExpired.value += 1;
       }
     })
   } catch (error) {
@@ -220,25 +241,17 @@ const loadAllTickets = async () => {
   }
 };
 
-const loadData = async (pagination?: PaginationState) => {
+const loadData = async (pagination?: PaginationState, loadDataParams?: loadDataParams, event?: Event) => {
   try {
     const page = pagination?.currentPage ?? 1;
     const perPage = pagination?.perPage ?? 10;
-    const response = await ticketService.getAllTicketsWithoutAssignment(page, perPage);
-    if (response.data && response.data.results) {
+    const response = await ticketService.getAllTicketsWithoutAssignment(page, perPage, loadDataParams?.search, loadDataParams?.id_ans, loadDataParams?.time_elapsed, loadDataParams?.before);
+    if (response.data && response.data.results) { 
       tickets.value = response.data.results;
       total.value = response.data.count;
       itemsCount.value = response.data.results.length;
       tickets.value.forEach(ticket => {
-        if (filterAns.value[ticket.ticket_ans]) {
-          ticket.ans = filterAns.value[ticket.ticket_ans].ans_name;
-        }
-        let time_elapsed = calculateTimeInElapsed(ticket);
-        ticket.hour_elapsed = time_elapsed[0];
-        ticket.minute_elapsed = time_elapsed[1];
-        if (ticket.ans && ticket.ans !== "programado") {
-          ticket.isCritical = isCriticalTime(parseInt(ticket.ans), time_elapsed[0], time_elapsed[1]);
-        }
+        setTicketInformationValidate(ticket);
       })
       tickets.value.sort((a, b) => {
         const timeA = a.hour_elapsed * 60 + a.minute_elapsed;
@@ -252,9 +265,8 @@ const loadData = async (pagination?: PaginationState) => {
 };
 
 const calculateTimeInElapsed = (ticket: TicketList): number[] => {
-  const createdDate = new Date(ticket.create_at);
+  const createdDate = new Date(parseBackendDate(ticket.create_at));
   const now = new Date();
-  createdDate.setHours(createdDate.getHours() + 5); // ajuste por modificación de entrega del backend
   const diffMs = now.getTime() - createdDate.getTime();
   const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
   const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
@@ -266,6 +278,80 @@ function isCriticalTime(ans: number, hour: number, minutes: number): boolean {
   const criticalTimeLimit = ans * 0.7; // ejemplo: crítico si se ha pasado el 70% del ANS
   const elapsedTime = hour + (minutes / 60);
   return elapsedTime >= criticalTimeLimit;
+}
+
+function isExpiredTime(ticket: TicketList): boolean {
+  if (ticket.estimated_closing_date) {
+    const estimatedDate = new Date(parseBackendDate(ticket.estimated_closing_date));
+    const now = new Date();
+    if (now >= estimatedDate) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function setTicketInformationValidate(ticket: TicketList) {
+  filterAns.value.some(ans => {
+    if (ans.id_ans === ticket.ticket_ans) {
+      ticket.ans = ans.ans_name;
+      return true;
+    }
+  })
+  let time_elapsed = calculateTimeInElapsed(ticket);
+  if (ticket.ans && ticket.ans !== "programado") {
+    ticket.isCritical = isCriticalTime(parseInt(ticket.ans), time_elapsed[0], time_elapsed[1]);
+  }
+  ticket.hour_elapsed = time_elapsed[0];
+  ticket.minute_elapsed = time_elapsed[1];
+  ticket.isExpired = isExpiredTime(ticket);
+}
+
+function getClass(ticket: TicketList): string[] {
+  if (ticket.ans === "Programado") {
+    return ['bg-blue-100 text-blue-500', "bg-blue-500"];
+  }
+  const ans = parseInt(ticket.ans);
+  if (ans <= 2) {
+    return ['bg-red-100 text-red-700', "bg-red-500"];
+  }
+  if (ans > 2 && ans <= 4) {
+    return ['bg-orange-100 text-orange-700', "bg-orange-500"];
+  }
+  if (ans > 4 && ans <= 6) {
+    return ['bg-yellow-100 text-yellow-800', "bg-yellow-500"];
+  }
+  if (ans > 6) {
+    return ['bg-amber-100 text-amber-700', "bg-amber-500"];
+  }
+  return ['bg-blue-100 text-blue-700'];
+}
+
+function handleSearch() {
+  loadDataParams.value.search = serchFilters.value.search;
+  loadDataParams.value.time_elapsed = serchFilters.value.time_elapsed;
+  loadDataParams.value.id_ans = undefined;
+
+  if (serchFilters.value.ans) {
+    filterAns.value.forEach(ans => {
+      if (ans.ans_name === serchFilters.value.ans) {
+        loadDataParams.value.id_ans = ans.id_ans;
+        return true;
+      }
+    })
+  }
+
+  if (serchFilters.value.time_elapsed) {
+    const now = new Date();
+    loadDataParams.value.before = false;
+    if (serchFilters.value.time_elapsed === "+3") {
+      loadDataParams.value.before = true;
+      serchFilters.value.time_elapsed = "3";
+    }
+    now.setHours(now.getHours() - parseInt(serchFilters.value.time_elapsed));
+    loadDataParams.value.time_elapsed = formatDateISOS(now);
+  }
+  loadData(Pagination.value, loadDataParams.value);
 }
 
 onMounted(() => {

@@ -7,6 +7,7 @@ import type {
   TicketList
 } from "../models/Ticket";
 import { SessionStorageService } from "./SessionStorageService";
+import { time } from "node:console";
 
 const sessionStorage = new SessionStorageService();
 
@@ -24,8 +25,16 @@ export class TicketsService {
   // async getAllPaginated(page: number , pageSize: number): Promise<ApiResponse<PaginatedResponse<ANS>>> {
   //     return await http.get<PaginatedResponse<ANS>>(
 
-  async getAllTicketsWithoutAssignment(page: number, pageSize: number): Promise<ApiResponse<PaginatedResponse<TicketList>>> {
-    return await http.get<PaginatedResponse<TicketList>>(`${this.endpoint}?assigned_to__isnull=true&page=${page}&page_size=${pageSize}`);
+  async getAllTicketsWithoutAssignment(page: number, pageSize: number, text: string = '', id_ans?: number | null, time_elapsed: string = '', before: boolean = false): Promise<ApiResponse<PaginatedResponse<TicketList>>> {
+    if (before){
+      return await http.get<PaginatedResponse<TicketList>>(
+        `${this.endpoint}?assigned_to__isnull=true&ticket_ans=${id_ans || ''}&create_at_before=${time_elapsed}&search=${text}&page=${page}&page_size=${pageSize}`
+      );
+    }    
+    return await http.get<PaginatedResponse<TicketList>>(
+      `${this.endpoint}?assigned_to__isnull=true&ticket_ans=${id_ans || ''}&create_at_after=${time_elapsed}&search=${text}&page=${page}&page_size=${pageSize}`
+      // `${this.endpoint}?assigned_to__isnull=true&page=${page}&page_size=${pageSize}`
+    );
   }
 
   async getBacklogTickets(params?: {

@@ -98,6 +98,6 @@ export interface TicketList {
   // time_elapsed: string;
   hour_elapsed: number;
   minute_elapsed: number;
-  isExpried: boolean;
+  isExpired: boolean;
   isCritical: boolean;
 }

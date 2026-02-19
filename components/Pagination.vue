@@ -120,7 +120,7 @@ export interface PaginationState {
     totalPages: number,
     perPage: number,
     currentPage: number
-    perPageOptions: [10, 20, 50, 100]
+    perPageOptions: [5, 10, 20, 50, 100]
 }
 
 const pagination = ref<PaginationState>({
@@ -131,7 +131,7 @@ const pagination = ref<PaginationState>({
     totalPages: 1,
     perPage: 10,
     currentPage: 1,
-    perPageOptions: [10, 20, 50, 100]
+    perPageOptions: [5, 10, 20, 50, 100]
 })
 
 function recalculate() {
@@ -167,12 +167,10 @@ function recalculate() {
 }
 
 watch(
-    () => props.totalRegisters,
-    () => {
-        recalculate()
-        emit('change', pagination.value)
-    },
-    { immediate: true }
+  () => props.totalRegisters,
+  () => {
+    recalculate()
+  }
 )
 
 function goToPage(page: number) {
