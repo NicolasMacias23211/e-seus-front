@@ -21,19 +21,14 @@ export class TicketsService {
     );
   }
 
-
-  // async getAllPaginated(page: number , pageSize: number): Promise<ApiResponse<PaginatedResponse<ANS>>> {
-  //     return await http.get<PaginatedResponse<ANS>>(
-
   async getAllTicketsWithoutAssignment(page: number, pageSize: number, text: string = '', id_ans?: number | null, time_elapsed: string = '', before: boolean = false): Promise<ApiResponse<PaginatedResponse<TicketList>>> {
-    if (before){
+    if (before) {
       return await http.get<PaginatedResponse<TicketList>>(
         `${this.endpoint}?assigned_to__isnull=true&ticket_ans=${id_ans || ''}&create_at_before=${time_elapsed}&search=${text}&page=${page}&page_size=${pageSize}`
       );
-    }    
+    }
     return await http.get<PaginatedResponse<TicketList>>(
       `${this.endpoint}?assigned_to__isnull=true&ticket_ans=${id_ans || ''}&create_at_after=${time_elapsed}&search=${text}&page=${page}&page_size=${pageSize}`
-      // `${this.endpoint}?assigned_to__isnull=true&page=${page}&page_size=${pageSize}`
     );
   }
 
@@ -77,6 +72,11 @@ export class TicketsService {
       `/tickets/${id_ticket}/`,
       { status_id },
     );
+  }
+
+
+  async patchTicket(ticketUpdate: TicketUpdate, id: number): Promise<ApiResponse<TicketUpdate>> {
+    return await http.patch<TicketUpdate>(`${this.endpoint + id}/`, ticketUpdate)
   }
 
   async updateTicket(

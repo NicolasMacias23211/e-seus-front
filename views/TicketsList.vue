@@ -25,7 +25,7 @@
           </div>
           <div>
             <p class="text-2xl font-bold text-[#021C7D]">
-              {{ total }}
+              {{ itemsCount }}
             </p>
             <p class="text-xs text-slate-500">Sin Asignar</p>
           </div>
@@ -105,7 +105,8 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
-          <tr v-for="ticket in tickets" :key="ticket.id_ticket"
+          <tr v-for="ticket in tickets" :key="ticket.id_ticket" 
+            @dblclick.prevent="openModal(ticket)"
             class="hover:bg-slate-50 cursor-pointer transition-colors">
             <td class="px-6 py-4">
               <span class="text-[#50bdeb] font-bold text-lg">#{{ ticket.id_ticket }}</span>
@@ -150,8 +151,8 @@
               </div>
             </td>
             <td class="px-6 py-4">
-              <button
-                class="px-4 py-2 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] hover:shadow-lg text-white rounded-lg font-semibold text-xs transition-all">
+              <button @click="openModal(ticket)"
+                class="px-4 py-2 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] hover:shadow-lg text-white rounded-lg font-semibold text-xs cursor-pointer">
                 Asignar
               </button>
             </td>
@@ -160,6 +161,54 @@
       </table>
       <Pagination :total-registers="total" :items-count="itemsCount" @change="loadData" />
     </div>
+    <Teleport to="body">
+      <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+        @click.self="closeModal">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-scale-in">
+          <div class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white px-6 py-4 rounded-t-2xl">
+            <h2 class="text-xl font-bold">
+              Asignación de Ticket #{{ form.id_ticket }}
+            </h2>
+          </div>
+
+          <form @submit.prevent="assignTicket" class="p-6 space-y-4">
+            <div>
+              <input id="ansId" v-model.number="form.id_ticket" type="number" hidden
+                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all disabled:bg-slate-100"
+                placeholder="ID del ticket" />
+            </div>
+            <input id="client" v-model="form.search" @input="searchEUsers" @focus="handleFocus" @blur="hideDropdown"
+              type="text" required autocomplete="off"
+              class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-300"
+              placeholder="Buscar usuario a asignar..." />
+            <div v-if="showDropdown && eUsers.length > 0"
+              class="absolute z-10 bg-white border-2 border-blue-200 rounded-xl shadow-xl max-h-48 overflow-y-auto">
+              <div v-for="user in eUsersFiltered" :key="user.network_user" @mousedown.prevent="selectUser(user)"
+                class="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-100 last:border-b-0 font-medium text-slate-700">
+                {{ user.full_name }}
+              </div>
+            </div>
+            <div v-if="
+              showDropdown &&
+              eUsersFiltered.length === 0
+            "
+              class="absolute z-10 mt-1 bg-white border-2 border-blue-200 rounded-xl shadow-xl p-4 text-slate-500 text-sm font-medium">
+              No se encontraron usuarios
+            </div>
+            <div class="flex gap-3 pt-4">
+              <button type="button" @click="closeModal"
+                class="flex-1 px-4 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 transition-all font-medium cursor-pointer">
+                Cancelar
+              </button>
+              <button type="submit"
+                class="flex-1 px-4 py-3 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white rounded-xl hover:shadow-lg transition-all font-medium cursor-pointer">
+                Asignar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -178,8 +227,13 @@ import { TicketsService } from "../services/ticketsService";
 import { AnsService } from "../services/ansService";
 import type { TicketList } from "../models/Ticket";
 import type { ANS } from "../models/ANS";
+import type { EUser } from "../models/EUser";
 import Pagination, { PaginationState } from "../components/Pagination.vue";
 import { parseBackendDate, formatDateISOS } from "../utils/Date";
+import { eUsersService } from "../services/e-usersService";
+import { TicketUpdate } from '../models/Ticket';
+import { useNotification } from "../utils/useNotification";
+
 interface loadDataParams {
   search?: string;
   id_ans?: number;
@@ -187,10 +241,17 @@ interface loadDataParams {
   before?: boolean;
 }
 
+const notification = useNotification();
 const ansService = new AnsService();
 const ticketService = new TicketsService();
+const updateTicket = ref<TicketUpdate>({
+  assigned_to: "",
+});
+const e_UsersService = new eUsersService();
 const tickets = ref<TicketList[]>([]);
 const allTickets = ref<TicketList[]>([]);
+const eUsers = ref<EUser[]>([]);
+const eUsersFiltered = ref<EUser[]>([]);
 const total = ref(0);
 const itemsCount = ref(0);
 const filterAns = ref<ANS[]>([]);
@@ -207,6 +268,19 @@ const serchFilters = ref({
   ans: "",
   time_elapsed: "",
 })
+const showModal = ref(false);
+const form = ref<{
+  id_ticket?: number
+  networkUser: string,
+  fullName: string,
+  search: string
+}>({
+  id_ticket: undefined,
+  networkUser: "",
+  fullName: "",
+  search: "",
+})
+const showDropdown = ref(false);
 
 const loadAns = async () => {
   try {
@@ -219,11 +293,47 @@ const loadAns = async () => {
   }
 };
 
+const loadEUser = async () => {
+  try {
+    const response = await e_UsersService.getAll();
+    if (response.data && response.data.results) {
+      eUsers.value = response.data.results;
+      eUsersFiltered.value = response.data.results;
+    }
+  } catch (error) {
+    console.error("Error al cargar los ANS:", error);
+  }
+};
+
+const searchEUsers = async () => {
+  try {
+    if (!form.value.search) {
+      eUsersFiltered.value = eUsers.value;
+      return;
+    }
+    eUsersFiltered.value = eUsers.value.filter(user =>
+      matchText(form.value.search, user.full_name)
+    )
+    showDropdown.value = true;
+
+  } catch (error) {
+    console.error("Error al cargar los EUsers:", error);
+  }
+};
+
+const selectUser = (user: EUser) => {
+  form.value.networkUser = user.network_user;
+  form.value.search = user.full_name;
+  showDropdown.value = false;
+  updateTicket.value.assigned_to = user.network_user;
+};
+
 const loadAllTickets = async () => {
   try {
     const response = await ticketService.getAllTicketsWithoutAssignment(1, 1000);
     if (response.data && response.data.results) {
       allTickets.value = response.data.results;
+      itemsCount.value = response.data.results.length;
     }
     ticketsCritial.value = 0;
     ticketsExpired.value = 0;
@@ -246,10 +356,9 @@ const loadData = async (pagination?: PaginationState, loadDataParams?: loadDataP
     const page = pagination?.currentPage ?? 1;
     const perPage = pagination?.perPage ?? 10;
     const response = await ticketService.getAllTicketsWithoutAssignment(page, perPage, loadDataParams?.search, loadDataParams?.id_ans, loadDataParams?.time_elapsed, loadDataParams?.before);
-    if (response.data && response.data.results) { 
+    if (response.data && response.data.results) {
       tickets.value = response.data.results;
       total.value = response.data.count;
-      itemsCount.value = response.data.results.length;
       tickets.value.forEach(ticket => {
         setTicketInformationValidate(ticket);
       })
@@ -261,6 +370,7 @@ const loadData = async (pagination?: PaginationState, loadDataParams?: loadDataP
     }
   } catch (error) {
     console.error("Error al cargar los tickets:", error);
+    notification.error("Error", "No se logró cargar los tickets")
   }
 };
 
@@ -271,6 +381,36 @@ const calculateTimeInElapsed = (ticket: TicketList): number[] => {
   const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
   const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
   return [diffHrs, diffMins];
+}
+
+const assignTicket = async () => {
+  try {
+
+    if (form.value.id_ticket) {
+      let response = await ticketService.patchTicket(updateTicket.value, form.value.id_ticket);
+
+      if (response.success) {
+        notification.success(
+          "¡Actualizado!",
+          "El ticket ha sido actualizado correctamente"
+        );
+
+        loadAllTickets();
+        loadData();
+        loadEUser();
+        loadAns();
+      }
+      closeModal();
+      return
+    }
+    console.error("Error al actualizar el ticket: id ticket es undefined")
+    notification.error("Error", "No se logro actualizar el ticket")
+    closeModal();
+  } catch (error) {
+    console.error("Error al actualizar el ticket: ", error)
+    notification.error("Error", "No se logró actualizar el ticket")
+    closeModal();
+  }
 }
 
 function isCriticalTime(ans: number, hour: number, minutes: number): boolean {
@@ -301,6 +441,9 @@ function setTicketInformationValidate(ticket: TicketList) {
   let time_elapsed = calculateTimeInElapsed(ticket);
   if (ticket.ans && ticket.ans !== "programado") {
     ticket.isCritical = isCriticalTime(parseInt(ticket.ans), time_elapsed[0], time_elapsed[1]);
+  }
+  if (ticket.ans === "Programado" && time_elapsed[0] > 5) {
+    ticket.isCritical = true;
   }
   ticket.hour_elapsed = time_elapsed[0];
   ticket.minute_elapsed = time_elapsed[1];
@@ -354,7 +497,40 @@ function handleSearch() {
   loadData(Pagination.value, loadDataParams.value);
 }
 
+function matchText(search: string, target: string): boolean {
+  if (!search.trim()) return true
+
+  const terms = search
+    .toLowerCase()
+    .trim()
+    .split(/\s+/)
+
+  const normalizedTarget = target
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  return terms.every(term => normalizedTarget.includes(term))
+}
+
+function openModal(Ticket: TicketList) {
+  form.value.id_ticket = Ticket.id_ticket;
+  showModal.value = true;
+}
+function closeModal() {
+  showModal.value = false;
+}
+function handleFocus() {
+  showDropdown.value = true;
+  searchEUsers();
+};
+function hideDropdown() {
+  showDropdown.value = false;
+};
+
+
 onMounted(() => {
+  loadEUser();
   loadAns();
   loadAllTickets();
   loadData();

@@ -1,5 +1,6 @@
 export interface EUser {
   network_user: string;
+  full_name: string;
   name: string;
   middle_name: string | null;
   last_name: string;
