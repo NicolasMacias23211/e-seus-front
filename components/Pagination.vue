@@ -167,12 +167,10 @@ function recalculate() {
 }
 
 watch(
-    () => props.totalRegisters,
-    () => {
-        recalculate()
-        emit('change', pagination.value)
-    },
-    { immediate: true }
+  () => props.totalRegisters,
+  () => {
+    recalculate()
+  }
 )
 
 function goToPage(page: number) {

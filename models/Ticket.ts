@@ -85,3 +85,19 @@ export interface TicketUpdate {
   sub_program_name?: string;
   ticket_ans?: number;
 }
+
+// Interfaz para actualización parcial de tickets
+export interface TicketList {
+  id_ticket: number;
+  ticket_title: string;
+  ticket_description: string;
+  ticket_ans: number;
+  create_at: string;
+  estimated_closing_date: string | null;
+  ans: string;
+  // time_elapsed: string;
+  hour_elapsed: number;
+  minute_elapsed: number;
+  isExpired: boolean;
+  isCritical: boolean;
+}
