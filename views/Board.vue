@@ -1100,7 +1100,6 @@ import type { UserInfo } from "../models/login";
 import { SessionStorageService } from "../services/SessionStorageService";
 import { useNotification } from "../utils/useNotification";
 import { NotesService } from "../services/notesService";
-import { ClientsService } from "../services/clientsService";
 import { StatusService } from "../services/statusService";
 import { AnsService } from "../services/ansService";
 import { ReportedTimeService } from "../services/reportedTimeService";
@@ -1111,7 +1110,6 @@ import { TicketPriorityService } from "../services/ticketPriorityService";
 import { ClosingCodeService } from "../services/closingCode";
 import { ProjectDateService } from "../services/projectDateService";
 
-const clientsService = new ClientsService();
 const notification = useNotification();
 const ansService = new AnsService();
 const reportedTimeService = new ReportedTimeService();
@@ -1381,7 +1379,7 @@ const loadColumsByStatus = async () => {
   try {
     const statusRes = await statusService.getAll();
     if (statusRes.success && statusRes.data?.results) {
-      const statuses = statusRes.data.results as Status[];
+      const statuses = statusRes.data.results.flat();
       const boardStatuses = statuses
         .filter(
           (status) =>

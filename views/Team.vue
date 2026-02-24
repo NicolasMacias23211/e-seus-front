@@ -153,7 +153,6 @@ const loadTeamMembers = async () => {
       }));
     }
   } catch (error) {
-    console.error("Error al cargar miembros del equipo:", error);
     notification.error(
       "Error",
       "No se pudieron cargar los miembros del equipo."
@@ -174,7 +173,6 @@ const loadRoles = async () => {
       availableRoles.value = response.data.results;
     }
   } catch (error) {
-    console.error("Error al cargar roles:", error);
     notification.error("Error", "No se pudieron cargar los roles.");
   }
 };

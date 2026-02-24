@@ -238,62 +238,6 @@
             </button>
           </div>
         </div>
-
-        <div class="bg-white rounded-xl border-2 shadow-sm p-6">
-          <h3
-            class="text-lg font-bold text-[#021C7D] mb-4 flex items-center gap-2"
-          >
-            <Clock class="w-5 h-5" />
-            Registro Manual
-          </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="text-sm font-semibold text-slate-700 block mb-2"
-                >Ticket</label
-              >
-              <select
-                class="w-full px-4 py-2.5 border-2 border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-none focus:border-[#50bdeb] transition-colors"
-              >
-                <option value="">Seleccionar ticket...</option>
-                <option
-                  v-for="ticket in recentTickets"
-                  :key="ticket.id_ticket"
-                  :value="ticket.id_ticket"
-                >
-                  {{ ticket.id_ticket }} - {{ ticket.ticket_title }}
-                </option>
-              </select>
-            </div>
-            <div>
-              <label class="text-sm font-semibold text-slate-700 block mb-2"
-                >Horas</label
-              >
-              <input
-                type="number"
-                step="0.5"
-                min="0"
-                placeholder="0.0"
-                class="w-full px-4 py-2.5 border-2 border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-none focus:border-[#50bdeb] transition-colors"
-              />
-            </div>
-            <div>
-              <label class="text-sm font-semibold text-slate-700 block mb-2"
-                >Fecha</label
-              >
-              <input
-                type="date"
-                class="w-full px-4 py-2.5 border-2 border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-none focus:border-[#50bdeb] transition-colors"
-              />
-            </div>
-            <div class="flex items-end">
-              <button
-                class="w-full px-4 py-2.5 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] hover:shadow-lg text-white rounded-xl font-semibold transition-all duration-200"
-              >
-                Registrar Tiempo
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div class="space-y-6">
@@ -771,7 +715,6 @@ const activeTicket = ref<number | null>(null);
 let timerInterval: number | null = null;
 
 const currentWeekStart = ref(new Date());
-const timeEntryData = ref<Record<string, number>>({});
 
 interface TimeEntry {
   id: string;
@@ -1148,7 +1091,6 @@ const saveModalEntry = async () => {
 
     notification.success("¡Éxito!", message);
   } catch (error) {
-    console.error("Error al guardar entrada:", error);
     notification.error(
       "Error",
       "Ocurrió un error al guardar el tiempo reportado",
@@ -1233,7 +1175,7 @@ const saveEntry = async (entry: TimeEntry) => {
               network_user: userInfo.username,
             });
           } catch (noteError) {
-            console.error("Error al crear comentario:", noteError);
+            notification.error("Error", "Error al crear comentario");
           }
         }
 
@@ -1246,33 +1188,10 @@ const saveEntry = async (entry: TimeEntry) => {
       }
     }
   } catch (error) {
-    console.error("Error al guardar tiempo:", error);
     notification.error("Error", "Ocurrió un error al guardar el tiempo");
   } finally {
     entry.isSaving = false;
   }
-};
-
-const saveTimeEntries = async () => {
-  const pendingEntries = timeEntries.value.filter(
-    (entry) => entry.isDirty || !entry.reportedTimeId,
-  );
-
-  if (pendingEntries.length === 0) {
-    notification.info("Info", "No hay cambios pendientes por guardar");
-    return;
-  }
-
-  saveTimers.forEach((timer) => clearTimeout(timer));
-  saveTimers.clear();
-
-  const promises = pendingEntries.map((entry) => saveEntry(entry));
-  await Promise.all(promises);
-
-  notification.success(
-    "¡Éxito!",
-    `Se guardaron ${pendingEntries.length} registro(s) de tiempo`,
-  );
 };
 
 const onTimeChange = (entry: TimeEntry) => {
@@ -1371,7 +1290,6 @@ const loadReportedTimes = async () => {
         });
     }
   } catch (error) {
-    console.error("Error al cargar tiempos reportados:", error);
     notification.error("Error", "No se pudieron cargar los tiempos reportados");
   }
 };
@@ -1382,7 +1300,7 @@ const loadAssignedTickets = async () => {
     notification.error("Error", "No se pudo obtener el usuario de la sesión");
     return;
   }
-
+//TODO: ajustar este llamado pues esta trayendo todos mis ticket includo los del backlog, se debe liminar solo a quellos en progreso
   try {
     const response = await ticketsService.GetTicketsByPerson(userInfo.username);
 
@@ -1390,7 +1308,6 @@ const loadAssignedTickets = async () => {
       availableTickets.value = response.data.results.flat();
     }
   } catch (error) {
-    console.error("Error al cargar tickets asignados:", error);
     notification.error("Error", "No se pudieron cargar los tickets asignados");
   }
 };
@@ -1400,64 +1317,7 @@ onMounted(async () => {
   await loadReportedTimes();
 });
 
-const recentTickets = ref<Ticket[]>([
-  {
-    id_ticket: 101,
-    ticket_title: "Error en el login",
-    service_name: "Soporte Técnico",
-    priority_name: "Alta",
-    status_name: "En Progreso",
-    reporter_user_name: "user1",
-    assigned_to: "user2",
-    create_at: "2025-11-20",
-    estimated_closing_date: "2025-11-30",
-    ticket_description: "Corregir error de autenticación",
-    ticket_attachments: null,
-    ticket_closing_code: null,
-    ticket_ans: null,
-    update_at: null,
-    closing_date: null,
-    sub_program_name: "Cliente Principal A",
-  },
-  {
-    id_ticket: 102,
-    ticket_title: "Implementar dark mode",
-    service_name: "Desarrollo",
-    priority_name: "Media",
-    status_name: "En Progreso",
-    reporter_user_name: "user3",
-    assigned_to: "user2",
-    create_at: "2025-11-21",
-    estimated_closing_date: "2025-12-05",
-    ticket_description: "Añadir tema oscuro a la aplicación",
-    ticket_attachments: null,
-    ticket_closing_code: null,
-    ticket_ans: null,
-    update_at: null,
-    closing_date: null,
-    sub_program_name: "Cliente Principal A",
-  },
-  {
-    id_ticket: 103,
-    ticket_title: "Optimizar queries",
-    service_name: "Base de Datos",
-    priority_name: "Alta",
-    status_name: "En Progreso",
-    reporter_user_name: "user4",
-    assigned_to: "user2",
-    create_at: "2025-11-22",
-    estimated_closing_date: "2025-12-01",
-    ticket_description: "Mejorar rendimiento de consultas",
-    ticket_attachments: null,
-    ticket_closing_code: null,
-    ticket_ans: null,
-    update_at: null,
-    closing_date: null,
-    sub_program_name: "Cliente Principal B",
-  },
-]);
-
-interface TicketWithTracking extends Ticket {
+interface TicketWithTracking extends TicketShort {
   tracked: number;
   estimated: number;
 }
@@ -1466,22 +1326,22 @@ const activeTickets = ref<TicketWithTracking[]>([
   {
     id_ticket: 101,
     ticket_title: "Error en el login",
-    service_name: "Soporte Técnico",
-    priority_name: "Alta",
-    status_name: "En Progreso",
-    reporter_user_name: "user1",
     assigned_to: "user2",
     create_at: "2025-11-20",
     estimated_closing_date: "2025-11-30",
     ticket_description: "Corregir error de autenticación",
     ticket_attachments: null,
     ticket_closing_code: null,
-    ticket_ans: null,
-    update_at: null,
+    ticket_ans: 2,
+    update_at: "",
     closing_date: null,
     sub_program_name: "Cliente Principal A",
-    tracked: 12,
-    estimated: 20,
+    reporter_user_name: "pepito",
+    service_name: "servico X",
+    priority_name: "alta",
+    status_name: "progreso",
+    tracked : 2,
+    estimated : 12
   },
   {
     id_ticket: 102,

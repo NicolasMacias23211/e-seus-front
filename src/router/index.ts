@@ -11,7 +11,6 @@ import Team from "../../views/Team.vue";
 import Reports from "../../views/Reports.vue";
 import Settings from "../../views/Settings.vue";
 import CreateTicket from "../../views/externalsUsers/CreateTicket.vue";
-import ExternalTicketsList from "../../views/externalsUsers/TicketsList.vue";
 import Profile from "../../views/externalsUsers/Profile.vue";
 import Clients from "../../views/adminMenu/Clients.vue";
 import Programs from "../../views/adminMenu/Programs.vue";
@@ -142,12 +141,6 @@ const router = createRouter({
       meta: { layout: "standalone" },
     },
     {
-      path: "/created-tickets",
-      name: "created-tickets",
-      component: ExternalTicketsList,
-      meta: { layout: "standalone" },
-    },
-    {
       path: "/profile",
       name: "profile",
       component: Profile,
@@ -166,7 +159,7 @@ router.beforeEach((to, from, next) => {
 
   const eUsersRoutes = ["/login"];
 
-  const publicRoutes = ["/create-ticket", "/created-tickets", "/login"];
+  const publicRoutes = ["/create-ticket", "/login"];
 
   if (!isAuthenticated && !eUsersRoutes.includes(to.path)) {
     next("/login");

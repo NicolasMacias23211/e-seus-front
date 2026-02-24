@@ -91,24 +91,24 @@
               <div class="p-4 space-y-2">
                 <div
                   v-for="ticket in myTickets"
-                  :key="ticket.idTicket"
+                  :key="ticket.id_ticket"
                   class="flex items-center gap-4 p-4 rounded-xl border-2 hover:border-[#50bdeb] hover:shadow-md cursor-pointer transition-all duration-200 group"
                 >
                   <div
                     :class="[
                       'p-2.5 rounded-lg',
-                      typeIcons[getTicketTypeByService(ticket.ticketService)]
+                      typeIcons[getTicketTypeByService(ticket.ticket_service)]
                         .bgColor,
                     ]"
                   >
                     <component
                       :is="
-                        typeIcons[getTicketTypeByService(ticket.ticketService)]
+                        typeIcons[getTicketTypeByService(ticket.ticket_service)]
                           .icon
                       "
                       :class="[
                         'h-5 w-5',
-                        typeIcons[getTicketTypeByService(ticket.ticketService)]
+                        typeIcons[getTicketTypeByService(ticket.ticket_service)]
                           .color,
                       ]"
                     />
@@ -117,27 +117,27 @@
                     <p
                       class="font-semibold text-sm truncate text-[#021C7D] group-hover:text-[#50bdeb] transition-colors"
                     >
-                      {{ ticket.ticketTitle }}
+                      {{ ticket.ticket_title }}
                     </p>
                     <div class="flex items-center gap-2 mt-1">
                       <span class="text-xs text-slate-500 font-medium"
-                        >Ticket #{{ ticket.idTicket }}</span
+                        >Ticket #{{ ticket.id_ticket }}</span
                       >
                       <span class="text-xs text-slate-400">•</span>
                       <span class="text-xs text-slate-500">{{
-                        ticket.subProgramName
+                        ticket.sub_program_name
                       }}</span>
                     </div>
                   </div>
                   <span
                     :class="[
                       'text-xs px-3 py-1.5 rounded-full font-semibold',
-                      priorityConfig[ticket.ticketPriority as keyof typeof priorityConfig].color,
+                      priorityConfig[ticket.ticket_priority as keyof typeof priorityConfig].color,
                     ]"
                   >
                     {{
                       priorityConfig[
-                        ticket.ticketPriority as keyof typeof priorityConfig
+                        ticket.ticket_priority as keyof typeof priorityConfig
                       ].label
                     }}
                   </span>
