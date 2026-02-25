@@ -1,29 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { SessionStorageService } from "../../services/SessionStorageService";
-import Login from "../../views/Login.vue";
-import Dashboard from "../../views/Dashboard.vue";
-import KanvanBoard from "../../views/Board.vue";
-import TicketsList from "../../views/TicketsList.vue";
-import TicketDetail from "../../views/TicketDetail.vue";
-import TimeTracking from "../../views/TimeTracking.vue";
-import Backlog from "../../views/Backlog.vue";
-import Team from "../../views/Team.vue";
-import Reports from "../../views/Reports.vue";
-import Settings from "../../views/Settings.vue";
-import CreateTicket from "../../views/externalsUsers/CreateTicket.vue";
-import ExternalTicketsList from "../../views/externalsUsers/TicketsList.vue";
-import Profile from "../../views/externalsUsers/Profile.vue";
-import Clients from "../../views/adminMenu/Clients.vue";
-import Programs from "../../views/adminMenu/Programs.vue";
-import SubPrograms from "../../views/adminMenu/SubPrograms.vue";
-import Services from "../../views/adminMenu/Services.vue";
-import ANS from "../../views/adminMenu/ANS.vue";
-import ClosingCodes from "../../views/adminMenu/ClosingCodes.vue";
-import TicketPriorities from "../../views/adminMenu/TicketPriorities.vue";
-import EUsers from "../../views/adminMenu/EUsers.vue";
-import Users from "../../views/adminMenu/Users.vue";
-import Roles from "../../views/adminMenu/Roles.vue";
-import WorkingHours from '../../views/adminMenu/WorkingHours.vue';
 
 const sessionStorage = new SessionStorageService();
 
@@ -37,125 +13,119 @@ const router = createRouter({
     {
       path: "/login",
       name: "login",
-      component: Login,
+      component: () => import("../../views/Login.vue"),
       meta: { layout: "standalone" },
     },
     {
       path: "/dashboard",
       name: "dashboard",
-      component: Dashboard,
+      component: () => import("../../views/Dashboard.vue"),
     },
     {
       path: "/backlog",
       name: "backlog",
-      component: Backlog,
+      component: () => import("../../views/Backlog.vue"),
     },
     {
       path: "/board",
       name: "board",
-      component: KanvanBoard,
+      component: () => import("../../views/Board.vue"),
     },
     {
       path: "/tickets",
       name: "tickets",
-      component: TicketsList,
+      component: () => import("../../views/TicketsList.vue"),
     },
     {
       path: "/ticket/:id",
       name: "ticket-detail",
-      component: TicketDetail,
+      component: () => import("../../views/TicketDetail.vue"),
     },
     {
       path: "/timetracking",
       name: "timetracking",
-      component: TimeTracking,
+      component: () => import("../../views/TimeTracking.vue"),
     },
     {
       path: "/team",
       name: "team",
-      component: Team,
+      component: () => import("../../views/Team.vue"),
     },
     {
       path: "/settings",
       name: "settings",
-      component: Settings,
+      component: () => import("../../views/Settings.vue"),
     },
     {
       path: "/settings/cliente-principal",
       name: "settings-clients",
-      component: Clients,
+      component: () => import("../../views/adminMenu/Clients.vue"),
     },
     {
       path: "/settings/programa",
       name: "settings-programs",
-      component: Programs,
+      component: () => import("../../views/adminMenu/Programs.vue"),
     },
     {
       path: "/settings/sub-programa",
       name: "settings-subprograms",
-      component: SubPrograms,
+      component: () => import("../../views/adminMenu/SubPrograms.vue"),
     },
     {
       path: "/settings/tipos-servicio",
       name: "settings-services",
-      component: Services,
+      component: () => import("../../views/adminMenu/Services.vue"),
     },
     {
       path: "/settings/ans",
       name: "settings-ans",
-      component: ANS,
+      component: () => import("../../views/adminMenu/ANS.vue"),
     },
     {
       path: "/settings/codigos-cierre",
       name: "settings-closing-codes",
-      component: ClosingCodes,
+      component: () => import("../../views/adminMenu/ClosingCodes.vue"),
     },
     {
       path: "/settings/estados-solicitud",
       name: "settings-priorities",
-      component: TicketPriorities,
+      component: () => import("../../views/adminMenu/TicketPriorities.vue"),
     },
     {
       path: "/settings/e-usuarios",
       name: "settings-eusers",
-      component: EUsers,
+      component: () => import("../../views/adminMenu/EUsers.vue"),
     },
     {
       path: "/settings/usuarios",
       name: "settings-users",
-      component: Users,
+      component: () => import("../../views/adminMenu/Users.vue"),
     },
     {
       path: "/settings/roles",
       name: "settings-roles",
-      component: Roles,
+      component: () => import("../../views/adminMenu/Roles.vue"),
     },
     {
       path: "/settings/horarios",
       name: "settings-horarios",
-      component: WorkingHours,
+      component: () => import("../../views/adminMenu/WorkingHours.vue"),
     },
     {
       path: "/create-ticket",
       name: "create-ticket",
-      component: CreateTicket,
-      meta: { layout: "standalone" },
-    },
-    {
-      path: "/created-tickets",
-      name: "created-tickets",
-      component: ExternalTicketsList,
+      component: () => import("../../views/externalsUsers/CreateTicket.vue"),
       meta: { layout: "standalone" },
     },
     {
       path: "/profile",
       name: "profile",
-      component: Profile,
+      component: () => import("../../views/externalsUsers/Profile.vue"),
     },
     {
       path: "/reports",
       name: "reports",
-      component: Reports,
+      component: () => import("../../views/Reports.vue"),
     },
   ],
 });
@@ -166,7 +136,7 @@ router.beforeEach((to, from, next) => {
 
   const eUsersRoutes = ["/login"];
 
-  const publicRoutes = ["/create-ticket", "/created-tickets", "/login"];
+  const publicRoutes = ["/create-ticket", "/login"];
 
   if (!isAuthenticated && !eUsersRoutes.includes(to.path)) {
     next("/login");

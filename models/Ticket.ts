@@ -84,6 +84,7 @@ export interface TicketUpdate {
   estimated_closing_date?: string;
   sub_program_name?: string;
   ticket_ans?: number;
+  cumplimiento?: boolean;
 }
 
 // Interfaz para actualización parcial de tickets

@@ -275,8 +275,6 @@
                   </div>
                 </div>
               </div>
-
-              <!-- Step 2: Clasificación -->
               <div v-show="currentStep === 2" class="step-content">
                 <h2
                   class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3"
@@ -382,8 +380,6 @@
                   </div>
                 </div>
               </div>
-
-              <!-- Step 3: Cliente y Programa -->
               <div v-show="currentStep === 3" class="step-content">
                 <h2
                   class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3"
@@ -549,8 +545,6 @@
                   </div>
                 </div>
               </div>
-
-              <!-- Step 4: Archivos Adjuntos -->
               <div v-show="currentStep === 4" class="step-content">
                 <h2
                   class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3"
@@ -677,8 +671,6 @@
                   </p>
                 </div>
               </div>
-
-              <!-- Navigation Buttons -->
               <div
                 class="flex justify-between items-center pt-6 mt-6 border-t-2 border-slate-100"
               >
@@ -815,7 +807,6 @@
                 </div>
               </div>
             </form>
-
             <div
               v-if="showSuccess"
               class="mt-6 p-5 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 text-green-800 rounded-xl shadow-lg flex items-center gap-3 animate-fade-in"
@@ -871,10 +862,7 @@
           </div>
         </div>
       </div>
-
-      <!-- Vista de Mis Tickets -->
       <div v-show="activeTab === 'list'" class="animate-fade-in">
-        <!-- Panel de Estadísticas -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div
             class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105 border border-blue-500/20"
@@ -979,12 +967,10 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Lista de Tickets -->
           <div class="lg:col-span-2">
             <div
               class="bg-white/98 backdrop-blur-xl rounded-2xl shadow-[0_20px_60px_rgba(59,130,246,0.3)] border border-white/20 overflow-hidden"
             >
-              <!-- Header con búsqueda y filtros -->
               <div class="bg-gradient-to-r from-blue-700 to-blue-500 p-6">
                 <h2
                   class="text-2xl font-bold text-white mb-4 flex items-center gap-3"
@@ -1004,8 +990,6 @@
                     {{ filteredTickets.length }} de {{ tickets.length }}
                   </span>
                 </h2>
-
-                <!-- Búsqueda -->
                 <div class="relative mb-4">
                   <input
                     v-model="ticketSearchQuery"
@@ -1027,8 +1011,6 @@
                     />
                   </svg>
                 </div>
-
-                <!-- Filtros -->
                 <div class="flex flex-wrap gap-3">
                   <select
                     v-model="selectedStatusFilter"
@@ -1084,8 +1066,6 @@
                   </button>
                 </div>
               </div>
-
-              <!-- Lista de tickets -->
               <div class="p-6">
                 <div v-if="tickets.length === 0" class="text-center py-12">
                   <div
@@ -1160,14 +1140,12 @@
                         : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-md hover:scale-[1.01]',
                     ]"
                   >
-                    <!-- Indicador de selección -->
                     <div
                       v-if="selectedTicket?.id_ticket === ticket.id_ticket"
                       class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-16 bg-gradient-to-b from-blue-500 to-cyan-500 rounded-r-full"
                     ></div>
 
                     <div class="flex items-start gap-4">
-                      <!-- ID Badge -->
                       <div
                         :class="[
                           'flex-shrink-0 w-16 h-16 rounded-2xl flex flex-col items-center justify-center font-bold border-2 transition-all',
@@ -1181,8 +1159,6 @@
                           ticket.id_ticket
                         }}</span>
                       </div>
-
-                      <!-- Contenido del ticket -->
                       <div class="flex-1 min-w-0">
                         <h3
                           class="font-bold text-slate-800 mb-2 text-base leading-tight"
@@ -1194,8 +1170,6 @@
                         >
                           {{ ticket.ticket_description }}
                         </p>
-
-                        <!-- Tags y meta información -->
                         <div class="flex flex-wrap items-center gap-2 mb-3">
                           <span
                             :class="[
@@ -1234,8 +1208,6 @@
                             {{ getTicketComments(ticket.id_ticket).length }}
                           </span>
                         </div>
-
-                        <!-- Fecha y hora -->
                         <div
                           class="flex items-center gap-4 text-xs text-slate-500"
                         >
@@ -1269,8 +1241,6 @@
                           </span>
                         </div>
                       </div>
-
-                      <!-- Flecha indicadora -->
                       <div class="flex-shrink-0">
                         <div
                           :class="[
@@ -1301,8 +1271,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Panel de Detalles del Ticket -->
           <div class="lg:col-span-1">
             <div
               class="bg-white/98 backdrop-blur-xl rounded-2xl shadow-[0_20px_60px_rgba(59,130,246,0.3)] border border-white/20 overflow-hidden sticky top-6"
@@ -1338,9 +1306,7 @@
                   completos
                 </p>
               </div>
-
               <div v-else class="h-full flex flex-col">
-                <!-- Header del ticket -->
                 <div
                   class="bg-gradient-to-r from-blue-800 to-blue-900 p-6 text-white"
                 >
@@ -1397,8 +1363,6 @@
                     </span>
                   </div>
                 </div>
-
-                <!-- Tabs de navegación -->
                 <div
                   class="flex border-b-2 border-slate-100 bg-slate-50/50 px-2"
                 >
@@ -1468,12 +1432,8 @@
                     ></div>
                   </button>
                 </div>
-
-                <!-- Contenido de los tabs -->
                 <div class="flex-1 overflow-y-auto">
-                  <!-- Tab Información -->
                   <div v-show="detailTab === 'info'" class="p-6 space-y-6">
-                    <!-- Descripción -->
                     <div>
                       <h3
                         class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 flex items-center gap-2"
@@ -1497,8 +1457,6 @@
                         {{ selectedTicket.ticket_description }}
                       </p>
                     </div>
-
-                    <!-- Detalles técnicos -->
                     <div class="space-y-4">
                       <h3
                         class="text-xs font-bold text-slate-500 uppercase tracking-wide flex items-center gap-2"
@@ -1586,8 +1544,6 @@
                       </div>
                     </div>
                   </div>
-
-                  <!-- Tab Comentarios -->
                   <div v-show="detailTab === 'comments'" class="p-6">
                     <div
                       v-if="
@@ -1619,16 +1575,11 @@
                         Este ticket aún no tiene comentarios
                       </p>
                     </div>
-
-                    <!-- Timeline de comentarios -->
                     <div v-else class="space-y-4">
                       <div class="relative">
-                        <!-- Línea vertical del timeline -->
                         <div
                           class="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-300 via-sky-200 to-transparent"
                         ></div>
-
-                        <!-- Comentarios -->
                         <div
                           v-for="(note, index) in getTicketComments(
                             selectedTicket.id_ticket,
@@ -1636,14 +1587,11 @@
                           :key="note.id_note"
                           class="relative pl-16 pb-8 last:pb-0 group"
                         >
-                          <!-- Avatar con efecto -->
                           <div
                             class="absolute left-0 top-0 w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white font-bold shadow-lg group-hover:scale-110 transition-transform border-4 border-white"
                           >
                             {{ getUserInitials(note.network_user) }}
                           </div>
-
-                          <!-- Contenido del comentario -->
                           <div
                             class="bg-gradient-to-br from-white to-slate-50 rounded-2xl p-4 border-2 border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all"
                           >
@@ -1916,7 +1864,6 @@ const steps = [
   { id: 4, label: "Archivos" },
 ];
 
-// Interfaz personalizada para el formulario de creación
 interface CreateTicketForm {
   ticket_title: string;
   ticket_description: string;

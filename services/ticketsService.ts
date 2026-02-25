@@ -6,6 +6,7 @@ import type {
   TicketUpdate,
   TicketList
 } from "../models/Ticket";
+import type { WeeklyStats } from "../models/Metricas";
 import { SessionStorageService } from "./SessionStorageService";
 import { time } from "node:console";
 
@@ -98,5 +99,9 @@ export class TicketsService {
 
   async getTicketById(id_ticket: number): Promise<ApiResponse<Ticket>> {
     return await http.get<Ticket>(`/tickets/${id_ticket}/`);
+  }
+
+  async getWeeklyStats(): Promise<ApiResponse<WeeklyStats>> {
+    return await http.get<WeeklyStats>("/tickets/weekly-stats/");
   }
 }

@@ -1,6 +1,8 @@
 <template>
   <div v-if="isStandaloneRoute" class="h-screen bg-slate-100">
-    <router-view />
+    <router-view v-slot="{ Component }">
+      <component :is="Component" />
+    </router-view>
   </div>
 
   <div v-else class="flex h-screen bg-slate-100 overflow-hidden">
@@ -10,7 +12,9 @@
       <AppHeader />
 
       <main class="flex-1 overflow-y-auto p-6 bg-slate-200">
-        <router-view />
+        <router-view v-slot="{ Component }">
+          <component :is="Component" />
+        </router-view>
       </main>
     </div>
   </div>

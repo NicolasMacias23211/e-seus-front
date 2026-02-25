@@ -14,6 +14,7 @@ export * from "./Ticket";
 export * from "./ReportedTime";
 export * from "./Notes";
 export * from "./ProjectDate";
+export * from "./Metricas";
 
 // Legacy type definitions (for backward compatibility)
 // These can be removed once all views are migrated to use the new models

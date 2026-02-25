@@ -91,24 +91,24 @@
               <div class="p-4 space-y-2">
                 <div
                   v-for="ticket in myTickets"
-                  :key="ticket.idTicket"
+                  :key="ticket.id_ticket"
                   class="flex items-center gap-4 p-4 rounded-xl border-2 hover:border-[#50bdeb] hover:shadow-md cursor-pointer transition-all duration-200 group"
                 >
                   <div
                     :class="[
                       'p-2.5 rounded-lg',
-                      typeIcons[getTicketTypeByService(ticket.ticketService)]
+                      typeIcons[getTicketTypeByService(ticket.ticket_service)]
                         .bgColor,
                     ]"
                   >
                     <component
                       :is="
-                        typeIcons[getTicketTypeByService(ticket.ticketService)]
+                        typeIcons[getTicketTypeByService(ticket.ticket_service)]
                           .icon
                       "
                       :class="[
                         'h-5 w-5',
-                        typeIcons[getTicketTypeByService(ticket.ticketService)]
+                        typeIcons[getTicketTypeByService(ticket.ticket_service)]
                           .color,
                       ]"
                     />
@@ -117,27 +117,29 @@
                     <p
                       class="font-semibold text-sm truncate text-[#021C7D] group-hover:text-[#50bdeb] transition-colors"
                     >
-                      {{ ticket.ticketTitle }}
+                      {{ ticket.ticket_title }}
                     </p>
                     <div class="flex items-center gap-2 mt-1">
                       <span class="text-xs text-slate-500 font-medium"
-                        >Ticket #{{ ticket.idTicket }}</span
+                        >Ticket #{{ ticket.id_ticket }}</span
                       >
                       <span class="text-xs text-slate-400">•</span>
                       <span class="text-xs text-slate-500">{{
-                        ticket.subProgramName
+                        ticket.sub_program_name
                       }}</span>
                     </div>
                   </div>
                   <span
                     :class="[
                       'text-xs px-3 py-1.5 rounded-full font-semibold',
-                      priorityConfig[ticket.ticketPriority as keyof typeof priorityConfig].color,
+                      priorityConfig[
+                        ticket.ticket_priority as keyof typeof priorityConfig
+                      ].color,
                     ]"
                   >
                     {{
                       priorityConfig[
-                        ticket.ticketPriority as keyof typeof priorityConfig
+                        ticket.ticket_priority as keyof typeof priorityConfig
                       ].label
                     }}
                   </span>
@@ -210,95 +212,95 @@ import type { Ticket } from "../models";
 // Mock tickets data using Ticket model
 const mockTickets = ref<Ticket[]>([
   {
-    idTicket: 101,
-    ticketTitle: "Implementar sistema de autenticación",
-    ticketDescription: "Crear el sistema de login y registro con JWT",
-    ticketAttachments: null,
-    ticketService: 1,
-    ticketPriority: "Alta",
-    ticketClosingCode: null,
-    ticketAns: 1,
-    reporterUser: "jperez",
-    createAt: new Date("2025-11-20"),
-    updateAt: null,
-    assignedTo: "mgonzalez",
-    closingDate: null,
-    estimatedClosingDate: new Date("2025-12-01"),
-    statusId: 2,
-    subProgramName: "Cliente Principal A",
-  },
+    id_ticket: 101,
+    ticket_title: "Implementar sistema de autenticación",
+    ticket_description: "Crear el sistema de login y registro con JWT",
+    ticket_attachments: null,
+    ticket_service: 1,
+    ticket_priority: "Alta",
+    ticket_closing_code: null,
+    ticket_ans: 1,
+    reporter_user: "jperez",
+    create_at: "2025-11-20T00:00:00.000Z",
+    update_at: "",
+    assigned_to: "mgonzalez",
+    closing_date: null,
+    estimated_closing_date: "2025-12-01T00:00:00.000Z",
+    status_id: 2,
+    sub_program_name: "Cliente Principal A",
+  } as any,
   {
-    idTicket: 102,
-    ticketTitle: "Corregir error en módulo de pagos",
-    ticketDescription: "Bug en el proceso de checkout",
-    ticketAttachments: null,
-    ticketService: 1,
-    ticketPriority: "Urgente",
-    ticketClosingCode: null,
-    ticketAns: 1,
-    reporterUser: "cramirez",
-    createAt: new Date("2025-11-21"),
-    updateAt: null,
-    assignedTo: "mgonzalez",
-    closingDate: null,
-    estimatedClosingDate: new Date("2025-11-25"),
-    statusId: 2,
-    subProgramName: "Cliente Principal A",
-  },
+    id_ticket: 102,
+    ticket_title: "Corregir error en módulo de pagos",
+    ticket_description: "Bug en el proceso de checkout",
+    ticket_attachments: null,
+    ticket_service: 1,
+    ticket_priority: "Urgente",
+    ticket_closing_code: null,
+    ticket_ans: 1,
+    reporter_user: "cramirez",
+    create_at: "2025-11-21T00:00:00.000Z",
+    update_at: "",
+    assigned_to: "mgonzalez",
+    closing_date: null,
+    estimated_closing_date: "2025-11-25T00:00:00.000Z",
+    status_id: 2,
+    sub_program_name: "Cliente Principal A",
+  } as any,
   {
-    idTicket: 103,
-    ticketTitle: "Optimización de queries de base de datos",
-    ticketDescription: "Mejorar rendimiento de consultas principales",
-    ticketAttachments: null,
-    ticketService: 2,
-    ticketPriority: "Media",
-    ticketClosingCode: null,
-    ticketAns: 2,
-    reporterUser: "amartinez",
-    createAt: new Date("2025-11-19"),
-    updateAt: null,
-    assignedTo: "ltorres",
-    closingDate: null,
-    estimatedClosingDate: new Date("2025-12-05"),
-    statusId: 2,
-    subProgramName: "Cliente Principal B",
-  },
+    id_ticket: 103,
+    ticket_title: "Optimización de queries de base de datos",
+    ticket_description: "Mejorar rendimiento de consultas principales",
+    ticket_attachments: null,
+    ticket_service: 2,
+    ticket_priority: "Media",
+    ticket_closing_code: null,
+    ticket_ans: 2,
+    reporter_user: "amartinez",
+    create_at: "2025-11-19T00:00:00.000Z",
+    update_at: "",
+    assigned_to: "ltorres",
+    closing_date: null,
+    estimated_closing_date: "2025-12-05T00:00:00.000Z",
+    status_id: 2,
+    sub_program_name: "Cliente Principal B",
+  } as any,
   {
-    idTicket: 104,
-    ticketTitle: "Diseño de nuevos componentes UI",
-    ticketDescription: "Crear biblioteca de componentes reutilizables",
-    ticketAttachments: null,
-    ticketService: 1,
-    ticketPriority: "Baja",
-    ticketClosingCode: null,
-    ticketAns: 1,
-    reporterUser: "pherrera",
-    createAt: new Date("2025-11-18"),
-    updateAt: null,
-    assignedTo: "dsilva",
-    closingDate: null,
-    estimatedClosingDate: new Date("2025-12-10"),
-    statusId: 2,
-    subProgramName: "Cliente Principal A",
-  },
+    id_ticket: 104,
+    ticket_title: "Diseño de nuevos componentes UI",
+    ticket_description: "Crear biblioteca de componentes reutilizables",
+    ticket_attachments: null,
+    ticket_service: 1,
+    ticket_priority: "Baja",
+    ticket_closing_code: null,
+    ticket_ans: 1,
+    reporter_user: "pherrera",
+    create_at: "2025-11-18T00:00:00.000Z",
+    update_at: "",
+    assigned_to: "dsilva",
+    closing_date: null,
+    estimated_closing_date: "2025-12-10T00:00:00.000Z",
+    status_id: 2,
+    sub_program_name: "Cliente Principal A",
+  } as any,
   {
-    idTicket: 105,
-    ticketTitle: "Testing y corrección de bugs menores",
-    ticketDescription: "Suite de pruebas para nuevas funcionalidades",
-    ticketAttachments: null,
-    ticketService: 3,
-    ticketPriority: "Media",
-    ticketClosingCode: null,
-    ticketAns: 1,
-    reporterUser: "clopez",
-    createAt: new Date("2025-11-22"),
-    updateAt: null,
-    assignedTo: "rdiaz",
-    closingDate: null,
-    estimatedClosingDate: new Date("2025-12-03"),
-    statusId: 2,
-    subProgramName: "Cliente Principal C",
-  },
+    id_ticket: 105,
+    ticket_title: "Testing y corrección de bugs menores",
+    ticket_description: "Suite de pruebas para nuevas funcionalidades",
+    ticket_attachments: null,
+    ticket_service: 3,
+    ticket_priority: "Media",
+    ticket_closing_code: null,
+    ticket_ans: 1,
+    reporter_user: "clopez",
+    create_at: "2025-11-22T00:00:00.000Z",
+    update_at: "",
+    assigned_to: "rdiaz",
+    closing_date: null,
+    estimated_closing_date: "2025-12-03T00:00:00.000Z",
+    status_id: 2,
+    sub_program_name: "Cliente Principal C",
+  } as any,
 ]);
 
 const stats = [
@@ -357,7 +359,7 @@ const stats = [
 ];
 
 const myTickets = computed(() =>
-  mockTickets.value.filter((t) => t.assignedTo).slice(0, 5)
+  mockTickets.value.filter((t) => t.assigned_to).slice(0, 5),
 );
 
 // Activity data using EUser references
