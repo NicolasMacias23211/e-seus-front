@@ -695,7 +695,7 @@ import {
   ChevronRight,
   Info,
 } from "lucide-vue-next";
-import type { Ticket, TicketShort } from "../models";
+import type { TicketShort } from "../models";
 import type { ReportedTime } from "../models/ReportedTime";
 import { useNotification } from "../utils/useNotification";
 import { ReportedTimeService } from "../services/reportedTimeService";
@@ -1265,10 +1265,10 @@ const loadReportedTimes = async () => {
           const hours = parseInt(timeParts[0] || "0", 10);
           const minutes = parseInt(timeParts[1] || "0", 10);
           let dateStr: string;
-          if (typeof rt.date_reported === 'string') {
-            dateStr = rt.date_reported.split("T")[0];
+          if (typeof rt.date_reported === "string") {
+            dateStr = rt.date_reported.split("T")[0] || "";
           } else {
-            dateStr = String(rt.date_reported).split("T")[0];
+            dateStr = String(rt.date_reported).split("T")[0] || "";
           }
 
           const ticket = availableTickets.value.find(
@@ -1300,7 +1300,7 @@ const loadAssignedTickets = async () => {
     notification.error("Error", "No se pudo obtener el usuario de la sesión");
     return;
   }
-//TODO: ajustar este llamado pues esta trayendo todos mis ticket includo los del backlog, se debe liminar solo a quellos en progreso
+  //TODO: ajustar este llamado pues esta trayendo todos mis ticket includo los del backlog, se debe liminar solo a quellos en progreso
   try {
     const response = await ticketsService.GetTicketsByPerson(userInfo.username);
 
@@ -1340,8 +1340,8 @@ const activeTickets = ref<TicketWithTracking[]>([
     service_name: "servico X",
     priority_name: "alta",
     status_name: "progreso",
-    tracked : 2,
-    estimated : 12
+    tracked: 2,
+    estimated: 12,
   },
   {
     id_ticket: 102,

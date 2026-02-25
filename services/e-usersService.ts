@@ -1,11 +1,15 @@
 import { type EUser } from "../models/EUser";
+import {
+  type MetricasCumplimiento,
+  type MetricasOcupacion,
+} from "../models/Metricas";
 import { http, type ApiResponse, type PaginatedResponse } from "./http";
 
 export class eUsersService {
   private endPoint = "/eusers/";
 
   async GetEUsersByNetworkUser(
-    networkUser: string
+    networkUser: string,
   ): Promise<ApiResponse<EUser>> {
     return await http.get<EUser>(`/eusers/${networkUser}/`);
   }
@@ -24,5 +28,35 @@ export class eUsersService {
 
   async delete(id: string): Promise<ApiResponse<EUser>> {
     return await http.delete<EUser>(this.endPoint + id + "/");
+  }
+
+  async getMetricasCumplimiento(
+    networkUser: string,
+    fechaDesde?: string,
+    fechaHasta?: string,
+  ): Promise<ApiResponse<MetricasCumplimiento>> {
+    const params = new URLSearchParams();
+    params.append("network_user", networkUser);
+    if (fechaDesde) params.append("fecha_desde", fechaDesde);
+    if (fechaHasta) params.append("fecha_hasta", fechaHasta);
+
+    return await http.get<MetricasCumplimiento>(
+      `/eusers/metricas-cumplimiento/?${params.toString()}`,
+    );
+  }
+
+  async getMetricasOcupacion(
+    networkUser: string,
+    fechaDesde?: string,
+    fechaHasta?: string,
+  ): Promise<ApiResponse<MetricasOcupacion>> {
+    const params = new URLSearchParams();
+    params.append("network_user", networkUser);
+    if (fechaDesde) params.append("fecha_desde", fechaDesde);
+    if (fechaHasta) params.append("fecha_hasta", fechaHasta);
+
+    return await http.get<MetricasOcupacion>(
+      `/eusers/metricas-ocupacion/?${params.toString()}`,
+    );
   }
 }

@@ -170,7 +170,7 @@
               <span
                 class="px-2.5 py-1 bg-white border border-slate-200 text-slate-600 text-xs font-semibold rounded-full shadow-sm"
               >
-                {{ ticketsByStatus[column.status].length }}
+                {{ ticketsByStatus[column.status]?.length || 0 }}
               </span>
             </div>
 
@@ -196,7 +196,7 @@
                 </div>
 
                 <div
-                  v-if="ticketsByStatus[column.status].length === 0"
+                  v-if="ticketsByStatus[column.status]?.length === 0"
                   class="flex flex-col items-center justify-center py-8 text-slate-400"
                 >
                   <div
@@ -1394,13 +1394,17 @@ const loadColumsByStatus = async () => {
         statusIdMap.value.set(status.id_status, status);
       });
 
-      columns.value = boardStatuses.map((status, index) => ({
-        title: status.status_name,
-        status: status.id_status.toString(),
-        color: columnColors[index % columnColors.length].color,
-        bgClass: columnColors[index % columnColors.length].bgClass,
-        statusId: status.id_status,
-      }));
+      columns.value = boardStatuses.map((status, index) => {
+        const colorIndex = index % columnColors.length;
+        const colorConfig = columnColors[colorIndex];
+        return {
+          title: status.status_name,
+          status: status.id_status.toString(),
+          color: colorConfig?.color || "bg-slate-500",
+          bgClass: colorConfig?.bgClass || "bg-slate-50/30",
+          statusId: status.id_status,
+        };
+      });
     }
   } catch (error) {
     notification.error(
@@ -1507,16 +1511,22 @@ const calculateEstimatedDateIfNeeded = async () => {
 
   try {
     const ansHours = parseInt(currentAns.ans_name);
-    const dateCreation = fullTicket.value.create_at.split(".")[0];
+    const dateCreation = fullTicket.value.create_at.split(".")[0] || "";
 
     const projectDateResponse = await projectDateService.findProjectDate(
       ansHours,
       dateCreation,
     );
 
-    if (projectDateResponse.success && projectDateResponse.data) {
-      editedTicket.value.estimated_closing_date =
-        projectDateResponse.data.response;
+    if (
+      projectDateResponse.success &&
+      projectDateResponse.data &&
+      projectDateResponse.data.response
+    ) {
+      const responseDate = projectDateResponse.data.response;
+      if (typeof responseDate === "string") {
+        editedTicket.value.estimated_closing_date = responseDate;
+      }
     }
   } catch (error) {
     notification.error(
@@ -1963,6 +1973,17 @@ const confirmAction = async () => {
         return;
       }
 
+      // Preparar los datos para la actualización del ticket denegado
+      const updateData: TicketUpdate = {
+        closing_date: new Date().toISOString(),
+      };
+
+      // Actualizar el ticket con la fecha de cierre
+      await TicketService.updateTicket(
+        draggedTicket.value.id_ticket,
+        updateData,
+      );
+
       const response = await TicketService.updateTicketStatus(
         draggedTicket.value.id_ticket,
         targetStatus.value,
@@ -1978,9 +1999,9 @@ const confirmAction = async () => {
             const reportedTimeStr = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`;
 
             await reportedTimeService.createReportedTime({
-              date_reported: new Date().toISOString().split("T")[0],
+              date_reported: new Date().toISOString().split("T")[0] || "",
               id_ticket: draggedTicket.value.id_ticket,
-              network_user: CurrentUserInfo.username,
+              network_user: CurrentUserInfo.username || "",
               reported_time: reportedTimeStr,
             });
           } catch (error) {
@@ -1996,7 +2017,7 @@ const confirmAction = async () => {
             note: commentText.value.trim(),
             visible_to_client: false,
             id_ticket: draggedTicket.value.id_ticket,
-            network_user: CurrentUserInfo.username,
+            network_user: CurrentUserInfo.username || "",
           });
         } catch (error) {
           notification.error(
@@ -2042,6 +2063,30 @@ const confirmAction = async () => {
         return;
       }
 
+      // Preparar los datos para la actualización del ticket completado
+      const currentDate = new Date().toISOString();
+      let cumplimiento = false;
+
+      // Calcular cumplimiento: si hay fecha estimada y la actual es menor o igual
+      if (editedTicket.value.estimated_closing_date) {
+        const estimatedDate = new Date(
+          editedTicket.value.estimated_closing_date,
+        );
+        const closingDate = new Date(currentDate);
+        cumplimiento = closingDate <= estimatedDate;
+      }
+
+      const updateData: TicketUpdate = {
+        closing_date: currentDate,
+        cumplimiento: cumplimiento,
+      };
+
+      // Actualizar el ticket con la fecha de cierre y cumplimiento
+      await TicketService.updateTicket(
+        draggedTicket.value.id_ticket,
+        updateData,
+      );
+
       const response = await TicketService.updateTicketStatus(
         draggedTicket.value.id_ticket,
         targetStatus.value,
@@ -2056,10 +2101,11 @@ const confirmAction = async () => {
             const minutes = totalMinutes % 60;
             const reportedTimeStr = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`;
 
+            const dateReported = new Date().toISOString().split("T")[0] || "";
             await reportedTimeService.createReportedTime({
-              date_reported: new Date().toISOString().split("T")[0],
+              date_reported: dateReported,
               id_ticket: draggedTicket.value.id_ticket,
-              network_user: CurrentUserInfo.username,
+              network_user: CurrentUserInfo.username || "",
               reported_time: reportedTimeStr,
             });
           } catch (error) {
@@ -2075,7 +2121,7 @@ const confirmAction = async () => {
             note: commentText.value.trim(),
             visible_to_client: false,
             id_ticket: draggedTicket.value.id_ticket,
-            network_user: CurrentUserInfo.username,
+            network_user: CurrentUserInfo.username || "",
           });
         } catch (error) {
           notification.error(
@@ -2154,8 +2200,10 @@ const confirmAction = async () => {
         }
 
         if (editedTicket.value.estimated_closing_date) {
-          updateData.estimated_closing_date =
-            editedTicket.value.estimated_closing_date;
+          const estimatedDate = editedTicket.value.estimated_closing_date;
+          if (typeof estimatedDate === "string") {
+            updateData.estimated_closing_date = estimatedDate;
+          }
         }
 
         const updateResponse = await TicketService.updateTicket(
@@ -2207,10 +2255,11 @@ const confirmAction = async () => {
             const minutes = totalMinutes % 60;
             const reportedTimeStr = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`;
 
+            const dateReported = new Date().toISOString().split("T")[0] || "";
             await reportedTimeService.createReportedTime({
-              date_reported: new Date().toISOString().split("T")[0],
+              date_reported: dateReported,
               id_ticket: draggedTicket.value.id_ticket,
-              network_user: CurrentUserInfo.username,
+              network_user: CurrentUserInfo.username || "",
               reported_time: reportedTimeStr,
             });
           } catch (error) {
@@ -2227,7 +2276,7 @@ const confirmAction = async () => {
               note: commentText.value.trim(),
               visible_to_client: false,
               id_ticket: draggedTicket.value.id_ticket,
-              network_user: CurrentUserInfo.username,
+              network_user: CurrentUserInfo.username || "",
             });
           } catch (error) {
             notification.error(
