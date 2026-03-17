@@ -7,7 +7,6 @@
     <div
       class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-fade-in"
     >
-      <!-- Header -->
       <div
         class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] px-8 py-6 flex items-center justify-between"
       >
@@ -33,10 +32,7 @@
           <X class="w-6 h-6 text-white" />
         </button>
       </div>
-
-      <!-- Content -->
       <div class="overflow-y-auto max-h-[calc(90vh-180px)] px-8 py-6">
-        <!-- Introducción -->
         <section class="mb-8">
           <h3
             class="text-xl font-bold text-[#021C7D] mb-4 flex items-center gap-2"
@@ -50,8 +46,6 @@
             encontrarás una guía del flujo básico de la aplicación.
           </p>
         </section>
-
-        <!-- Flujo para Usuarios Externos -->
         <section class="mb-8">
           <h3
             class="text-xl font-bold text-[#021C7D] mb-4 flex items-center gap-2"
@@ -132,8 +126,6 @@
             </div>
           </div>
         </section>
-
-        <!-- Flujo para Usuarios Internos -->
         <section class="mb-8">
           <h3
             class="text-xl font-bold text-[#021C7D] mb-4 flex items-center gap-2"
@@ -231,8 +223,6 @@
             </div>
           </div>
         </section>
-
-        <!-- Estados de Tickets -->
         <section class="mb-8">
           <h3
             class="text-xl font-bold text-[#021C7D] mb-4 flex items-center gap-2"
@@ -282,8 +272,6 @@
             </div>
           </div>
         </section>
-
-        <!-- Consejos Útiles -->
         <section class="mb-4">
           <h3
             class="text-xl font-bold text-[#021C7D] mb-4 flex items-center gap-2"
@@ -343,8 +331,6 @@
           </div>
         </section>
       </div>
-
-      <!-- Footer -->
       <div
         class="px-8 py-4 bg-slate-50 border-t-2 border-slate-200 flex justify-end"
       >

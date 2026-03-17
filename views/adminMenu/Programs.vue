@@ -44,10 +44,10 @@
               class="hover:bg-blue-50 transition-colors"
             >
               <td class="px-6 py-4 text-sm text-slate-700 font-medium">
-                {{ program.programName }}
+                {{ program.program_name }}
               </td>
               <td class="px-6 py-4 text-sm text-slate-600">
-                {{ program.clientName }}
+                {{ program.client_name }}
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center justify-center gap-2">
@@ -168,11 +168,12 @@ const notification = useNotification();
 
 // Estado
 const programs = ref<Program[]>([
-  { programName: "Programa Alpha", clientName: "Cliente A - Empresa Tech" },
-  { programName: "Programa Beta", clientName: "Cliente A - Empresa Tech" },
+  { program_name: "Programa Alpha", client_name: "Cliente A - Empresa Tech", client_name_display: "" },
+  { program_name: "Programa Beta", client_name: "Cliente A - Empresa Tech", client_name_display: "" },
   {
-    programName: "Programa Gamma",
-    clientName: "Cliente B - Corporación Global",
+    program_name: "Programa Gamma",
+    client_name: "Cliente B - Corporación Global",
+    client_name_display: ""
   },
 ]);
 
@@ -202,10 +203,10 @@ const openCreateModal = () => {
 const openEditModal = (program: Program) => {
   isEditing.value = true;
   editingIndex.value = programs.value.findIndex(
-    (p) => p.programName === program.programName
+    (p) => p.program_name === program.program_name
   );
-  form.programName = program.programName;
-  form.clientName = program.clientName;
+  form.programName = program.program_name;
+  form.clientName = program.client_name;
   showModal.value = true;
 };
 
@@ -220,8 +221,9 @@ const closeModal = () => {
 const handleSubmit = () => {
   if (isEditing.value) {
     programs.value[editingIndex.value] = {
-      programName: form.programName,
-      clientName: form.clientName,
+      program_name: form.programName,
+      client_name: form.clientName,
+      client_name_display : ""
     };
     notification.success(
       "¡Actualizado!",
@@ -229,8 +231,9 @@ const handleSubmit = () => {
     );
   } else {
     programs.value.push({
-      programName: form.programName,
-      clientName: form.clientName,
+      program_name: form.programName,
+      client_name: form.clientName,
+      client_name_display: ""
     });
     notification.success(
       "¡Creado!",
@@ -242,10 +245,10 @@ const handleSubmit = () => {
 
 const confirmDelete = (program: Program) => {
   if (
-    confirm(`¿Está seguro de eliminar el programa "${program.programName}"?`)
+    confirm(`¿Está seguro de eliminar el programa "${program.program_name}"?`)
   ) {
     const index = programs.value.findIndex(
-      (p) => p.programName === program.programName
+      (p) => p.program_name === program.program_name
     );
     programs.value.splice(index, 1);
     notification.success(

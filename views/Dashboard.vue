@@ -209,7 +209,6 @@ import {
 } from "lucide-vue-next";
 import type { Ticket } from "../models";
 
-// Mock tickets data using Ticket model
 const mockTickets = ref<Ticket[]>([
   {
     id_ticket: 101,
@@ -362,7 +361,6 @@ const myTickets = computed(() =>
   mockTickets.value.filter((t) => t.assigned_to).slice(0, 5),
 );
 
-// Activity data using EUser references
 const recentActivity = [
   {
     id: 1,
@@ -408,7 +406,6 @@ const typeIcons = {
   },
 };
 
-// Helper to get ticket type icon (since it's not in DB model, use service as proxy)
 const getTicketTypeByService = (serviceId: number) => {
   const typeMap: Record<number, keyof typeof typeIcons> = {
     1: "feature",

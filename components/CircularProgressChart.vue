@@ -115,7 +115,7 @@ const initChart = () => {
             },
           },
         ],
-        animation: false, // Desactivar animación automática
+        animation: false,
       },
     ],
   };
@@ -152,7 +152,7 @@ const updateChart = () => {
         {
           data: [
             {
-              animation: false, // Sin animación para actualizaciones suaves
+              animation: false, 
               value: animatedValue.value,
               name: "Completado",
               itemStyle: {
@@ -178,9 +178,8 @@ const updateChart = () => {
   }
 };
 
-// Animación del contador de 0 a valor final
 const animateValue = (targetValue: number) => {
-  const duration = 1500; // 1.5 segundos
+  const duration = 1500; 
   const steps = 60;
   const increment = targetValue / steps;
   const stepDuration = duration / steps;
@@ -222,7 +221,6 @@ watch(
 
 onMounted(() => {
   initChart();
-  // Iniciar la animación después de un pequeño delay
   setTimeout(() => {
     animateValue(props.value);
   }, 100);

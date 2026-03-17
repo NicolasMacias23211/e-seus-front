@@ -61,7 +61,6 @@ import { Users } from "lucide-vue-next";
 import { useNotification } from "../../utils/useNotification";
 import type { User } from "../../models/User";
 import { UsersService } from "../../services/usersService";
-// import { UsersService } from "../../services/usersService";
 
 const notification = useNotification();
 const usersService = new UsersService();

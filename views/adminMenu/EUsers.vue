@@ -2,7 +2,8 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#021C7D] to-[#50bdeb] flex items-center justify-center">
+        <div
+          class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#021C7D] to-[#50bdeb] flex items-center justify-center">
           <UserCog class="w-5 h-5 text-white" />
         </div>
         <div>
@@ -48,30 +49,22 @@
                 {{ user.phone || "-" }}
               </td>
               <td class="px-6 py-4 text-sm text-slate-600">
-                {{ user.user_client_name  || "-" }}
+                {{ user.user_client_name || "-" }}
               </td>
               <td class="px-6 py-4">
-                <span
-                  class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold"
-                  :class="getRoleBadgeClass(user.rol_name)"
-                >
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold"
+                  :class="getRoleBadgeClass(user.rol_name)">
                   {{ user.rol_name }}
                 </span>
-              </td> 
+              </td>
               <td class="px-6 py-4">
                 <div class="flex items-center justify-center gap-2">
-                  <button
-                    @click="openEditModal(user)"
-                    class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all"
-                    title="Editar"
-                  >
+                  <button @click="openEditModal(user)"
+                    class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all" title="Editar">
                     <Edit2 class="w-4 h-4" />
                   </button>
-                  <button
-                    @click="confirmDelete(user)"
-                    class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all"
-                    title="Eliminar"
-                  >
+                  <button @click="confirmDelete(user)"
+                    class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all" title="Eliminar">
                     <Trash2 class="w-4 h-4" />
                   </button>
                 </div>
@@ -106,7 +99,7 @@
               <input id="networkUser" v-model="form.network_user" type="text" required maxlength="45"
                 :disabled="isEditing"
                 class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all disabled:bg-slate-100"
-                placeholder="usuario.red"/>
+                placeholder="usuario.red" />
             </div>
 
             <div class="grid grid-cols-2 gap-4">
@@ -116,7 +109,7 @@
                 </label>
                 <input id="name" v-model="form.name" type="text" required maxlength="45"
                   class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
-                  placeholder="Nombre"/>
+                  placeholder="Nombre" />
               </div>
 
               <div>
@@ -125,152 +118,90 @@
                 </label>
                 <input id="middleName" v-model="form.middle_name" type="text" maxlength="45"
                   class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
-                  placeholder="Segundo nombre (opcional)"/>
+                  placeholder="Segundo nombre (opcional)" />
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label
-                  for="lastName"
-                  class="block text-sm font-bold text-slate-700 mb-2"
-                >
+                <label for="lastName" class="block text-sm font-bold text-slate-700 mb-2">
                   Apellido <span class="text-red-500">*</span>
                 </label>
-                <input
-                  id="lastName"
-                  v-model="form.last_name"
-                  type="text"
-                  required
-                  maxlength="45"
+                <input id="lastName" v-model="form.last_name" type="text" required maxlength="45"
                   class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
-                  placeholder="Apellido"
-                />
+                  placeholder="Apellido" />
               </div>
 
               <div>
-                <label
-                  for="secondLastName"
-                  class="block text-sm font-bold text-slate-700 mb-2"
-                >
+                <label for="secondLastName" class="block text-sm font-bold text-slate-700 mb-2">
                   Segundo Apellido
                 </label>
-                <input
-                  id="secondLastName"
-                  v-model="form.second_last_name"
-                  type="text"
-                  maxlength="45"
+                <input id="secondLastName" v-model="form.second_last_name" type="text" maxlength="45"
                   class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
-                  placeholder="Segundo apellido (opcional)"
-                />
+                  placeholder="Segundo apellido (opcional)" />
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label
-                  for="email"
-                  class="block text-sm font-bold text-slate-700 mb-2"
-                >
+                <label for="email" class="block text-sm font-bold text-slate-700 mb-2">
                   <Mail class="w-4 h-4 inline mr-1" />
                   Email <span class="text-red-500">*</span>
                 </label>
-                <input
-                  id="email"
-                  v-model="form.email"
-                  type="email"
-                  required
-                  maxlength="45"
+                <input id="email" v-model="form.email" type="email" required maxlength="45"
                   class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
-                  placeholder="correo@ejemplo.com"
-                />
+                  placeholder="correo@ejemplo.com" />
               </div>
 
               <div>
-                <label
-                  for="phone"
-                  class="block text-sm font-bold text-slate-700 mb-2"
-                >
+                <label for="phone" class="block text-sm font-bold text-slate-700 mb-2">
                   <Phone class="w-4 h-4 inline mr-1" />
                   Teléfono
                 </label>
-                <input
-                  id="phone"
-                  v-model="form.phone"
-                  type="tel"
-                  maxlength="45"
+                <input id="phone" v-model="form.phone" type="tel" maxlength="45"
                   class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
-                  placeholder="+54 11 1234-5678"
-                />
+                  placeholder="+54 11 1234-5678" />
               </div>
             </div>
 
             <div class="grid grid-cols-3 gap-4">
               <div>
-                <label
-                  for="clientName"
-                  class="block text-sm font-bold text-slate-700 mb-2"
-                >
+                <label for="clientName" class="block text-sm font-bold text-slate-700 mb-2">
                   <Building2 class="w-4 h-4 inline mr-1" />
                   Cliente <span class="text-red-500"></span>
                 </label>
-                <select
-                  id="clientName"
-                  v-model="form.user_client_name"
-                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all bg-white"
-                >
+                <select id="clientName" v-model="form.user_client_name"
+                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all bg-white">
                   <option :value="null">Seleccionar cliente...</option>
-                  <option
-                    v-for="client in clients"
-                    :key="client.client_name"
-                    :value="client.client_name"
-                  >
+                  <option v-for="client in clients" :key="client.client_name" :value="client.client_name">
                     {{ client.client_name }}
                   </option>
                 </select>
               </div>
 
               <div>
-                <label for="serviceId"class="block text-sm font-bold text-slate-700 mb-2">
+                <label for="serviceId" class="block text-sm font-bold text-slate-700 mb-2">
                   <Briefcase class="w-4 h-4 inline mr-1" />
                   Servicio <span class="text-red-500"></span>
                 </label>
-                <select
-                  id="serviceId"
-                  v-model.number="form.id_services"
-                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all bg-white"
-                >
+                <select id="serviceId" v-model.number="form.id_services"
+                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all bg-white">
                   <option :value="null">Seleccionar servicio...</option>
-                  <option
-                    v-for="service in services"
-                    :key="service.id_services"
-                    :value="service.id_services"
-                  >
+                  <option v-for="service in services" :key="service.id_services" :value="service.id_services">
                     {{ service.service_name }}
                   </option>
                 </select>
               </div>
 
               <div>
-                <label
-                  for="roleName"
-                  class="block text-sm font-bold text-slate-700 mb-2"
-                >
+                <label for="roleName" class="block text-sm font-bold text-slate-700 mb-2">
                   <Shield class="w-4 h-4 inline mr-1" />
                   Rol <span class="text-red-500">*</span>
                 </label>
-                <select
-                  id="roleName"
-                  v-model="form.rol_name"
-                  
-                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all bg-white"
-                >
+                <select id="roleName" v-model="form.rol_name"
+                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all bg-white">
                   <option value="" disabled>Seleccione un rol...</option>
-                  <option
-                    v-for="role in roles"
-                    :key="role.rol_name"
-                    :value="role.rol_name"
-                  >
+                  <option v-for="role in roles" :key="role.rol_name" :value="role.rol_name">
                     {{ role.rol_name }}
                   </option>
                 </select>
@@ -278,17 +209,12 @@
             </div>
 
             <div class="flex gap-3 pt-4">
-              <button
-                type="button"
-                @click="closeModal"
-                class="flex-1 px-4 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 transition-all font-medium"
-              >
+              <button type="button" @click="closeModal"
+                class="flex-1 px-4 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 transition-all font-medium">
                 Cancelar
               </button>
-              <button
-                type="submit"
-                class="flex-1 px-4 py-3 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white rounded-xl hover:shadow-lg transition-all font-medium"
-              >
+              <button type="submit"
+                class="flex-1 px-4 py-3 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white rounded-xl hover:shadow-lg transition-all font-medium">
                 {{ isEditing ? "Actualizar" : "Crear" }}
               </button>
             </div>
@@ -296,20 +222,15 @@
         </div>
       </div>
     </Teleport>
-    <ConfirmDialog
-      :is-visible="showConfirmDialog"
-      type="delete" title="Confirmar eliminación"
+    <ConfirmDialog :is-visible="showConfirmDialog" type="delete" title="Confirmar eliminación"
       message="¿Está seguro de que desea eliminar este usuario? Esta acción no se puede deshacer."
-      confirm-text="Si, eliminar"
-      cancel-text="Cancelar"
-      @confirm="handleDeleteConfirm"
-      @cancel="handleDeleteCancel"/>
+      confirm-text="Si, eliminar" cancel-text="Cancelar" @confirm="handleDeleteConfirm" @cancel="handleDeleteCancel" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
-import {UserCog, Plus, Edit2, Trash2, User, Mail, Phone, Building2, Briefcase, Shield, Users,} from "lucide-vue-next";
+import { UserCog, Plus, Edit2, Trash2, User, Mail, Phone, Building2, Briefcase, Shield } from "lucide-vue-next";
 import { useNotification } from "../../utils/useNotification";
 import { eUsersService } from "../../services/e-usersService";
 import type { EUser } from "../../models/EUser";
@@ -319,35 +240,30 @@ import { RequestTypeService } from "../../services/RequestTypeService";
 import { RolesService } from "../../services/rolesService";
 import type { Client } from "../../models/Client";
 import type { Service } from "../../models/Service";
-import type { Role } from "../../models/Role";   
+import type { Role } from "../../models/Role";
 
 const notification = useNotification();
 
-// Instancias de servicios
 const eusersService = new eUsersService();
 const clientsService = new ClientsService();
 const servicesService = new RequestTypeService();
 const rolesService = new RolesService();
 
-// Arrays de datos
 const eusers = ref<EUser[]>([]);
 const clients = ref<Client[]>([]);
 const services = ref<Service[]>([]);
 const roles = ref<Role[]>([]);
 
-// Control de modal y diálogo
 const showConfirmDialog = ref(false);
 const clientToDelete = ref<EUser | null>(null);
 const showModal = ref(false);
 const isEditing = ref(false);
 const editingIndex = ref(-1);
 
-
-
-
 const form = reactive<EUser>({
   network_user: "",
   name: "",
+  full_name: "",
   middle_name: null,
   last_name: "",
   second_last_name: null,
@@ -358,7 +274,6 @@ const form = reactive<EUser>({
   rol_name: "",
 });
 
-// Métodos
 const getFullName = (user: EUser) => {
   const parts = [
     user.name,
@@ -431,7 +346,6 @@ const handleSubmit = () => {
   create();
 }
 
-
 const create = async () => {
   try {
     let dataCreate: EUser = ({
@@ -440,6 +354,7 @@ const create = async () => {
       middle_name: form.middle_name,
       last_name: form.last_name,
       second_last_name: form.second_last_name,
+      full_name: form.name + form.middle_name + form.last_name + form.second_last_name,
       email: form.email,
       phone: form.phone,
       user_client_name: form.user_client_name || "",
@@ -449,7 +364,7 @@ const create = async () => {
 
     let response = await eusersService.create(dataCreate);
 
-    if(response.success) {
+    if (response.success) {
       notification.success(
         "¡Creado!",
         "El usuario ha sido creado correctamente"
@@ -477,6 +392,7 @@ const update = async () => {
       middle_name: form.middle_name,
       last_name: form.last_name,
       second_last_name: form.second_last_name,
+      full_name: form.name + form.middle_name + form.last_name + form.second_last_name,
       email: form.email,
       phone: form.phone,
       user_client_name: form.user_client_name || "",
@@ -516,7 +432,7 @@ const handleDeleteCancel = () => {
 
 const handleDeleteConfirm = async () => {
   try {
-    if (clientToDelete.value && clientToDelete.value.network_user != undefined){
+    if (clientToDelete.value && clientToDelete.value.network_user != undefined) {
       let response = await eusersService.delete(clientToDelete.value.network_user);
       if (response.success) {
         notification.success(
@@ -530,7 +446,7 @@ const handleDeleteConfirm = async () => {
       console.error("Error al eliminar el usuario:", response.error);
       notification.error("Error", "No se logró eliminar el usuario");
       handleDeleteCancel();
-    }  
+    }
   } catch (error) {
     console.error("Error al eliminar el usuario:", error);
     notification.error("Error", "No se logró eliminar el usuario");
@@ -602,6 +518,7 @@ onMounted(() => {
     transform: scale(0.9);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
