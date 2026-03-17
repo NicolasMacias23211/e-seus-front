@@ -3,7 +3,6 @@
     class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 p-6"
   >
     <div class="w-full max-w-5xl mx-auto">
-      <!-- Header con gradiente -->
       <div
         class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] rounded-2xl p-6 mb-6 shadow-lg"
       >
@@ -23,7 +22,6 @@
       </div>
 
       <div class="bg-white rounded-2xl shadow-md border-2 border-blue-100 p-8">
-        <!-- Avatar y nombre -->
         <div
           class="flex items-center gap-6 mb-8 pb-8 border-b-2 border-blue-100 bg-gradient-to-r from-blue-50/50 to-transparent p-6 rounded-xl"
         >
@@ -48,7 +46,6 @@
         </div>
 
         <form @submit.prevent="handleSubmit">
-          <!-- Información Personal (Solo lectura) -->
           <div class="mb-6">
             <h3
               class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"
@@ -125,7 +122,6 @@
             </div>
           </div>
 
-          <!-- Información de Contacto (Editable) -->
           <div class="mb-6">
             <h3
               class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"
@@ -173,7 +169,6 @@
             </div>
           </div>
 
-          <!-- Información Adicional (Solo lectura) -->
           <div class="mb-6">
             <h3
               class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"
@@ -196,7 +191,6 @@
             </div>
           </div>
 
-          <!-- Mensaje de éxito -->
           <div
             v-if="showSuccess"
             class="mb-6 p-4 bg-green-50 border-2 border-green-200 rounded-xl flex items-center gap-3"
@@ -216,7 +210,6 @@
             </div>
           </div>
 
-          <!-- Botones de acción -->
           <div class="flex gap-4 pt-6 border-t-2 border-blue-100">
             <button
               type="button"
@@ -258,10 +251,10 @@ import type { EUser } from "../../models";
 
 const showSuccess = ref(false);
 
-// Mock data del usuario
 const userProfile = reactive<EUser>({
   network_user: "jperez",
   name: "Juan",
+  full_name : "Juan Carlos Perez Gonzalez",
   middle_name: "Carlos",
   last_name: "Pérez",
   second_last_name: "González",
@@ -272,7 +265,6 @@ const userProfile = reactive<EUser>({
   rol_name: "Soporte Técnico",
 });
 
-// Copia editable solo de los campos modificables
 const editableProfile = reactive({
   email: userProfile.email,
   phone: userProfile.phone,
@@ -301,14 +293,11 @@ const resetChanges = () => {
 };
 
 const handleSubmit = () => {
-  // Actualizar solo los campos editables
   userProfile.email = editableProfile.email;
   userProfile.phone = editableProfile.phone;
 
-  // Mostrar mensaje de éxito
   showSuccess.value = true;
 
-  // Ocultar mensaje después de 3 segundos
   setTimeout(() => {
     showSuccess.value = false;
   }, 3000);
@@ -321,5 +310,4 @@ const handleSubmit = () => {
 </script>
 
 <style scoped>
-/* Estilos personalizados si son necesarios */
 </style>

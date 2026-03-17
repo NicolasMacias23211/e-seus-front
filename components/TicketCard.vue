@@ -7,10 +7,10 @@
       <div class="flex items-start justify-between gap-2">
         <div class="flex items-center gap-2">
           <component
-            :is="typeIcons[getTicketTypeByName(ticket.service_name)].icon"
+            :is="typeIcons[getTicketTypeByName(ticket.service_name) || '']?.icon"
             :class="[
               'h-4 w-4',
-              typeIcons[getTicketTypeByName(ticket.service_name)].color,
+              typeIcons[getTicketTypeByName(ticket.service_name) || '']?.color,
             ]"
           />
           <span

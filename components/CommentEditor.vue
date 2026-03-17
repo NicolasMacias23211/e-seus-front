@@ -284,7 +284,6 @@ const emit = defineEmits<{
 const editorRef = ref<HTMLDivElement | null>(null);
 const showPreview = ref(false);
 
-// Sincronizar contenido del editor con el modelValue
 watch(
   () => props.modelValue,
   (newValue) => {
@@ -313,7 +312,6 @@ const handlePaste = (event: ClipboardEvent) => {
 };
 
 const handleKeydown = (event: KeyboardEvent) => {
-  // Atajos de teclado
   if (event.ctrlKey || event.metaKey) {
     switch (event.key.toLowerCase()) {
       case "b":
@@ -428,7 +426,6 @@ const renderedHtml = computed(() => {
 </script>
 
 <style scoped>
-/* Estilos para el editor contenteditable */
 [contenteditable="true"] {
   outline: none;
 }
@@ -437,7 +434,6 @@ const renderedHtml = computed(() => {
   outline: none;
 }
 
-/* Estilos para elementos dentro del editor */
 :deep(b),
 :deep(strong) {
   font-weight: 700;
@@ -509,7 +505,6 @@ const renderedHtml = computed(() => {
   color: #50bdeb;
 }
 
-/* Estilos para la vista previa (prose) */
 .prose {
   color: #1e293b;
 }

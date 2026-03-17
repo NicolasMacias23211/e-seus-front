@@ -1799,6 +1799,7 @@ const getStatusName = (statusId: number) => {
 
   for (let index = 0; index < statuses.value.length; index++) {
     const status = statuses.value[index];
+    if (!status) continue;
     statusMap[status.id_status] = status.status_name;
   }
   return statusMap[statusId] || "Desconocido";

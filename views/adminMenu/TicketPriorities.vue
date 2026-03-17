@@ -151,7 +151,7 @@ import { ref, reactive, onMounted } from "vue";
 import { AlertTriangle, Plus, Edit2, Trash2 } from "lucide-vue-next";
 import { useNotification } from "../../utils/useNotification";
 import { TicketPriorityService } from "../../services/ticketPriorityService";
-import { TicketPriority } from "../../models/TicketPriority";
+import type { TicketPriority } from "../../models/TicketPriority";
 import ConfirmDialog from "../../components/ConfirmDialog.vue";
 
 

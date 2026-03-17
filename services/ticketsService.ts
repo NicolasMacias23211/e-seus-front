@@ -8,7 +8,6 @@ import type {
 } from "../models/Ticket";
 import type { WeeklyStats } from "../models/Metricas";
 import { SessionStorageService } from "./SessionStorageService";
-import { time } from "node:console";
 
 const sessionStorage = new SessionStorageService();
 
@@ -30,7 +29,7 @@ export class TicketsService {
     return await http.get<PaginatedResponse<TicketList>>(
       `${this.endpoint}?assigned_to__isnull=true&ticket_ans=${id_ans || ''}&create_at_after=${time_elapsed}&search=${text}&page=${page}&page_size=${pageSize}`
     );
-
+  }
   async GetTicketByReporter(
     reporter_user: string,
   ): Promise<PaginatedResponse<Ticket>> {
@@ -51,7 +50,6 @@ export class TicketsService {
       throw new Error("Usuario no autenticado");
     }
 
-    // Construir query params
     const queryParams = new URLSearchParams();
     queryParams.append("assigned_to", networkUser);
 
