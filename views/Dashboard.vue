@@ -97,18 +97,18 @@
                   <div
                     :class="[
                       'p-2.5 rounded-lg',
-                      typeIcons[getTicketTypeByService(ticket.ticket_service)]
+                      typeIcons[getTicketTypeByService(ticket.id_ticket)]
                         .bgColor,
                     ]"
                   >
                     <component
                       :is="
-                        typeIcons[getTicketTypeByService(ticket.ticket_service)]
+                        typeIcons[getTicketTypeByService(ticket.id_ticket)]
                           .icon
                       "
                       :class="[
                         'h-5 w-5',
-                        typeIcons[getTicketTypeByService(ticket.ticket_service)]
+                        typeIcons[getTicketTypeByService(ticket.id_ticket)]
                           .color,
                       ]"
                     />
@@ -133,13 +133,13 @@
                     :class="[
                       'text-xs px-3 py-1.5 rounded-full font-semibold',
                       priorityConfig[
-                        ticket.ticket_priority as keyof typeof priorityConfig
+                        ticket.priority_name as keyof typeof priorityConfig
                       ].color,
                     ]"
                   >
                     {{
                       priorityConfig[
-                        ticket.ticket_priority as keyof typeof priorityConfig
+                        ticket.priority_name as keyof typeof priorityConfig
                       ].label
                     }}
                   </span>
@@ -197,7 +197,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import {
   LayoutGrid,
   AlertCircle,
@@ -207,101 +207,40 @@ import {
   Wrench,
   LayoutDashboard,
 } from "lucide-vue-next";
-import type { Ticket } from "../models";
+import type { TicketShort } from "../models";
+import { SessionStorageService } from "../services/SessionStorageService";
+import type { UserInfo } from "../models/login";
+import { TicketsService } from "../services/ticketsService";
+import { useNotification } from "../utils/useNotification";
 
-// Mock tickets data using Ticket model
-const mockTickets = ref<Ticket[]>([
-  {
-    id_ticket: 101,
-    ticket_title: "Implementar sistema de autenticación",
-    ticket_description: "Crear el sistema de login y registro con JWT",
-    ticket_attachments: null,
-    ticket_service: 1,
-    ticket_priority: "Alta",
-    ticket_closing_code: null,
-    ticket_ans: 1,
-    reporter_user: "jperez",
-    create_at: "2025-11-20T00:00:00.000Z",
-    update_at: "",
-    assigned_to: "mgonzalez",
-    closing_date: null,
-    estimated_closing_date: "2025-12-01T00:00:00.000Z",
-    status_id: 2,
-    sub_program_name: "Cliente Principal A",
-  } as any,
-  {
-    id_ticket: 102,
-    ticket_title: "Corregir error en módulo de pagos",
-    ticket_description: "Bug en el proceso de checkout",
-    ticket_attachments: null,
-    ticket_service: 1,
-    ticket_priority: "Urgente",
-    ticket_closing_code: null,
-    ticket_ans: 1,
-    reporter_user: "cramirez",
-    create_at: "2025-11-21T00:00:00.000Z",
-    update_at: "",
-    assigned_to: "mgonzalez",
-    closing_date: null,
-    estimated_closing_date: "2025-11-25T00:00:00.000Z",
-    status_id: 2,
-    sub_program_name: "Cliente Principal A",
-  } as any,
-  {
-    id_ticket: 103,
-    ticket_title: "Optimización de queries de base de datos",
-    ticket_description: "Mejorar rendimiento de consultas principales",
-    ticket_attachments: null,
-    ticket_service: 2,
-    ticket_priority: "Media",
-    ticket_closing_code: null,
-    ticket_ans: 2,
-    reporter_user: "amartinez",
-    create_at: "2025-11-19T00:00:00.000Z",
-    update_at: "",
-    assigned_to: "ltorres",
-    closing_date: null,
-    estimated_closing_date: "2025-12-05T00:00:00.000Z",
-    status_id: 2,
-    sub_program_name: "Cliente Principal B",
-  } as any,
-  {
-    id_ticket: 104,
-    ticket_title: "Diseño de nuevos componentes UI",
-    ticket_description: "Crear biblioteca de componentes reutilizables",
-    ticket_attachments: null,
-    ticket_service: 1,
-    ticket_priority: "Baja",
-    ticket_closing_code: null,
-    ticket_ans: 1,
-    reporter_user: "pherrera",
-    create_at: "2025-11-18T00:00:00.000Z",
-    update_at: "",
-    assigned_to: "dsilva",
-    closing_date: null,
-    estimated_closing_date: "2025-12-10T00:00:00.000Z",
-    status_id: 2,
-    sub_program_name: "Cliente Principal A",
-  } as any,
-  {
-    id_ticket: 105,
-    ticket_title: "Testing y corrección de bugs menores",
-    ticket_description: "Suite de pruebas para nuevas funcionalidades",
-    ticket_attachments: null,
-    ticket_service: 3,
-    ticket_priority: "Media",
-    ticket_closing_code: null,
-    ticket_ans: 1,
-    reporter_user: "clopez",
-    create_at: "2025-11-22T00:00:00.000Z",
-    update_at: "",
-    assigned_to: "rdiaz",
-    closing_date: null,
-    estimated_closing_date: "2025-12-03T00:00:00.000Z",
-    status_id: 2,
-    sub_program_name: "Cliente Principal C",
-  } as any,
-]);
+const notification = useNotification();
+const TicketService = new TicketsService();
+const SessionStorageServiceInstance = new SessionStorageService();
+const CurrentUserInfo: UserInfo =
+  SessionStorageServiceInstance.getUserInfo() || {
+    username: "",
+    full_name: "",
+    email: "",
+    position: "",
+    document: 0,
+  };
+const Tickets = ref<TicketShort[]>([]);
+
+const loadTickets = async () => {
+  if (CurrentUserInfo.username === "") {
+    return;
+  }
+  try {
+    const response = await TicketService.GetTicketsByPerson(
+      CurrentUserInfo.username,
+    );
+    if (response.data && response.data.results) {
+      Tickets.value = response.data.results.flat();
+    }
+  } catch (error) {
+    notification.error("Error", "No se pudieron cargar los tickets");
+  }
+};
 
 const stats = [
   {
@@ -359,7 +298,7 @@ const stats = [
 ];
 
 const myTickets = computed(() =>
-  mockTickets.value.filter((t) => t.assigned_to).slice(0, 5),
+  Tickets.value.filter((t) => t.assigned_to).slice(0, 5),
 );
 
 // Activity data using EUser references
@@ -417,4 +356,9 @@ const getTicketTypeByService = (serviceId: number) => {
   };
   return typeMap[serviceId] || "task";
 };
+
+onMounted(() => {
+  loadTickets();
+});
+
 </script>
