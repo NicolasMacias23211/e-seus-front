@@ -4,11 +4,10 @@ import type {
   TicketCreate,
   TicketShort,
   TicketUpdate,
-  TicketList
+  TicketList,
 } from "../models/Ticket";
-import type { WeeklyStats } from "../models/Metricas";
+import type { WeeklyStats, DashboardStats } from "../models/Metricas";
 import { SessionStorageService } from "./SessionStorageService";
-import { time } from "node:console";
 
 const sessionStorage = new SessionStorageService();
 
@@ -21,15 +20,23 @@ export class TicketsService {
       `/tickets/?assigned_to=${assigned_to}`,
     );
   }
-  async getAllTicketsWithoutAssignment(page: number, pageSize: number, text: string = '', id_ans?: number | null, time_elapsed: string = '', before: boolean = false): Promise<ApiResponse<PaginatedResponse<TicketList>>> {
+  async getAllTicketsWithoutAssignment(
+    page: number,
+    pageSize: number,
+    text: string = "",
+    id_ans?: number | null,
+    time_elapsed: string = "",
+    before: boolean = false,
+  ): Promise<ApiResponse<PaginatedResponse<TicketList>>> {
     if (before) {
       return await http.get<PaginatedResponse<TicketList>>(
-        `${this.endpoint}?assigned_to__isnull=true&ticket_ans=${id_ans || ''}&create_at_before=${time_elapsed}&search=${text}&page=${page}&page_size=${pageSize}`
+        `${this.endpoint}?assigned_to__isnull=true&ticket_ans=${id_ans || ""}&create_at_before=${time_elapsed}&search=${text}&page=${page}&page_size=${pageSize}`,
       );
     }
     return await http.get<PaginatedResponse<TicketList>>(
-      `${this.endpoint}?assigned_to__isnull=true&ticket_ans=${id_ans || ''}&create_at_after=${time_elapsed}&search=${text}&page=${page}&page_size=${pageSize}`
+      `${this.endpoint}?assigned_to__isnull=true&ticket_ans=${id_ans || ""}&create_at_after=${time_elapsed}&search=${text}&page=${page}&page_size=${pageSize}`,
     );
+  }
 
   async GetTicketByReporter(
     reporter_user: string,
@@ -82,9 +89,14 @@ export class TicketsService {
     );
   }
 
-
-  async patchTicket(ticketUpdate: TicketUpdate, id: number): Promise<ApiResponse<TicketUpdate>> {
-    return await http.patch<TicketUpdate>(`${this.endpoint + id}/`, ticketUpdate)
+  async patchTicket(
+    ticketUpdate: TicketUpdate,
+    id: number,
+  ): Promise<ApiResponse<TicketUpdate>> {
+    return await http.patch<TicketUpdate>(
+      `${this.endpoint + id}/`,
+      ticketUpdate,
+    );
   }
 
   async updateTicket(
@@ -103,5 +115,12 @@ export class TicketsService {
 
   async getWeeklyStats(): Promise<ApiResponse<WeeklyStats>> {
     return await http.get<WeeklyStats>("/tickets/weekly-stats/");
+  }
+
+  async getDashboardStats(): Promise<ApiResponse<DashboardStats>> {
+    const username = sessionStorage.getUserInfo()?.username;
+    return await http.get<DashboardStats>(
+      `/tickets/dashboard-stats/?assigned_to=${username}`,
+    );
   }
 }

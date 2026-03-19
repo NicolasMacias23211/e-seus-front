@@ -84,6 +84,7 @@
                 </div>
                 <button
                   class="text-[#50bdeb] hover:text-[#021C7D] text-sm font-medium transition-colors"
+                  @click="goToBoard"
                 >
                   Ver todos →
                 </button>
@@ -97,19 +98,14 @@
                   <div
                     :class="[
                       'p-2.5 rounded-lg',
-                      typeIcons[getTicketTypeByService(ticket.id_ticket)]
-                        .bgColor,
+                      getServiceStyle(ticket.service_name).bgColor,
                     ]"
                   >
                     <component
-                      :is="
-                        typeIcons[getTicketTypeByService(ticket.id_ticket)]
-                          .icon
-                      "
+                      :is="getServiceStyle(ticket.service_name).icon"
                       :class="[
                         'h-5 w-5',
-                        typeIcons[getTicketTypeByService(ticket.id_ticket)]
-                          .color,
+                        getServiceStyle(ticket.service_name).color,
                       ]"
                     />
                   </div>
@@ -160,6 +156,13 @@
               </div>
               <div class="p-4 space-y-3">
                 <div
+                  v-if="recentActivity.length === 0"
+                  class="flex flex-col items-center justify-center py-8 text-slate-400"
+                >
+                  <Clock class="h-8 w-8 mb-2 opacity-40" />
+                  <p class="text-sm">Sin actividad reciente</p>
+                </div>
+                <div
                   v-for="activity in recentActivity"
                   :key="activity.id"
                   class="flex gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors"
@@ -175,11 +178,17 @@
                         activity.user
                       }}</span>
                       <span class="text-slate-600">
-                        {{ activity.action }}
+                        &nbsp;{{ activity.action }}&nbsp;
                       </span>
                       <span class="font-semibold text-[#50bdeb]">{{
                         activity.ticket
                       }}</span>
+                    </p>
+                    <p
+                      v-if="activity.note_preview"
+                      class="text-xs text-slate-500 mt-0.5 line-clamp-1 italic"
+                    >
+                      "{{ activity.note_preview }}"
                     </p>
                     <div class="flex items-center gap-2 mt-1.5">
                       <Clock class="h-3 w-3 text-slate-400" />
@@ -208,13 +217,20 @@ import {
   LayoutDashboard,
 } from "lucide-vue-next";
 import type { TicketShort } from "../models";
+import type { DashboardStatsData } from "../models/Metricas";
+import type { RecentActivityItem } from "../models/Notes";
 import { SessionStorageService } from "../services/SessionStorageService";
 import type { UserInfo } from "../models/login";
 import { TicketsService } from "../services/ticketsService";
+import { NotesService } from "../services/notesService";
 import { useNotification } from "../utils/useNotification";
+import { timeAgo } from "../utils/Date";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const notification = useNotification();
 const TicketService = new TicketsService();
+const notesService = new NotesService();
 const SessionStorageServiceInstance = new SessionStorageService();
 const CurrentUserInfo: UserInfo =
   SessionStorageServiceInstance.getUserInfo() || {
@@ -225,6 +241,38 @@ const CurrentUserInfo: UserInfo =
     document: 0,
   };
 const Tickets = ref<TicketShort[]>([]);
+const recentActivityRaw = ref<RecentActivityItem[]>([]);
+const statsData = ref<DashboardStatsData>({
+  assigned: 0,
+  in_progress: 0,
+  completed_this_month: 0,
+  overdue: 0,
+  completed_vs_last_month: 0,
+});
+
+const loadRecentActivity = async () => {
+  if (CurrentUserInfo.username === "") return;
+  try {
+    const response = await notesService.getRecentActivity(5);
+    if (response.data?.data) {
+      recentActivityRaw.value = response.data.data;
+    }
+  } catch {
+    notification.error("Error", "No se pudo cargar la actividad reciente");
+  }
+};
+
+const loadDashboardStats = async () => {
+  if (CurrentUserInfo.username === "") return;
+  try {
+    const response = await TicketService.getDashboardStats();
+    if (response.data?.data) {
+      statsData.value = response.data.data;
+    }
+  } catch {
+    notification.error("Error", "No se pudieron cargar las estadísticas");
+  }
+};
 
 const loadTickets = async () => {
   if (CurrentUserInfo.username === "") {
@@ -242,92 +290,92 @@ const loadTickets = async () => {
   }
 };
 
-const stats = [
-  {
-    title: "Tickets Asignados",
-    value: "15",
-    change: "tickets activos",
-    trend: "Total",
-    trendColor: "text-blue-600",
-    badge: "Tuyos",
-    badgeColor: "bg-blue-100 text-blue-700",
-    icon: LayoutGrid,
-    bgColor: "bg-blue-50",
-    iconColor: "text-[#50bdeb]",
-    barColor: "bg-gradient-to-r from-[#021C7D] to-[#50bdeb]",
-  },
-  {
-    title: "En Progreso",
-    value: "8",
-    change: "tickets trabajando",
-    trend: "Activo",
-    trendColor: "text-amber-600",
-    badge: "Trabajando",
-    badgeColor: "bg-amber-100 text-amber-700",
-    icon: Clock,
-    bgColor: "bg-amber-50",
-    iconColor: "text-amber-500",
-    barColor: "bg-gradient-to-r from-amber-400 to-amber-600",
-  },
-  {
-    title: "Completados",
-    value: "23",
-    change: "este mes",
-    trend: "+5",
-    trendColor: "text-green-600",
-    badge: "Éxito",
-    badgeColor: "bg-green-100 text-green-700",
-    icon: CheckCircle,
-    bgColor: "bg-green-50",
-    iconColor: "text-green-500",
-    barColor: "bg-gradient-to-r from-green-400 to-green-600",
-  },
-  {
-    title: "Vencidos",
-    value: "2",
-    change: "no cerrados a tiempo",
-    trend: "Atención",
-    trendColor: "text-red-600",
-    badge: "No completados",
-    badgeColor: "bg-red-100 text-red-700",
-    icon: AlertCircle,
-    bgColor: "bg-red-50",
-    iconColor: "text-red-500",
-    barColor: "bg-gradient-to-r from-red-400 to-red-600",
-  },
-];
+const stats = computed(() => {
+  const delta = statsData.value.completed_vs_last_month;
+  const deltaLabel = delta > 0 ? `+${delta}` : delta < 0 ? `${delta}` : "";
+  const deltaColor =
+    delta > 0
+      ? "text-green-600"
+      : delta < 0
+        ? "text-red-600"
+        : "text-slate-500";
+  return [
+    {
+      title: "Tickets Asignados",
+      value: statsData.value.assigned,
+      change: "tickets activos",
+      trend: "Total",
+      trendColor: "text-blue-600",
+      badge: "Tuyos",
+      badgeColor: "bg-blue-100 text-blue-700",
+      icon: LayoutGrid,
+      bgColor: "bg-blue-50",
+      iconColor: "text-[#50bdeb]",
+      barColor: "bg-gradient-to-r from-[#021C7D] to-[#50bdeb]",
+    },
+    {
+      title: "En Progreso",
+      value: statsData.value.in_progress,
+      change: "tickets trabajando",
+      trend: "Activo",
+      trendColor: "text-amber-600",
+      badge: "Trabajando",
+      badgeColor: "bg-amber-100 text-amber-700",
+      icon: Clock,
+      bgColor: "bg-amber-50",
+      iconColor: "text-amber-500",
+      barColor: "bg-gradient-to-r from-amber-400 to-amber-600",
+    },
+    {
+      title: "Completados",
+      value: statsData.value.completed_this_month,
+      change: "este mes",
+      trend: deltaLabel,
+      trendColor: deltaColor,
+      badge: "Éxito",
+      badgeColor: "bg-green-100 text-green-700",
+      icon: CheckCircle,
+      bgColor: "bg-green-50",
+      iconColor: "text-green-500",
+      barColor: "bg-gradient-to-r from-green-400 to-green-600",
+    },
+    {
+      title: "Vencidos",
+      value: statsData.value.overdue,
+      change: "no cerrados a tiempo",
+      trend: statsData.value.overdue > 0 ? "Atención" : "Al día",
+      trendColor:
+        statsData.value.overdue > 0 ? "text-red-600" : "text-green-600",
+      badge: "No completados",
+      badgeColor: "bg-red-100 text-red-700",
+      icon: AlertCircle,
+      bgColor: "bg-red-50",
+      iconColor: "text-red-500",
+      barColor: "bg-gradient-to-r from-red-400 to-red-600",
+    },
+  ];
+});
 
 const myTickets = computed(() =>
   Tickets.value.filter((t) => t.assigned_to).slice(0, 5),
 );
 
-// Activity data using EUser references
-const recentActivity = [
-  {
-    id: 1,
-    user: "Juan Pérez ",
-    userInitials: "JP",
-    action: "completó el ticket ",
-    ticket: "104",
-    time: "Hace 5 minutos",
-  },
-  {
-    id: 2,
-    user: "María García ",
-    userInitials: "MG",
-    action: "creó un nuevo ticket ",
-    ticket: "105",
-    time: "Hace 1 hora",
-  },
-  {
-    id: 3,
-    user: "Carlos López ",
-    userInitials: "CL",
+const recentActivity = computed(() =>
+  recentActivityRaw.value.map((item) => ({
+    id: item.id_note,
+    user: item.full_name,
+    userInitials: item.full_name
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((n) => n[0].toUpperCase())
+      .join(""),
     action: "comentó en ",
-    ticket: "102",
-    time: "Hace 2 horas",
-  },
-];
+    ticket: item.ticket_title,
+    note_preview: item.note_preview,
+    time: timeAgo(item.create_at),
+  })),
+);
 
 const priorityConfig = {
   Baja: { color: "bg-gray-100 text-gray-700", label: "Baja" },
@@ -336,29 +384,51 @@ const priorityConfig = {
   Urgente: { color: "bg-red-100 text-red-700", label: "Urgente" },
 };
 
-const typeIcons = {
-  bug: { icon: AlertCircle, color: "text-red-500", bgColor: "bg-red-50" },
-  feature: { icon: Zap, color: "text-[#50bdeb]", bgColor: "bg-blue-50" },
-  task: { icon: CheckCircle, color: "text-green-500", bgColor: "bg-green-50" },
-  improvement: {
-    icon: Wrench,
-    color: "text-amber-500",
-    bgColor: "bg-amber-50",
-  },
+const serviceStylePalette = [
+  { icon: Zap, color: "text-[#50bdeb]", bgColor: "bg-blue-50" },
+  { icon: CheckCircle, color: "text-green-500", bgColor: "bg-green-50" },
+  { icon: Wrench, color: "text-amber-500", bgColor: "bg-amber-50" },
+  { icon: AlertCircle, color: "text-red-500", bgColor: "bg-red-50" },
+];
+
+const getServiceStyle = (serviceName: string) => {
+  if (!serviceName) return serviceStylePalette[0];
+  const name = serviceName.toLowerCase();
+  if (
+    name.includes("bug") ||
+    name.includes("error") ||
+    name.includes("incidente") ||
+    name.includes("fallo")
+  )
+    return serviceStylePalette[3];
+  if (
+    name.includes("nuevo") ||
+    name.includes("nueva") ||
+    name.includes("funcionalidad") ||
+    name.includes("desarrollo")
+  )
+    return serviceStylePalette[0];
+  if (
+    name.includes("mejora") ||
+    name.includes("optimiz") ||
+    name.includes("mantenimiento") ||
+    name.includes("soporte")
+  )
+    return serviceStylePalette[2];
+  const hash = Array.from(serviceName).reduce(
+    (acc, c) => (acc * 31 + c.charCodeAt(0)) % serviceStylePalette.length,
+    0,
+  );
+  return serviceStylePalette[Math.abs(hash)];
 };
 
-// Helper to get ticket type icon (since it's not in DB model, use service as proxy)
-const getTicketTypeByService = (serviceId: number) => {
-  const typeMap: Record<number, keyof typeof typeIcons> = {
-    1: "feature",
-    2: "improvement",
-    3: "bug",
-  };
-  return typeMap[serviceId] || "task";
-};
+function goToBoard() {
+  router.push("/board");
+}
 
 onMounted(() => {
   loadTickets();
+  loadDashboardStats();
+  loadRecentActivity();
 });
-
 </script>

@@ -324,7 +324,6 @@
                   'grid grid-cols-12 gap-4 px-4 py-3 items-center hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-100',
                   index === sortedTickets.length - 1 ? 'border-b-0' : '',
                 ]"
-                @click="openTicket(ticket.id_ticket)"
               >
                 <div class="col-span-1">
                   <span class="font-mono text-xs font-semibold text-[#50bdeb]">
@@ -460,7 +459,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from "vue";
-import { useRouter } from "vue-router";
 import TicketCard from "../components/TicketCard.vue";
 import CreateTicketModal from "../components/CreateTicketModal.vue";
 import ExportToExcel from "../components/ExportToExcel.vue";
@@ -488,7 +486,6 @@ import { RequestTypeService } from "../services/RequestTypeService";
 import { TicketPriorityService } from "../services/ticketPriorityService";
 import { useNotification } from "../utils/useNotification";
 
-const router = useRouter();
 const ticketsService = new TicketsService();
 const requestTypeService = new RequestTypeService();
 const priorityService = new TicketPriorityService();
@@ -713,10 +710,6 @@ const clearFilters = () => {
   filterPriority.value = "";
   filterService.value = "";
   searchQuery.value = "";
-};
-
-const openTicket = (ticketId: number) => {
-  router.push(`/ticket/${ticketId}`);
 };
 
 const getPriorityClass = (priorityName: string) => {

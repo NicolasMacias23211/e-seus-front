@@ -7,6 +7,26 @@ export function parseBackendDate(dateStr: string): string {
   return `${datePart} ${time}`;
 }
 
+export function timeAgo(dateStr: string): string {
+  const diff = Math.floor(
+    (Date.now() - new Date(dateStr).getTime()) / 1000,
+  );
+  if (diff < 60) return "Ahora mismo";
+  if (diff < 3600) {
+    const m = Math.floor(diff / 60);
+    return m === 1 ? "Hace 1 minuto" : `Hace ${m} minutos`;
+  }
+  if (diff < 86400) {
+    const h = Math.floor(diff / 3600);
+    return h === 1 ? "Hace 1 hora" : `Hace ${h} horas`;
+  }
+  const d = Math.floor(diff / 86400);
+  if (d === 1) return "Ayer";
+  if (d < 7) return `Hace ${d} días`;
+  const w = Math.floor(d / 7);
+  return w === 1 ? "Hace 1 semana" : `Hace ${w} semanas`;
+}
+
 export function formatDateISOS(date: Date): string {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')

@@ -46,3 +46,21 @@ export interface WeeklyStats {
   success: boolean;
   data: WeeklyStatsData;
 }
+
+export interface DashboardStatsData {
+  /** Total de tickets asignados al usuario (todos los estados activos) */
+  assigned: number;
+  /** Tickets en estado "En Progreso" asignados al usuario */
+  in_progress: number;
+  /** Tickets cerrados/completados por el usuario en el mes actual */
+  completed_this_month: number;
+  /** Tickets que superaron su fecha estimada de cierre sin haber sido cerrados */
+  overdue: number;
+  /** Variación de completados vs mes anterior (puede ser positivo o negativo) */
+  completed_vs_last_month: number;
+}
+
+export interface DashboardStats {
+  success: boolean;
+  data: DashboardStatsData;
+}
