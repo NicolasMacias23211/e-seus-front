@@ -58,7 +58,6 @@ export class TicketsService {
       throw new Error("Usuario no autenticado");
     }
 
-    // Construir query params
     const queryParams = new URLSearchParams();
     queryParams.append("assigned_to", networkUser);
 

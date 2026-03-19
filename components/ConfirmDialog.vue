@@ -195,7 +195,6 @@ const handleCancel = () => {
 </script>
 
 <style scoped>
-/* Animaciones de transición */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;

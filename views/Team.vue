@@ -205,7 +205,7 @@ const filteredMembers = computed(() => {
 const totalMembers = computed(() => teamMembers.value.length);
 
 const getMemberCountByRole = (roleName: string) => {
-  return teamMembers.value.filter((m) => m.rol_name === roleName).length;
+  return teamMembers.value.filter((m) => m. rol_name === roleName).length;
 };
 
 const getRoleIcon = (role: string) => {

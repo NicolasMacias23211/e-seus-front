@@ -400,7 +400,7 @@
 
           <div v-else class="max-w-5xl mx-auto space-y-3">
             <TicketCard
-              v-for="ticket in sortedTickets"
+              v-for="ticket in sortedTicketsAsShort"
               :key="ticket.id_ticket"
               :ticket="ticket"
             />
@@ -477,10 +477,9 @@ import {
   FileSpreadsheet,
   FileText,
 } from "lucide-vue-next";
-import type { Ticket } from "../models/Ticket";
+import type { Ticket, TicketShort, TicketCreate } from "../models/Ticket";
 import type { Service } from "../models/Service";
 import type { TicketPriority } from "../models/TicketPriority";
-import type { TicketCreate } from "../models/Ticket";
 import { TicketsService } from "../services/ticketsService";
 import { RequestTypeService } from "../services/RequestTypeService";
 import { TicketPriorityService } from "../services/ticketPriorityService";
@@ -763,6 +762,27 @@ const exportData = computed(() => {
     tiempo_reportado: getTotalReportedTime(ticket),
   }));
 });
+
+const sortedTicketsAsShort = computed((): TicketShort[] =>
+  sortedTickets.value.map((ticket) => ({
+    id_ticket: ticket.id_ticket,
+    ticket_title: ticket.ticket_title,
+    service_name: ticket.service.service_name,
+    priority_name: ticket.priority.priority_name,
+    status_name: ticket.status.status_name,
+    reporter_user_name: ticket.reporter_user,
+    assigned_to: ticket.assigned_to,
+    create_at: ticket.create_at,
+    estimated_closing_date: ticket.estimated_closing_date,
+    ticket_description: ticket.ticket_description,
+    ticket_attachments: ticket.ticket_attachments,
+    ticket_closing_code: ticket.ticket_closing_code,
+    ticket_ans: ticket.ticket_ans,
+    update_at: ticket.update_at,
+    closing_date: ticket.closing_date,
+    sub_program_name: ticket.sub_program_name,
+  }))
+);
 
 // Manejar creación de ticket
 const handleTicketCreated = async (ticket: TicketCreate) => {

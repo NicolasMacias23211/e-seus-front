@@ -1,5 +1,4 @@
 <template>
-  <!-- Versión compacta -->
   <button
     v-if="compact"
     @click="exportToPDF"
@@ -16,22 +15,16 @@
       isExporting ? "Exportando..." : "Exportar PDF"
     }}</span>
   </button>
-
-  <!-- Versión normal -->
   <button
     v-else
     @click="exportToPDF"
     :disabled="isExporting"
     class="group relative overflow-hidden rounded-xl border-2 border-slate-200 bg-white p-4 transition-all duration-300 hover:border-transparent hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
   >
-    <!-- Fondo degradado en hover -->
     <div
       class="absolute inset-0 bg-gradient-to-br from-red-500 to-red-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
     ></div>
-
-    <!-- Contenido -->
     <div class="relative flex flex-col items-center gap-3">
-      <!-- Icono -->
       <div
         class="w-14 h-14 rounded-xl bg-red-50 flex items-center justify-center transition-all duration-300 group-hover:bg-white/20"
       >
@@ -44,8 +37,6 @@
           class="w-6 h-6 border-2 border-red-600 border-t-transparent rounded-full animate-spin"
         ></div>
       </div>
-
-      <!-- Texto -->
       <div class="text-center">
         <div
           class="font-bold text-slate-800 group-hover:text-white transition-colors duration-300"
@@ -58,8 +49,6 @@
           Exportar gráficas a PDF
         </div>
       </div>
-
-      <!-- Indicador de descarga -->
       <div
         class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       >
@@ -95,15 +84,12 @@ const createChartImage = async (
   color: string,
 ): Promise<string> => {
   return new Promise((resolve) => {
-    // Crear un contenedor temporal
     const container = document.createElement("div");
     container.style.width = "400px";
     container.style.height = "300px";
     container.style.position = "absolute";
     container.style.left = "-9999px";
     document.body.appendChild(container);
-
-    // Inicializar el chart
     const chart = echarts.init(container);
 
     const remaining = 100 - value;
@@ -175,7 +161,6 @@ const createChartImage = async (
 
     chart.setOption(option);
 
-    // Esperar a que el chart se renderice y obtener la imagen
     setTimeout(() => {
       const imageUrl = chart.getDataURL({
         type: "png",
@@ -210,7 +195,6 @@ const exportToPDF = async () => {
   try {
     isExporting.value = true;
 
-    // Crear las imágenes de las gráficas
     const cumplimientoImage = await createChartImage(
       props.cumplimientoValue,
       "Cumplimiento",
@@ -223,7 +207,6 @@ const exportToPDF = async () => {
       "#50bdeb",
     );
 
-    // Crear el PDF
     const doc = new jsPDF({
       orientation: "portrait",
       unit: "mm",
@@ -233,22 +216,18 @@ const exportToPDF = async () => {
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
 
-    // Header con gradiente simulado
     doc.setFillColor(2, 28, 125); // #021C7D
     doc.rect(0, 0, pageWidth, 40, "F");
 
-    // Título del documento
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
     doc.setFont("helvetica", "bold");
     doc.text("Reporte de Métricas", pageWidth / 2, 20, { align: "center" });
 
-    // Subtítulo
     doc.setFontSize(12);
     doc.setFont("helvetica", "normal");
     doc.text("Análisis de Rendimiento", pageWidth / 2, 30, { align: "center" });
 
-    // Información del usuario
     doc.setFillColor(240, 242, 245);
     doc.roundedRect(15, 50, pageWidth - 30, 30, 3, 3, "F");
 
@@ -263,7 +242,6 @@ const exportToPDF = async () => {
     doc.text(`Nombre: ${props.userName}`, 20, 68);
     doc.text(`Rol: ${props.userRole}`, 20, 75);
 
-    // Fecha de generación
     const currentDate = new Date().toLocaleDateString("es-ES", {
       year: "numeric",
       month: "long",
@@ -275,13 +253,11 @@ const exportToPDF = async () => {
       align: "right",
     });
 
-    // Título de sección
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(2, 28, 125);
     doc.text("Métricas de Rendimiento", 20, 95);
 
-    // Gráfica de Cumplimiento
     const chartWidth = 80;
     const chartHeight = 60;
     const chart1X = pageWidth / 4 - chartWidth / 2;
@@ -296,7 +272,6 @@ const exportToPDF = async () => {
       chartHeight,
     );
 
-    // Borde decorativo para gráfica de cumplimiento
     doc.setDrawColor(2, 28, 125);
     doc.setLineWidth(0.5);
     doc.roundedRect(
@@ -308,7 +283,6 @@ const exportToPDF = async () => {
       3,
     );
 
-    // Gráfica de Ocupación
     const chart2X = (3 * pageWidth) / 4 - chartWidth / 2;
 
     doc.addImage(
@@ -320,7 +294,6 @@ const exportToPDF = async () => {
       chartHeight,
     );
 
-    // Borde decorativo para gráfica de ocupación
     doc.setDrawColor(80, 189, 235);
     doc.roundedRect(
       chart2X - 5,
@@ -331,7 +304,6 @@ const exportToPDF = async () => {
       3,
     );
 
-    // Resumen estadístico
     doc.setFillColor(240, 242, 245);
     doc.roundedRect(15, 180, pageWidth - 30, 60, 3, 3, "F");
 
@@ -344,13 +316,11 @@ const exportToPDF = async () => {
     doc.setFont("helvetica", "normal");
     doc.setTextColor(71, 85, 105);
 
-    // Cumplimiento
     doc.text("• Cumplimiento:", 25, 200);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(2, 28, 125);
     doc.text(`${props.cumplimientoValue}%`, 65, 200);
 
-    // Ocupación
     doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(71, 85, 105);
@@ -372,12 +342,10 @@ const exportToPDF = async () => {
       { align: "center" },
     );
 
-    // Línea decorativa en el footer
     doc.setDrawColor(80, 189, 235);
     doc.setLineWidth(1);
     doc.line(20, pageHeight - 15, pageWidth - 20, pageHeight - 15);
 
-    // Guardar el PDF
     const fileName = `Metricas_${props.userName.replace(/\s+/g, "_")}_${
       new Date().toISOString().split("T")[0]
     }.pdf`;

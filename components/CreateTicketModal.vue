@@ -852,7 +852,7 @@ const loadData = async () => {
     }
 
     if (statusRes.success && statusRes.data?.results) {
-      statusList.value = statusRes.data.results;
+      statusList.value = statusRes.data.results.flat();
     }
   } catch (error) {
     console.error("Error al cargar los datos:", error);
@@ -922,12 +922,6 @@ const selectProgram = (program: { name: string; clientName: string }) => {
   subProgramSearch.value = "";
 };
 
-const handleProgramFocus = () => {
-  if (!form.clientName) return;
-  showProgramDropdown.value = true;
-  filterPrograms();
-};
-
 const hideProgramDropdown = () => {
   setTimeout(() => {
     showProgramDropdown.value = false;
@@ -964,12 +958,6 @@ const selectSubProgram = (subprogram: {
   form.subProgramName = subprogram.name;
   subProgramSearch.value = subprogram.name;
   showSubProgramDropdown.value = false;
-};
-
-const handleSubProgramFocus = () => {
-  if (!form.programName) return;
-  showSubProgramDropdown.value = true;
-  filterSubPrograms();
 };
 
 const hideSubProgramDropdown = () => {

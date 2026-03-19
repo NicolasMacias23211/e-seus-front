@@ -1973,12 +1973,10 @@ const confirmAction = async () => {
         return;
       }
 
-      // Preparar los datos para la actualización del ticket denegado
       const updateData: TicketUpdate = {
         closing_date: new Date().toISOString(),
       };
 
-      // Actualizar el ticket con la fecha de cierre
       await TicketService.updateTicket(
         draggedTicket.value.id_ticket,
         updateData,
@@ -2063,11 +2061,9 @@ const confirmAction = async () => {
         return;
       }
 
-      // Preparar los datos para la actualización del ticket completado
       const currentDate = new Date().toISOString();
       let cumplimiento = false;
 
-      // Calcular cumplimiento: si hay fecha estimada y la actual es menor o igual
       if (editedTicket.value.estimated_closing_date) {
         const estimatedDate = new Date(
           editedTicket.value.estimated_closing_date,
@@ -2081,7 +2077,6 @@ const confirmAction = async () => {
         cumplimiento: cumplimiento,
       };
 
-      // Actualizar el ticket con la fecha de cierre y cumplimiento
       await TicketService.updateTicket(
         draggedTicket.value.id_ticket,
         updateData,

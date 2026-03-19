@@ -216,22 +216,20 @@
 import {
   AlertCircle,
   BookmarkX,
-  Download,
   List,
-  Plus,
   Search,
-  RefreshCw
 } from "lucide-vue-next";
-import { ref, reactive, onMounted } from "vue";
+import { ref,onMounted } from "vue";
 import { TicketsService } from "../services/ticketsService";
 import { AnsService } from "../services/ansService";
 import type { TicketList } from "../models/Ticket";
 import type { ANS } from "../models/ANS";
 import type { EUser } from "../models/EUser";
-import Pagination, { PaginationState } from "../components/Pagination.vue";
+import type { PaginationState } from "../components/Pagination.vue";
+import Pagination from "../components/Pagination.vue";
 import { parseBackendDate, formatDateISOS } from "../utils/Date";
 import { eUsersService } from "../services/e-usersService";
-import { TicketUpdate } from '../models/Ticket';
+import type { TicketUpdate } from '../models/Ticket';
 import { useNotification } from "../utils/useNotification";
 
 interface loadDataParams {
@@ -351,7 +349,7 @@ const loadAllTickets = async () => {
   }
 };
 
-const loadData = async (pagination?: PaginationState, loadDataParams?: loadDataParams, event?: Event) => {
+const loadData = async (pagination?: PaginationState, loadDataParams?: loadDataParams) => {
   try {
     const page = pagination?.currentPage ?? 1;
     const perPage = pagination?.perPage ?? 10;
@@ -440,13 +438,13 @@ function setTicketInformationValidate(ticket: TicketList) {
   })
   let time_elapsed = calculateTimeInElapsed(ticket);
   if (ticket.ans && ticket.ans !== "programado") {
-    ticket.isCritical = isCriticalTime(parseInt(ticket.ans), time_elapsed[0], time_elapsed[1]);
+    ticket.isCritical = isCriticalTime(parseInt(ticket.ans), time_elapsed[0] || 0, time_elapsed[1] || 0);
   }
-  if (ticket.ans === "Programado" && time_elapsed[0] > 5) {
+  if (ticket.ans === "Programado" && (time_elapsed[0] || 0) > 5) {
     ticket.isCritical = true;
   }
-  ticket.hour_elapsed = time_elapsed[0];
-  ticket.minute_elapsed = time_elapsed[1];
+  ticket.hour_elapsed = time_elapsed[0] || 0;
+  ticket.minute_elapsed = time_elapsed[1] || 0;
   ticket.isExpired = isExpiredTime(ticket);
 }
 

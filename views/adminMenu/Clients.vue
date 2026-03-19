@@ -45,7 +45,7 @@
               class="hover:bg-blue-50 transition-colors"
             >
               <td class="px-6 py-4 text-sm text-slate-700 font-medium">
-                {{ client.clientName }}
+                {{ client.client_name }}
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center justify-center gap-2">
@@ -136,7 +136,7 @@
       :is-visible="showConfirmDialog"
       type="delete"
       title="Confirmar Eliminación"
-      :message="`¿Está seguro de que desea eliminar el cliente '${clientToDelete?.clientName}'?`"
+      :message="`¿Está seguro de que desea eliminar el cliente '${clientToDelete?.client_name}'?`"
       details="Esta acción eliminará permanentemente el cliente del sistema. Todos los programas y sub-programas asociados también podrían verse afectados."
       confirm-text="Sí, Eliminar"
       cancel-text="Cancelar"
@@ -156,9 +156,9 @@ import ConfirmDialog from "../../components/ConfirmDialog.vue";
 const notification = useNotification();
 
 const clients = ref<Client[]>([
-  { clientName: "Cliente A - Empresa Tech" },
-  { clientName: "Cliente B - Corporación Global" },
-  { clientName: "Cliente C - Soluciones SA" },
+  { client_name: "Cliente A - Empresa Tech" },
+  { client_name: "Cliente B - Corporación Global" },
+  { client_name: "Cliente C - Soluciones SA" },
 ]);
 
 const showModal = ref(false);
@@ -181,9 +181,9 @@ const openCreateModal = () => {
 const openEditModal = (client: Client) => {
   isEditing.value = true;
   editingIndex.value = clients.value.findIndex(
-    (c) => c.clientName === client.clientName
+    (c) => c.client_name === client.client_name
   );
-  form.clientName = client.clientName;
+  form.clientName = client.client_name;
   showModal.value = true;
 };
 
@@ -196,13 +196,13 @@ const closeModal = () => {
 
 const handleSubmit = () => {
   if (isEditing.value) {
-    clients.value[editingIndex.value] = { clientName: form.clientName };
+    clients.value[editingIndex.value] = { client_name: form.clientName };
     notification.success(
       "¡Actualizado!",
       "El cliente ha sido actualizado correctamente"
     );
   } else {
-    clients.value.push({ clientName: form.clientName });
+    clients.value.push({ client_name: form.clientName });
     notification.success("¡Creado!", "El cliente ha sido creado correctamente");
   }
   closeModal();
@@ -216,7 +216,7 @@ const confirmDelete = (client: Client) => {
 const handleDeleteConfirm = () => {
   if (clientToDelete.value) {
     const index = clients.value.findIndex(
-      (c) => c.clientName === clientToDelete.value!.clientName
+      (c) => c.client_name === clientToDelete.value!.client_name
     );
     clients.value.splice(index, 1);
     notification.success(

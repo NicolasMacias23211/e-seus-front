@@ -2,7 +2,7 @@ export function parseBackendDate(dateStr: string): string {
   // 1. Separar fecha y hora
   const [datePart, timePart] = dateStr.split('T');
   // 2. Limpiar la hora (quitar milisegundos y Z)
-  const time = timePart.split('.')[0].replace('Z', '');
+  const time = (timePart ?? '').split('.')[0]?.replace('Z', '') ?? '';
 
   return `${datePart} ${time}`;
 }

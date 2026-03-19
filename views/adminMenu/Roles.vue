@@ -163,7 +163,6 @@ import { RolesService } from "../../services/rolesService";
 const notification = useNotification();
 const rolesService = new RolesService();
 
-// primero se crea el array basico para luego llenarlo con el ref para que se dinamico
 const roles = ref<Role[]>([]);
 
 const showModal = ref(false);
@@ -203,6 +202,7 @@ const handleSubmit = () => {
     roles.value[editingIndex.value] = {
       rol_name: form.rolName,
       description: form.description,
+      icon : ""
     };
     notification.success(
       "¡Actualizado!",
@@ -212,6 +212,7 @@ const handleSubmit = () => {
     roles.value.push({
       rol_name: form.rolName,
       description: form.description,
+      icon : ""
     });
     notification.success("¡Creado!", "El rol ha sido creado correctamente");
   }

@@ -7,7 +7,6 @@
     <div
       class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto"
     >
-      <!-- Header -->
       <div
         class="flex items-center justify-between p-6 border-b-2 border-slate-100 bg-gradient-to-r from-[#021C7D] to-[#50bdeb]"
       >
@@ -31,10 +30,7 @@
           <X class="w-5 h-5 text-white" />
         </button>
       </div>
-
-      <!-- Body -->
       <div class="p-6 space-y-6">
-        <!-- Fechas -->
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-2">
@@ -58,8 +54,6 @@
             />
           </div>
         </div>
-
-        <!-- Validación de fechas -->
         <div
           v-if="dateFrom && dateTo && dateTo < dateFrom"
           class="flex items-center gap-2 p-3 bg-red-50 border-2 border-red-200 rounded-xl"
@@ -69,8 +63,6 @@
             La fecha "Hasta" debe ser posterior a la fecha "Desde"
           </span>
         </div>
-
-        <!-- Cliente Selector -->
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-2">
             Cliente (Opcional)
@@ -92,8 +84,6 @@
                 class="w-5 h-5 border-2 border-[#50bdeb] border-t-transparent rounded-full animate-spin"
               ></div>
             </div>
-
-            <!-- Dropdown clientes -->
             <div
               v-if="showClientDropdown && filteredClients.length > 0"
               class="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto z-10"
@@ -110,8 +100,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Cliente seleccionado -->
           <div
             v-if="selectedClient"
             class="mt-3 flex items-center justify-between p-3 bg-blue-50 border-2 border-blue-200 rounded-xl"
@@ -130,8 +118,6 @@
             </button>
           </div>
         </div>
-
-        <!-- Tipos de Servicio Selector -->
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-2">
             Tipo de Servicio (Opcional)
@@ -153,8 +139,6 @@
                 class="w-5 h-5 border-2 border-[#50bdeb] border-t-transparent rounded-full animate-spin"
               ></div>
             </div>
-
-            <!-- Dropdown servicios -->
             <div
               v-if="showServiceDropdown && filteredServices.length > 0"
               class="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto z-10"
@@ -177,8 +161,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Servicio seleccionado -->
           <div
             v-if="selectedService"
             class="mt-3 flex items-center justify-between p-3 bg-green-50 border-2 border-green-200 rounded-xl"
@@ -205,8 +187,6 @@
             </button>
           </div>
         </div>
-
-        <!-- E-User Selector -->
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-2">
             E-User por Nombre (Opcional)
@@ -228,8 +208,6 @@
                 class="w-5 h-5 border-2 border-[#50bdeb] border-t-transparent rounded-full animate-spin"
               ></div>
             </div>
-
-            <!-- Dropdown usuarios -->
             <div
               v-if="showUserDropdown && filteredUsers.length > 0"
               class="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto z-10"
@@ -249,8 +227,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Usuario seleccionado -->
           <div
             v-if="selectedUser"
             class="mt-3 flex items-center justify-between p-3 bg-purple-50 border-2 border-purple-200 rounded-xl"
@@ -281,8 +257,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Footer -->
       <div
         class="flex items-center justify-end gap-3 p-6 border-t-2 border-slate-100 bg-slate-50"
       >
@@ -329,14 +303,12 @@ import { type EUser } from "../models/EUser";
 import { type Client } from "../models/Client";
 import { type Service } from "../models/Service";
 
-// Props
 interface Props {
   isOpen: boolean;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
-// Emits
 const emit = defineEmits<{
   close: [];
   export: [params: GeneralExportParams];
@@ -350,37 +322,31 @@ export interface GeneralExportParams {
   eUser?: EUser;
 }
 
-// Services
 const eUserService = new eUsersService();
 const clientService = new ClientsService();
 const serviceTypeService = new RequestTypeService();
 
-// Estado - Fechas
 const dateFrom = ref("");
 const dateTo = ref("");
 
-// Estado - Clientes
 const clientSearchQuery = ref("");
 const selectedClient = ref<Client | null>(null);
 const allClients = ref<Client[]>([]);
 const isLoadingClients = ref(false);
 const showClientDropdown = ref(false);
 
-// Estado - Servicios
 const serviceSearchQuery = ref("");
 const selectedService = ref<Service | null>(null);
 const allServices = ref<Service[]>([]);
 const isLoadingServices = ref(false);
 const showServiceDropdown = ref(false);
 
-// Estado - Usuarios
 const userSearchQuery = ref("");
 const selectedUser = ref<EUser | null>(null);
 const allUsers = ref<EUser[]>([]);
 const isLoadingUsers = ref(false);
 const showUserDropdown = ref(false);
 
-// Computed
 const filteredClients = computed(() => {
   if (!clientSearchQuery.value) return allClients.value.slice(0, 10);
 
@@ -428,7 +394,6 @@ const isFormValid = computed(() => {
   return true;
 });
 
-// Métodos - Clientes
 const loadClients = async () => {
   isLoadingClients.value = true;
   try {
@@ -458,7 +423,6 @@ const clearClient = () => {
   clientSearchQuery.value = "";
 };
 
-// Métodos - Servicios
 const loadServices = async () => {
   isLoadingServices.value = true;
   try {
@@ -488,7 +452,6 @@ const clearService = () => {
   serviceSearchQuery.value = "";
 };
 
-// Métodos - Usuarios
 const loadUsers = async () => {
   isLoadingUsers.value = true;
   try {
@@ -534,7 +497,6 @@ const getInitials = (user: EUser): string => {
   return (name + lastName).toUpperCase();
 };
 
-// Métodos - Modal
 const closeModal = () => {
   emit("close");
   resetForm();
@@ -569,7 +531,6 @@ const resetForm = () => {
   showUserDropdown.value = false;
 };
 
-// Cerrar dropdowns al hacer click fuera
 const handleClickOutside = (event: MouseEvent) => {
   const target = event.target as HTMLElement;
   if (!target.closest(".relative")) {

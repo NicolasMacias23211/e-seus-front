@@ -225,7 +225,7 @@ const exportToPDF = async () => {
         return acc;
       }, {} as any),
       margin: { top: 10, right: 14, bottom: 10, left: 14 },
-      didDrawPage: (data) => {
+      didDrawPage: () => {
         const pageCount = doc.getNumberOfPages();
         const pageNumber = (doc as any).internal.getCurrentPageInfo()
           .pageNumber;

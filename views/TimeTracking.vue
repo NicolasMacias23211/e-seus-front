@@ -883,7 +883,10 @@ const handleDrop = (event: DragEvent, date: string | undefined) => {
 const isPastDate = (date: string): boolean => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const [year, month, day] = date.split("-").map(Number);
+  const parts = date.split("-").map(Number);
+  const year = parts[0] ?? 0;
+  const month = parts[1] ?? 1;
+  const day = parts[2] ?? 0;
   const entryDate = new Date(year, month - 1, day);
   entryDate.setHours(0, 0, 0, 0);
 
@@ -918,6 +921,7 @@ const confirmDelete = async () => {
 
   if (index > -1) {
     const entry = timeEntries.value[index];
+    if (!entry) return;
     if (entry.reportedTimeId) {
       try {
         await reportedTimeService.deleteReportedTime(entry.reportedTimeId);
@@ -1247,8 +1251,8 @@ const loadReportedTimes = async () => {
   const days = weekDays.value;
   if (days.length === 0) return;
 
-  const dateAfter = days[0]!.date;
-  const dateBefore = days[days.length - 1]!.date;
+  const dateAfter = days[0]!.date ?? "";
+  const dateBefore = days[days.length - 1]!.date ?? "";
 
   try {
     const response = await reportedTimeService.getReportedTimes(

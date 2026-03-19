@@ -46,10 +46,10 @@
               class="hover:bg-blue-50 transition-colors"
             >
               <td class="px-6 py-4 text-sm text-slate-700 font-medium">
-                {{ subProgram.subProgramName }}
+                {{ subProgram.sub_program_name }}
               </td>
               <td class="px-6 py-4 text-sm text-slate-600">
-                {{ subProgram.programName }}
+                {{ subProgram.program_name }}
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center justify-center gap-2">
@@ -173,9 +173,9 @@ import type { SubProgram } from "../../models/SubProgram";
 const notification = useNotification();
 
 const subPrograms = ref<SubProgram[]>([
-  { subProgramName: "Sub-Programa 1A", programName: "Programa Alpha" },
-  { subProgramName: "Sub-Programa 1B", programName: "Programa Alpha" },
-  { subProgramName: "Sub-Programa 2A", programName: "Programa Beta" },
+  { sub_program_name: "Sub-Programa 1A", program_name: "Programa Alpha", program_name_display : "" },
+  { sub_program_name: "Sub-Programa 1B", program_name: "Programa Alpha" , program_name_display: "" },
+  { sub_program_name: "Sub-Programa 2A", program_name: "Programa Beta", program_name_display: "" },
 ]);
 
 const programs = ref<string[]>([
@@ -203,10 +203,10 @@ const openCreateModal = () => {
 const openEditModal = (subProgram: SubProgram) => {
   isEditing.value = true;
   editingIndex.value = subPrograms.value.findIndex(
-    (sp) => sp.subProgramName === subProgram.subProgramName
+    (sp) => sp.sub_program_name === subProgram.sub_program_name
   );
-  form.subProgramName = subProgram.subProgramName;
-  form.programName = subProgram.programName;
+  form.subProgramName = subProgram.sub_program_name;
+  form.programName = subProgram.program_name;
   showModal.value = true;
 };
 
@@ -221,8 +221,9 @@ const closeModal = () => {
 const handleSubmit = () => {
   if (isEditing.value) {
     subPrograms.value[editingIndex.value] = {
-      subProgramName: form.subProgramName,
-      programName: form.programName,
+      sub_program_name: form.subProgramName,
+      program_name: form.programName,
+      program_name_display: "",
     };
     notification.success(
       "¡Actualizado!",
@@ -230,8 +231,9 @@ const handleSubmit = () => {
     );
   } else {
     subPrograms.value.push({
-      subProgramName: form.subProgramName,
-      programName: form.programName,
+      sub_program_name: form.subProgramName,
+      program_name: form.programName,
+      program_name_display: "",
     });
     notification.success(
       "¡Creado!",
@@ -244,11 +246,11 @@ const handleSubmit = () => {
 const confirmDelete = (subProgram: SubProgram) => {
   if (
     confirm(
-      `¿Está seguro de eliminar el sub-programa "${subProgram.subProgramName}"?`
+      `¿Está seguro de eliminar el sub-programa "${subProgram.sub_program_name}"?`
     )
   ) {
     const index = subPrograms.value.findIndex(
-      (sp) => sp.subProgramName === subProgram.subProgramName
+      (sp) => sp.sub_program_name === subProgram.sub_program_name
     );
     subPrograms.value.splice(index, 1);
     notification.success(
