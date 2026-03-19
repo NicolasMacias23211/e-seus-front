@@ -46,3 +46,16 @@ export interface WeeklyStats {
   success: boolean;
   data: WeeklyStatsData;
 }
+
+export interface DashboardStatsData {
+  assigned: number;
+  in_progress: number;
+  completed_this_month: number;
+  overdue: number;
+  completed_vs_last_month: number;
+}
+
+export interface DashboardStats {
+  success: boolean;
+  data: DashboardStatsData;
+}
