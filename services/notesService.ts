@@ -1,7 +1,6 @@
 import { http, type PaginatedResponse, type ApiResponse } from "./http";
 import type {
   Note,
-  RecentActivityItem,
   RecentActivityResponse,
 } from "../models/Notes";
 import { SessionStorageService } from "./SessionStorageService";
