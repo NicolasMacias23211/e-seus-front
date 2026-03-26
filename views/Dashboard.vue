@@ -96,17 +96,11 @@
                   class="flex items-center gap-4 p-4 rounded-xl border-2 hover:border-[#50bdeb] hover:shadow-md cursor-pointer transition-all duration-200 group"
                 >
                   <div
-                    :class="[
-                      'p-2.5 rounded-lg',
-                      getServiceStyle(ticket.service_name).bgColor,
-                    ]"
+                    :class="getServiceStyle(ticket.service_name)?.bgColor"
                   >
                     <component
-                      :is="getServiceStyle(ticket.service_name).icon"
-                      :class="[
-                        'h-5 w-5',
-                        getServiceStyle(ticket.service_name).color,
-                      ]"
+                      :is="getServiceStyle(ticket.service_name)?.icon"
+                      :class="getServiceStyle(ticket.service_name)?.color"
                     />
                   </div>
                   <div class="flex-1 min-w-0">
@@ -368,7 +362,7 @@ const recentActivity = computed(() =>
       .split(" ")
       .filter(Boolean)
       .slice(0, 2)
-      .map((n) => n[0].toUpperCase())
+      .map((n) => n.charAt(0).toUpperCase())
       .join(""),
     action: "comentó en ",
     ticket: item.ticket_title,
