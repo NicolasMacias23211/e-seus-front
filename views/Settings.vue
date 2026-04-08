@@ -77,6 +77,25 @@
       </router-link>
 
       <router-link
+        to="/settings/status"
+        class="group bg-white rounded-xl border-2 border-slate-200 p-6 hover:border-[#50bdeb] hover:shadow-lg transition-all duration-200"
+      >
+        <div class="flex items-start gap-4">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-red-50 to-red-100 group-hover:from-[#021C7D] group-hover:to-[#50bdeb] transition-all"
+          >
+            <List class="w-6 h-6 text-orange-600 group-hover:text-white" />
+          </div>
+          <div class="flex-1">
+            <h3 class="text-lg font-bold text-[#021C7D] mb-1">Estados</h3>
+            <p class="text-xs text-slate-600">
+              Estados para los tickets
+            </p>
+          </div>
+        </div>
+      </router-link>
+
+      <router-link
         to="/settings/ans"
         class="group bg-white rounded-xl border-2 border-slate-200 p-6 hover:border-[#50bdeb] hover:shadow-lg transition-all duration-200"
       >
@@ -246,6 +265,8 @@ import {
   Settings,
   Shield,
   UserCog,
-  Users
+  Users, 
+  List
 } from "lucide-vue-next";
+
 </script>

@@ -82,6 +82,11 @@ const router = createRouter({
       component: () => import("../../views/adminMenu/ANS.vue"),
     },
     {
+      path: "/settings/status",
+      name: "settings-status",
+      component: () => import("../../views/adminMenu/Status.vue"),
+    },
+    {
       path: "/settings/codigos-cierre",
       name: "settings-closing-codes",
       component: () => import("../../views/adminMenu/ClosingCodes.vue"),
