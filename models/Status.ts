@@ -1,5 +1,12 @@
 export interface Status {
-  id_status?: number;
+  id_status: number;
+  status_name: string;
+  status_description: string;
+  is_backlog: boolean;
+  is_completion: boolean;
+  ordering: number;
+}
+export interface StatusCrud {
   status_name: string;
   status_description: string;
   is_backlog: boolean;

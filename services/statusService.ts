@@ -1,5 +1,5 @@
 import { http, type ApiResponse, type PaginatedResponse } from "./http";
-import type { Status } from "../models/Status";
+import type { Status, StatusCrud } from "../models/Status";
 
 export class StatusService {
   private endpoint = "/status/";
@@ -17,12 +17,12 @@ export class StatusService {
     );
   }
 
-  async create(status: Status): Promise<ApiResponse<Status>> {
-    return await http.post<Status>(this.endpoint, status);
+  async create(status: StatusCrud): Promise<ApiResponse<StatusCrud>> {
+    return await http.post<StatusCrud>(this.endpoint, status);
   }
 
-  async update(status: Status, id: number): Promise<ApiResponse<Status>> {
-    return await http.put<Status>(`${this.endpoint + id}/`, status);
+  async update(status: StatusCrud, id: number): Promise<ApiResponse<StatusCrud>> {
+    return await http.put<StatusCrud>(`${this.endpoint + id}/`, status);
   }
 
   async delete(id: number): Promise<ApiResponse<Status>> {
