@@ -8,8 +8,13 @@ export class StatusService {
     return await http.get<PaginatedResponse<Status[]>>(this.endpoint);
   }
 
-  async getById(id: number): Promise<ApiResponse<Status>> {
-    return await http.get<Status>(`${this.endpoint}${id}/`);
+  async getAllPaginated(
+    page: number,
+    pageSize: number,
+  ): Promise<ApiResponse<PaginatedResponse<Status>>> {
+    return await http.get<PaginatedResponse<Status>>(
+      `${this.endpoint}?page=${page}&page_size=${pageSize}`,
+    );
   }
 
   async create(status: Status): Promise<ApiResponse<Status>> {
@@ -24,3 +29,4 @@ export class StatusService {
     return await http.delete<Status>(this.endpoint + id + "/");
   }
 }
+
