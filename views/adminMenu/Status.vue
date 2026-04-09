@@ -164,7 +164,7 @@ import { ref, reactive, onMounted } from "vue";
 import { List, Plus, Edit2, Trash2 } from "lucide-vue-next";
 import { useNotification } from "../../utils/useNotification";
 import { StatusService } from "../../services/statusService";
-import type { Status } from "../../models/Status";
+import type { Status, StatusCrud } from "../../models/Status";
 import ConfirmDialog from "../../components/ConfirmDialog.vue";
 import type { PaginationState } from "../../components/Pagination.vue";
 import Pagination from "../../components/Pagination.vue";
@@ -253,7 +253,7 @@ const handleSubmit = () => {
 
 const create = async () => {
   try {
-    let dataCreate: Status = ({
+    let dataCreate: StatusCrud = ({
       status_name: form.status_name,
       status_description: form.status_description,
       is_backlog: form.is_backlog,
@@ -284,7 +284,7 @@ const create = async () => {
 
 const update = async () => {
   try {
-    let data: Status = ({
+    let data: StatusCrud = ({
       status_name: form.status_name,
       status_description: form.status_description,
       is_backlog: form.is_backlog,
