@@ -5,18 +5,6 @@ export const env = {
   
   // URL base del API
   apiBaseUrl: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api",
-  eldapApiUrl: import.meta.env.ELDAP_API_URL || "https://ldapnet.emtelco.co/Emtelco/ldapnet/login/",
-
-  EldapAuthToken : "",
-  
-  // Variable de Desarrollo. Eliminar en producción
-  EldapUser: {
-    user: "sjimeher",
-    full_name: "SEBASTIAN CAMILO JIMENEZ HERNANDEZ",
-    position: "ARQUITECTO DE AVA",
-    mail: "sjimeher@emtelco.com.co",
-    document: "1017263043"
-  },
   
   appName: import.meta.env.VITE_APP_NAME || "E-SEUS",
   appVersion: import.meta.env.VITE_APP_VERSION || "1.0.0",
