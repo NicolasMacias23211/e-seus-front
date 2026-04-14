@@ -63,7 +63,7 @@ export class HttpService {
           return false;
         }
 
-        const url = `${this.baseUrl}/api/auth/token/refresh/`;
+        const url = `${this.baseUrl}/auth/token/refresh/`;
         const response = await fetch(url, {
           method: "POST",
           headers: {
@@ -79,7 +79,7 @@ export class HttpService {
         const data = await response.json();
         const newTokens = {
           access: data.access,
-          refresh: refreshToken,
+          refresh: data.refresh
         };
         sessionStorageService.setItem("authTokens", newTokens);
         return true;
