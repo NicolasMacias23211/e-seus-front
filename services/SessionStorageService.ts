@@ -76,16 +76,7 @@ export class SessionStorageService {
     this.removeItem("userInfo");
   }
 
-  public async refreshToken(): Promise<Tokens | null> {
-    const currentRefreshToken = this.getRefreshToken();
-
-    if (!currentRefreshToken) {
-      console.log("No hay token de refresco disponible.");
-      return null;
-    }
-
-    console.log("Refrescando el token de acceso...");
-
+  public async refreshToken(currentRefreshToken: String): Promise<boolean> {
     try {
       const response = await fetch(`${env.apiBaseUrl}/auth/token/refresh/`, {
         method: "POST",
@@ -102,14 +93,13 @@ export class SessionStorageService {
       const data = await response.json();
       const newTokens: Tokens = {
         access: data.access,
-        refresh: currentRefreshToken,
+        refresh: data.refresh,
       };
-
       this.setAuthTokens(newTokens);
-      return newTokens;
+      return true;
     } catch (error) {
       this.handleLogout();
-      return null;
+      return false;
     }
   }
 }

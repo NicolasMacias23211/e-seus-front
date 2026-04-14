@@ -52,39 +52,18 @@ export class HttpService {
       return this.refreshPromise;
     }
 
+    const sessionStorageService = new SessionStorageService();
     this.isRefreshing = true;
     this.refreshPromise = (async () => {
       try {
-        const sessionStorageService = new SessionStorageService();
         const refreshToken = sessionStorageService.getRefreshToken();
 
         if (!refreshToken) {
           sessionStorageService.handleLogout();
           return false;
         }
-
-        const url = `${this.baseUrl}/auth/token/refresh/`;
-        const response = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ refresh: refreshToken }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`Error al refrescar token: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const newTokens = {
-          access: data.access,
-          refresh: data.refresh
-        };
-        sessionStorageService.setItem("authTokens", newTokens);
-        return true;
+        return await sessionStorageService.refreshToken(refreshToken);
       } catch (error) {
-        const sessionStorageService = new SessionStorageService();
         sessionStorageService.handleLogout();
         return false;
       } finally {
