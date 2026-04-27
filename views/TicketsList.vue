@@ -105,8 +105,7 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
-          <tr v-for="ticket in tickets" :key="ticket.id_ticket" 
-            @dblclick.prevent="openModal(ticket)"
+          <tr v-for="ticket in tickets" :key="ticket.id_ticket" @dblclick.prevent="openModal(ticket)"
             class="hover:bg-slate-50 cursor-pointer transition-colors">
             <td class="px-6 py-4">
               <span class="text-[#50bdeb] font-bold text-lg">#{{ ticket.id_ticket }}</span>
@@ -219,7 +218,8 @@ import {
   List,
   Search,
 } from "lucide-vue-next";
-import { ref,onMounted } from "vue";
+import { ref, onMounted } from "vue";
+import { toRaw } from 'vue';
 import { TicketsService } from "../services/ticketsService";
 import { AnsService } from "../services/ansService";
 import type { TicketList } from "../models/Ticket";
@@ -228,9 +228,12 @@ import type { EUser } from "../models/EUser";
 import type { PaginationState } from "../components/Pagination.vue";
 import Pagination from "../components/Pagination.vue";
 import { parseBackendDate, formatDateISOS } from "../utils/Date";
+import { Holidays } from "../utils/holidays";
 import { eUsersService } from "../services/e-usersService";
 import type { TicketUpdate } from '../models/Ticket';
 import { useNotification } from "../utils/useNotification";
+import { WorkingHours } from "../models/WorkingHours";
+import { WorkingHoursService } from "../services/WorkingHoursService";
 
 interface loadDataParams {
   search?: string;
@@ -242,14 +245,21 @@ interface loadDataParams {
 const notification = useNotification();
 const ansService = new AnsService();
 const ticketService = new TicketsService();
+const holidaysServices = new Holidays();
+const workingHoursService = new WorkingHoursService();
+// holidays.calculateTimeInElapsed(new Date());
+
 const updateTicket = ref<TicketUpdate>({
   assigned_to: "",
 });
 const e_UsersService = new eUsersService();
 const tickets = ref<TicketList[]>([]);
 const allTickets = ref<TicketList[]>([]);
+const arrayTickets = ref<TicketList[]>([]);
 const eUsers = ref<EUser[]>([]);
 const eUsersFiltered = ref<EUser[]>([]);
+const workingHours = ref<WorkingHours[]>([]);
+const holidays = ref<string[]>([]);
 const total = ref(0);
 const itemsCount = ref(0);
 const filterAns = ref<ANS[]>([]);
@@ -326,6 +336,132 @@ const selectUser = (user: EUser) => {
   updateTicket.value.assigned_to = user.network_user;
 };
 
+class calculateTimeInElapsed {
+  private dateCurrent = new Date();
+
+  public setTimes(date: Date, initial: boolean): Date | null {
+    try {
+      const dayOfWeek = holidaysServices.daysWeek[date.getDay()];
+      const workingDay = workingHours.value?.find(element => element.week_day === dayOfWeek);
+      if (workingDay && workingDay.start_time && initial) {
+        return this.combineDateAndTime(date, workingDay.start_time);
+      }
+      if (workingDay && workingDay.end_time && !initial) {
+        return this.combineDateAndTime(date, workingDay.end_time);
+      }
+      return date; // Retorna la fecha sin modificar si no se encuentra un horario específico
+    } catch (error) {
+      console.error("Error setting times: ", error);
+      return null; // Retorna la fecha sin modificar en caso de error
+    }
+
+  }
+
+  public combineDateAndTime(date: Date, end_time: string): Date {
+    const [hours, minutes, seconds] = end_time.split(':').map(Number);
+    const newDate = new Date(date);
+    newDate.setHours(hours, minutes, seconds || 0, 0);
+    return newDate;
+  }
+
+  public Main(dateCreation: string | null): number[] | null[] {
+    if (!dateCreation) {
+      return [null, null];
+    }
+    let workingHoursInElapsed = 0;
+    let dateInitial: Date | null = new Date(dateCreation);
+    while (dateInitial.getTime() < this.dateCurrent.getTime()) {
+      const dateEnd = this.setTimes(dateInitial, false);
+      if (dateEnd && dateEnd.getTime() < this.dateCurrent.getTime()) {
+        workingHoursInElapsed += (dateEnd.getTime() - dateInitial.getTime()) / (1000 * 60 * 60);
+        dateInitial = this.setTimes(this.nextWorkingDay(dateInitial), true);
+        if (!dateInitial) {
+          return [null, null];
+        }
+        continue;
+      }
+      workingHoursInElapsed += (this.dateCurrent.getTime() - dateInitial.getTime()) / (1000 * 60 * 60);
+      break;
+    }
+    const hours = Math.floor(workingHoursInElapsed);
+    const minutes = Math.round((workingHoursInElapsed - hours) * 60);
+    return [hours, minutes];
+  }
+
+  public isWorkingDay(date: Date): boolean {
+    if (holidays.value.includes(date.toISOString().split('T')[0])) {
+      return false;
+    }
+    const response = workingHours.value?.some(element => {
+      if (element.week_day === holidaysServices.daysWeek[date.getDay()]) {
+        return true;
+      }
+    }) ?? false;
+    return response;
+  }
+
+  public nextWorkingDay(date: Date): Date {
+    do {
+      date.setDate(date.getDate() + 1);
+    } while (!this.isWorkingDay(date));
+    return date;
+  }
+}
+
+function isCriticalTime(ans: number, hour: number, minutes: number): boolean {
+  //lógica crítica basada en ANS y tiempo transcurrido
+  const criticalTimeLimit = ans * 0.7; // ejemplo: crítico si se ha pasado el 70% del ANS
+  const elapsedTime = hour + (minutes / 60);
+  return elapsedTime >= criticalTimeLimit;
+}
+
+function isExpiredTime(ticket: TicketList, hour: number, minutes: number): boolean {
+  if (!ticket.create_at) {
+    notification.error("Error", `No se pudo calcular el tiempo transcurrido del ticket #${ticket.id_ticket}. Fecha de creación no disponible`)
+    return true;
+  }
+  if (ticket.estimated_closing_date) {
+    const estimatedDate = new Date(parseBackendDate(ticket.estimated_closing_date));
+    const now = new Date();
+    if (now >= estimatedDate) {
+      ticket.isCritical = false; // Si ya está vencido, no se considera crítico
+      return true;
+    }
+  }
+  const elapsedTime = hour + (minutes / 60);
+  if (ticket.ans && ticket.ans !== "Programado") {
+    const ansTime = parseInt(ticket.ans);
+    if (elapsedTime >= ansTime) {
+      ticket.isCritical = false; // Si ya está vencido, no se considera crítico
+      return true;
+    }
+  }
+  return false;
+}
+
+function setTicketInformationValidate(ticket: TicketList) {
+  filterAns.value.some(ans => {
+    if (ans.id_ans === ticket.ticket_ans) {
+      ticket.ans = ans.ans_name;
+      return true;
+    }
+  })
+  const calculateTime = new calculateTimeInElapsed();
+  let time_elapsed: number[] | null[] = calculateTime.Main(ticket.create_at);
+  if (!time_elapsed) {
+    time_elapsed = [null, null];
+  }
+  if (ticket.ans && ticket.ans !== "programado") {
+    ticket.isCritical = isCriticalTime(parseInt(ticket.ans), time_elapsed[0] || 0, time_elapsed[1] || 0);
+  }
+  if (ticket.ans === "Programado" && (time_elapsed[0] || 0) > 5) {
+    ticket.isCritical = true;
+  }
+  ticket.hour_elapsed = time_elapsed[0] || 0;
+  ticket.minute_elapsed = time_elapsed[1] || 0;
+  ticket.isExpired = isExpiredTime(ticket, time_elapsed[0] || 0, time_elapsed[1] || 0);
+}
+
 const loadAllTickets = async () => {
   try {
     const response = await ticketService.getAllTicketsWithoutAssignment(1, 1000);
@@ -333,6 +469,7 @@ const loadAllTickets = async () => {
       allTickets.value = response.data.results;
       itemsCount.value = response.data.results.length;
     }
+    loadData();
     ticketsCritial.value = 0;
     ticketsExpired.value = 0;
     allTickets.value.forEach(ticket => {
@@ -355,11 +492,19 @@ const loadData = async (pagination?: PaginationState, loadDataParams?: loadDataP
     const perPage = pagination?.perPage ?? 10;
     const response = await ticketService.getAllTicketsWithoutAssignment(page, perPage, loadDataParams?.search, loadDataParams?.id_ans, loadDataParams?.time_elapsed, loadDataParams?.before);
     if (response.data && response.data.results) {
-      tickets.value = response.data.results;
+      arrayTickets.value = response.data.results;
       total.value = response.data.count;
-      tickets.value.forEach(ticket => {
-        setTicketInformationValidate(ticket);
-      })
+      arrayTickets.value.forEach(updated => {
+        const original = allTickets.value.find(
+          t => t.id_ticket === Number(updated.id_ticket
+        ));
+
+        if (original) {
+          Object.assign(original, updated);
+          Object.assign(updated, original);
+        }
+      });
+      tickets.value = arrayTickets.value;
       tickets.value.sort((a, b) => {
         const timeA = a.hour_elapsed * 60 + a.minute_elapsed;
         const timeB = b.hour_elapsed * 60 + b.minute_elapsed;
@@ -372,13 +517,18 @@ const loadData = async (pagination?: PaginationState, loadDataParams?: loadDataP
   }
 };
 
-const calculateTimeInElapsed = (ticket: TicketList): number[] => {
-  const createdDate = new Date(parseBackendDate(ticket.create_at));
-  const now = new Date();
-  const diffMs = now.getTime() - createdDate.getTime();
-  const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-  return [diffHrs, diffMins];
+const loadWorkingHoursAndHolidays = async () => {
+  try {
+    const response = await workingHoursService.getAll()
+    await holidaysServices.setHolidays()
+    if (response.data && response.data.results) {
+      workingHours.value = response.data.results
+      holidays.value = await holidaysServices.getHolidays();
+    }
+  } catch (error) {
+    console.error("Error al cargar los horarios de cierre: ", error)
+    notification.error("Error", "No se pudieron cargar los horarios de cierre")
+  }
 }
 
 const assignTicket = async () => {
@@ -392,7 +542,7 @@ const assignTicket = async () => {
           "¡Actualizado!",
           "El ticket ha sido actualizado correctamente"
         );
-
+        await loadWorkingHoursAndHolidays();
         loadAllTickets();
         loadData();
         loadEUser();
@@ -409,43 +559,6 @@ const assignTicket = async () => {
     notification.error("Error", "No se logró actualizar el ticket")
     closeModal();
   }
-}
-
-function isCriticalTime(ans: number, hour: number, minutes: number): boolean {
-  //lógica crítica basada en ANS y tiempo transcurrido
-  const criticalTimeLimit = ans * 0.7; // ejemplo: crítico si se ha pasado el 70% del ANS
-  const elapsedTime = hour + (minutes / 60);
-  return elapsedTime >= criticalTimeLimit;
-}
-
-function isExpiredTime(ticket: TicketList): boolean {
-  if (ticket.estimated_closing_date) {
-    const estimatedDate = new Date(parseBackendDate(ticket.estimated_closing_date));
-    const now = new Date();
-    if (now >= estimatedDate) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function setTicketInformationValidate(ticket: TicketList) {
-  filterAns.value.some(ans => {
-    if (ans.id_ans === ticket.ticket_ans) {
-      ticket.ans = ans.ans_name;
-      return true;
-    }
-  })
-  let time_elapsed = calculateTimeInElapsed(ticket);
-  if (ticket.ans && ticket.ans !== "programado") {
-    ticket.isCritical = isCriticalTime(parseInt(ticket.ans), time_elapsed[0] || 0, time_elapsed[1] || 0);
-  }
-  if (ticket.ans === "Programado" && (time_elapsed[0] || 0) > 5) {
-    ticket.isCritical = true;
-  }
-  ticket.hour_elapsed = time_elapsed[0] || 0;
-  ticket.minute_elapsed = time_elapsed[1] || 0;
-  ticket.isExpired = isExpiredTime(ticket);
 }
 
 function getClass(ticket: TicketList): string[] {
@@ -481,13 +594,12 @@ function handleSearch() {
       }
     })
   }
-
   if (serchFilters.value.time_elapsed) {
     const now = new Date();
     loadDataParams.value.before = false;
     if (serchFilters.value.time_elapsed === "+3") {
       loadDataParams.value.before = true;
-      serchFilters.value.time_elapsed = "3";
+      loadDataParams.value.time_elapsed = "3";
     }
     now.setHours(now.getHours() - parseInt(serchFilters.value.time_elapsed));
     loadDataParams.value.time_elapsed = formatDateISOS(now);
@@ -527,7 +639,8 @@ function hideDropdown() {
 };
 
 
-onMounted(() => {
+onMounted(async () => {
+  await loadWorkingHoursAndHolidays();
   loadEUser();
   loadAns();
   loadAllTickets();

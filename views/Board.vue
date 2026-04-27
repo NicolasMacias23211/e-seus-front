@@ -1513,7 +1513,7 @@ const calculateEstimatedDateIfNeeded = async () => {
     const ansHours = parseInt(currentAns.ans_name);
     const dateCreation = fullTicket.value.create_at.split(".")[0] || "";
 
-    const projectDateResponse = await projectDateService.findProjectDate(
+    const projectDateResponse = await projectDateService.calculateDate(
       ansHours,
       dateCreation,
     );
