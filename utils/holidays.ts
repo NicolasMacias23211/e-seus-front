@@ -1,12 +1,6 @@
 import { http } from '../services/http';
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import type { ApiResponse } from '../services/http';
-
-export interface Holidays {
-    success: boolean,
-    message: string,
-    results: string[]
-}
 
 export class Holidays {
     private endPoint = "/project-date/holidays/"

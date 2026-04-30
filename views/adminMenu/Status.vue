@@ -203,7 +203,7 @@ const form = reactive({
   status_description: "",
   is_backlog: false,
   is_completion: false,
-  ordering: 0,
+  ordering: 0
 });
 
 const openCreateModal = () => {
@@ -258,7 +258,7 @@ const create = async () => {
       status_description: form.status_description,
       is_backlog: form.is_backlog,
       is_completion: form.is_completion,
-      ordering: form.ordering,
+      ordering: form.ordering > 0 ? form.ordering : null,
     })
 
     let response = await statusService.create(dataCreate);
@@ -289,7 +289,7 @@ const update = async () => {
       status_description: form.status_description,
       is_backlog: form.is_backlog,
       is_completion: form.is_completion,
-      ordering: form.ordering,
+      ordering: form.ordering > 0 ? form.ordering : null,
     })
 
     let response = await statusService.update(data, form.id_status)

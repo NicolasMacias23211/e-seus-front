@@ -1684,6 +1684,8 @@ import type { Note } from "../../models/Notes";
 import { NotesService } from "../../services/notesService";
 import { SessionStorageService } from "../../services/SessionStorageService";
 import { FileUploadService } from "../../services/fileUploadService";
+import { ProjectDateService } from "../../services/projectDateService";
+import { formatDateISOS } from "../../utils/Date";
 
 const ansService = new AnsService();
 const serviceService = new RequestTypeService();
@@ -1694,6 +1696,7 @@ const usersService = new UsersService();
 const programsService = new ProgramsService();
 const subProgramsService = new SubProgramsService();
 const fileUploadService = new FileUploadService();
+const projectDateService = new ProjectDateService();
 const isSubmitting = ref(false);
 const showSuccess = ref(false);
 const createdTicketId = ref<number | null>(null);
@@ -1829,6 +1832,17 @@ const formatTime = (date: string) => {
     hour: "2-digit",
     minute: "2-digit",
   });
+};
+
+const calculateDateEstimatedClosing = async (ans: string, creationDate: Date) => {
+  if(ans === 'Programado'){
+    return null;
+  }
+  const repsonse = await projectDateService.calculateDate(Number(ans), formatDateISOS(creationDate));
+  if (repsonse.data?.response) {
+    return await repsonse.data.response
+  }
+  return null
 };
 
 const getUserInitials = (name: string | number) => {
@@ -2340,8 +2354,10 @@ const handleSubmit = async () => {
       }
       isUploadingFiles.value = false;
     }
-
+    
     // Crear objeto que coincida con TicketCreate del backend
+    let ans = ansList.value.find(item => item.id_ans! === form.ticket_ans);
+    console.log("ANS seleccionado:", ans);
     const ticketData: TicketCreate = {
       ticket_title: form.ticket_title,
       ticket_description: form.ticket_description,
@@ -2353,6 +2369,7 @@ const handleSubmit = async () => {
       reporter_user: currentUser.username,
       status_id: form.status_id,
       assigned_to: undefined,
+      estimated_closing_date: await calculateDateEstimatedClosing(ans?.ans_name!, new Date()) || null,
     };
 
     try {

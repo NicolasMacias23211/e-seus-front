@@ -719,6 +719,7 @@
                         ? 'border-slate-300 focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent'
                         : 'bg-slate-50 border-slate-200 text-slate-600 cursor-not-allowed',
                     ]"
+                    @change="calculateEstimatedDateIfNeeded"
                   >
                     <option value="" disabled>Seleccione un ANS</option>
                     <option
@@ -1387,7 +1388,7 @@ const loadColumsByStatus = async () => {
             status.ordering !== null &&
             status.ordering !== undefined,
         )
-        .sort((a, b) => a.ordering - b.ordering);
+        .sort((a, b) => (a.ordering || 0) - (b.ordering || 0));
 
       statusIdMap.value.clear();
       statuses.forEach((status) => {
@@ -1502,7 +1503,8 @@ const loadModalData = async () => {
 
 const calculateEstimatedDateIfNeeded = async () => {
   if (!isAnsNumeric.value || !fullTicket.value) return;
-
+  
+  editedTicket.value.estimated_closing_date = null;
   const currentAns = ansList.value.find(
     (ans) => ans.id_ans === editedTicket.value.ticket_ans,
   );
@@ -1535,21 +1537,6 @@ const calculateEstimatedDateIfNeeded = async () => {
     );
   }
 };
-
-watch(
-  () => editedTicket.value.ticket_ans,
-  async (newAns, oldAns) => {
-    if (newAns !== oldAns && fullTicket.value) {
-      if (isAnsNumeric.value) {
-        await calculateEstimatedDateIfNeeded();
-      } else {
-        if (!fullTicket.value.estimated_closing_date) {
-          editedTicket.value.estimated_closing_date = null;
-        }
-      }
-    }
-  },
-);
 
 const columns = ref<
   {
@@ -1666,10 +1653,8 @@ const handleDrop = async (event: DragEvent, newStatusId: number) => {
           closing_date: fullTicket.value.closing_date,
           estimated_closing_date: fullTicket.value.estimated_closing_date,
           status_name: newStatusName,
-          sub_program_name:
-            fullTicket.value.sub_program?.sub_program_name || "",
+          sub_program_name: fullTicket.value.sub_program?.sub_program_name || "",
         };
-
         subProgramSearch.value =
           editedTicket.value.sub_program_name || "No encontrado";
 
@@ -1703,10 +1688,6 @@ const handleDrop = async (event: DragEvent, newStatusId: number) => {
         targetStatus.value = newStatusId;
         modalAction.value = "move";
         activeTab.value = "details";
-
-        if (!editedTicket.value.estimated_closing_date) {
-          await calculateEstimatedDateIfNeeded();
-        }
 
         showModal.value = true;
       }
@@ -1800,10 +1781,6 @@ const handleDropToDelete = async (event: DragEvent) => {
       modalAction.value = "delete";
       activeTab.value = "details";
 
-      if (!editedTicket.value.estimated_closing_date) {
-        await calculateEstimatedDateIfNeeded();
-      }
-
       showModal.value = true;
       isDeletingZone.value = false;
     }
@@ -1857,8 +1834,16 @@ const handleDropToComplete = async (event: DragEvent) => {
         sub_program_name: fullTicket.value.sub_program?.sub_program_name || "",
       };
 
-      subProgramSearch.value =
-        editedTicket.value.sub_program_name || "No encontrado";
+      if (!editedTicket.value.estimated_closing_date) {
+        notification.error(
+          "Error",
+          "No se puede cerrar un ticket sin fecha una estimada de cierre.",
+        );
+        isCompletingZone.value = false;
+        return;
+      }
+
+      subProgramSearch.value = editedTicket.value.sub_program_name || "No encontrado";
 
       if (fullTicket.value && fullTicket.value.assigned_to) {
         const assignedUser = eUsersList.value.find(
@@ -1890,10 +1875,6 @@ const handleDropToComplete = async (event: DragEvent) => {
       targetStatus.value = completionStatus.id_status;
       modalAction.value = "complete";
       activeTab.value = "details";
-
-      if (!editedTicket.value.estimated_closing_date) {
-        await calculateEstimatedDateIfNeeded();
-      }
 
       showModal.value = true;
       isCompletingZone.value = false;
@@ -2076,7 +2057,6 @@ const confirmAction = async () => {
         closing_date: currentDate,
         cumplimiento: cumplimiento,
       };
-
       await TicketService.updateTicket(
         draggedTicket.value.id_ticket,
         updateData,
@@ -2547,10 +2527,6 @@ const openTicketModal = async (ticket: TicketShort) => {
         ticketReportedTimes.value = fullTicket.value.reported_times;
       } else {
         ticketReportedTimes.value = [];
-      }
-
-      if (!editedTicket.value.estimated_closing_date) {
-        await calculateEstimatedDateIfNeeded();
       }
 
       showModal.value = true;

@@ -139,7 +139,8 @@
                 :class="{
                   'bg-red-100 text-red-700': ticket.isCritical,
                 }">
-                <div class="w-3 h-3 rounded-full" :class="{
+                <div class="w-3 h-3 rounded-full" 
+                :class="{
                   'bg-red-500 animate-pulse': ticket.isCritical && !ticket.isExpired,
                   'bg-red-800': ticket.isExpired,
                   'bg-green-500': !ticket.isCritical,
@@ -247,7 +248,6 @@ const ansService = new AnsService();
 const ticketService = new TicketsService();
 const holidaysServices = new Holidays();
 const workingHoursService = new WorkingHoursService();
-// holidays.calculateTimeInElapsed(new Date());
 
 const updateTicket = ref<TicketUpdate>({
   assigned_to: "",
