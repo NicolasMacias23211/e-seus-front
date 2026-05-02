@@ -49,6 +49,7 @@ export interface TicketCreate {
   sub_program_name: string;
   status_id: number;
   assigned_to?: string;
+  estimated_closing_date: string | null;
 }
 
 export interface TicketShort {
