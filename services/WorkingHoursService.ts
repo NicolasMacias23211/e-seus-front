@@ -16,7 +16,7 @@ export class WorkingHoursService {
     async update(workingHours: WorkingHours, id: number): Promise<ApiResponse<WorkingHours>> {
         return await http.put<WorkingHours>(`${this.endPoint+id}/`, workingHours)
     }
-    
+
     async delete(id: number): Promise<ApiResponse<WorkingHours>> {
         return await http.delete<WorkingHours>(this.endPoint+id+"/")
     }

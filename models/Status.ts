@@ -4,12 +4,12 @@ export interface Status {
   status_description: string;
   is_backlog: boolean;
   is_completion: boolean;
-  ordering: number;
+  ordering: number | null;
 }
 export interface StatusCrud {
   status_name: string;
   status_description: string;
   is_backlog: boolean;
   is_completion: boolean;
-  ordering: number;
+  ordering: number | null;
 }

@@ -75,6 +75,7 @@ export class TicketsService {
   }
 
   async create(ticket: TicketCreate): Promise<ApiResponse<Ticket>> {
+    console.log("Datos del ticket a crear:", ticket);
     return await http.post<Ticket, TicketCreate>("/tickets/", ticket);
   }
 
