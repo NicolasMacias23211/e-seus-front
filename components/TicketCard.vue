@@ -149,7 +149,7 @@ const getTicketTypeByName = (serviceName: string) => {
 };
 
 const formatDate = (dateString: string | null) => {
-  if (!dateString) return "Fecha pendiente";
+  if (!dateString) return "P.D.";
 
   try {
     const date = new Date(dateString);
@@ -164,7 +164,7 @@ const formatDate = (dateString: string | null) => {
 
     return date.toLocaleDateString("es-ES", options).replace(",", " •");
   } catch (error) {
-    return "Fecha pendiente";
+    return "P.D.";
   }
 };
 

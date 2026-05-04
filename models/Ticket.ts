@@ -8,7 +8,6 @@ import type { ReportedTime } from "./ReportedTime";
 import type { SubProgram } from "./SubProgram";
 import type { User } from "./User";
 
-// Interfaz completa que coincide con la respuesta del backend
 export interface Ticket {
   id_ticket: number;
   service: Service;
@@ -35,6 +34,7 @@ export interface Ticket {
   reporter_user: string;
   status_id: number;
   sub_program_name: string;
+  cumplimiento?: boolean;
 }
 
 // Interfaz simplificada para la creación de tickets
@@ -70,7 +70,6 @@ export interface TicketShort {
   sub_program_name?: string;
 }
 
-// Interfaz para actualización parcial de tickets
 export interface TicketUpdate {
   ticket_title?: string;
   ticket_description?: string;
@@ -87,7 +86,6 @@ export interface TicketUpdate {
   cumplimiento?: boolean;
 }
 
-// Interfaz para actualización parcial de tickets
 export interface TicketList {
   id_ticket: number;
   ticket_title: string;

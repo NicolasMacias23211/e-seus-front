@@ -8,7 +8,7 @@
   <div v-else class="flex h-screen bg-slate-100 overflow-hidden">
     <AppSidebar />
 
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 flex flex-col overflow-hidden transition-all duration-300 min-w-0">
       <AppHeader />
 
       <main class="flex-1 overflow-y-auto p-6 bg-slate-200">

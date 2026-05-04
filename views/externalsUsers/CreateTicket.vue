@@ -1124,7 +1124,7 @@
 
                 <div
                   v-else
-                  class="space-y-4 max-h-[calc(100vh-480px)] overflow-y-auto pr-2"
+                  class="space-y-4 max-h-[calc(100vh-280px)] overflow-y-auto pr-2"
                 >
                   <div
                     v-for="ticket in filteredTickets"

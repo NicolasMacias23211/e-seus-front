@@ -198,7 +198,7 @@
         </div>
       </div>
     </div>
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-2 lg:grid-cols-2 gap-2">
       <div class="lg:col-span-2 space-y-6">
         <div
           class="bg-gradient-to-br from-[#021C7D] to-[#50bdeb] rounded-2xl p-8 text-center shadow-lg"
@@ -240,7 +240,7 @@
         </div>
       </div>
 
-      <div class="space-y-6">
+      <!-- <div class="space-y-6">
         <div class="bg-white rounded-xl border-2 shadow-sm p-6">
           <h3
             class="text-lg font-bold text-[#021C7D] mb-6 flex items-center gap-2"
@@ -279,7 +279,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
 
     <div
@@ -1321,71 +1321,71 @@ onMounted(async () => {
   await loadReportedTimes();
 });
 
-interface TicketWithTracking extends TicketShort {
-  tracked: number;
-  estimated: number;
-}
+// interface TicketWithTracking extends TicketShort {
+//   tracked: number;
+//   estimated: number;
+// }
 
-const activeTickets = ref<TicketWithTracking[]>([
-  {
-    id_ticket: 101,
-    ticket_title: "Error en el login",
-    assigned_to: "user2",
-    create_at: "2025-11-20",
-    estimated_closing_date: "2025-11-30",
-    ticket_description: "Corregir error de autenticación",
-    ticket_attachments: null,
-    ticket_closing_code: null,
-    ticket_ans: 2,
-    update_at: "",
-    closing_date: null,
-    sub_program_name: "Cliente Principal A",
-    reporter_user_name: "pepito",
-    service_name: "servico X",
-    priority_name: "alta",
-    status_name: "progreso",
-    tracked: 2,
-    estimated: 12,
-  },
-  {
-    id_ticket: 102,
-    ticket_title: "Implementar dark mode",
-    service_name: "Desarrollo",
-    priority_name: "Media",
-    status_name: "En Progreso",
-    reporter_user_name: "user3",
-    assigned_to: "user2",
-    create_at: "2025-11-21",
-    estimated_closing_date: "2025-12-05",
-    ticket_description: "Añadir tema oscuro",
-    ticket_attachments: null,
-    ticket_closing_code: null,
-    ticket_ans: null,
-    update_at: null,
-    closing_date: null,
-    sub_program_name: "Cliente Principal A",
-    tracked: 8,
-    estimated: 16,
-  },
-  {
-    id_ticket: 103,
-    ticket_title: "Optimizar queries",
-    service_name: "Base de Datos",
-    priority_name: "Alta",
-    status_name: "En Progreso",
-    reporter_user_name: "user4",
-    assigned_to: "user2",
-    create_at: "2025-11-22",
-    estimated_closing_date: "2025-12-01",
-    ticket_description: "Mejorar rendimiento",
-    ticket_attachments: null,
-    ticket_closing_code: null,
-    ticket_ans: null,
-    update_at: null,
-    closing_date: null,
-    sub_program_name: "Cliente Principal B",
-    tracked: 15,
-    estimated: 24,
-  },
-]);
+// const activeTickets = ref<TicketWithTracking[]>([
+//   {
+//     id_ticket: 101,
+//     ticket_title: "Error en el login",
+//     assigned_to: "user2",
+//     create_at: "2025-11-20",
+//     estimated_closing_date: "2025-11-30",
+//     ticket_description: "Corregir error de autenticación",
+//     ticket_attachments: null,
+//     ticket_closing_code: null,
+//     ticket_ans: 2,
+//     update_at: "",
+//     closing_date: null,
+//     sub_program_name: "Cliente Principal A",
+//     reporter_user_name: "pepito",
+//     service_name: "servico X",
+//     priority_name: "alta",
+//     status_name: "progreso",
+//     tracked: 2,
+//     estimated: 12,
+//   },
+//   {
+//     id_ticket: 102,
+//     ticket_title: "Implementar dark mode",
+//     service_name: "Desarrollo",
+//     priority_name: "Media",
+//     status_name: "En Progreso",
+//     reporter_user_name: "user3",
+//     assigned_to: "user2",
+//     create_at: "2025-11-21",
+//     estimated_closing_date: "2025-12-05",
+//     ticket_description: "Añadir tema oscuro",
+//     ticket_attachments: null,
+//     ticket_closing_code: null,
+//     ticket_ans: null,
+//     update_at: null,
+//     closing_date: null,
+//     sub_program_name: "Cliente Principal A",
+//     tracked: 8,
+//     estimated: 16,
+//   },
+//   {
+//     id_ticket: 103,
+//     ticket_title: "Optimizar queries",
+//     service_name: "Base de Datos",
+//     priority_name: "Alta",
+//     status_name: "En Progreso",
+//     reporter_user_name: "user4",
+//     assigned_to: "user2",
+//     create_at: "2025-11-22",
+//     estimated_closing_date: "2025-12-01",
+//     ticket_description: "Mejorar rendimiento",
+//     ticket_attachments: null,
+//     ticket_closing_code: null,
+//     ticket_ans: null,
+//     update_at: null,
+//     closing_date: null,
+//     sub_program_name: "Cliente Principal B",
+//     tracked: 15,
+//     estimated: 24,
+//   },
+// ]);
 </script>
