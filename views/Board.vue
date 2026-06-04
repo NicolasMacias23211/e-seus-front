@@ -1617,17 +1617,27 @@ const handleDragLeave = (_statusId: number) => {};
 const handleDrop = async (event: DragEvent, newStatusId: number) => {
   event.preventDefault();
   if (!draggedTicket.value) return;
-
+  
   const newStatus = statusIdMap.value.get(newStatusId);
   if (!newStatus) {
     notification.error("Error", "Estado no encontrado");
     return;
   }
-
+  
   const oldStatusName = draggedTicket.value.status_name;
   const newStatusName = newStatus.status_name;
+  const oldStatus = Array.from(statusIdMap.value.values()).find(status => {
+    return status.status_name.toLowerCase().trim() === oldStatusName?.toLowerCase().trim()
+  });
 
-  if (oldStatusName !== newStatusName) {
+  const oldOrdering = oldStatus?.ordering ?? 0;
+  const newOrdering = newStatus.ordering ?? 0;
+  if (oldOrdering > newOrdering){
+    notification.error("Error", "No se puede mover el ticket a un estado anterior");
+    return
+  }
+
+  if (oldStatusName !== newStatusName && oldOrdering < newOrdering) {
     await loadModalData();
 
     try {
