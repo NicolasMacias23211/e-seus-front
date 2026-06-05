@@ -24,7 +24,6 @@ export class UsersService {
                 return existingUser;
             }
             
-            console.log("Usuario no existe, creando...");
             return await this.create(user);
         } catch (error: any) {
             if (error.status === 404 || error.code === 404) {

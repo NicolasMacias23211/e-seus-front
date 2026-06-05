@@ -733,10 +733,13 @@ import { ProgramsService } from "../services/programsService";
 import { SubProgramsService } from "../services/subProgramsService";
 import { AnsService } from "../services/ansService";
 import { StatusService } from "../services/statusService";
+import { UsersService } from "../services/usersService";
 import { TicketsService } from "../services/ticketsService";
 import { SessionStorageService } from "../services/SessionStorageService";
 import { FileUploadService } from "../services/fileUploadService";
 import ConfirmDialog from "./ConfirmDialog.vue";
+import { formatDateISOS } from "../utils/Date";
+import { ProjectDateService } from "../services/projectDateService";
 
 const requestTypeService = new RequestTypeService();
 const priorityService = new TicketPriorityService();
@@ -748,6 +751,8 @@ const statusService = new StatusService();
 const ticketsService = new TicketsService();
 const sessionStorage = new SessionStorageService();
 const fileUploadService = new FileUploadService();
+const usersService = new UsersService();
+const projectDateService = new ProjectDateService();
 
 interface Props {
   modelValue: boolean;
@@ -1050,6 +1055,36 @@ const handleSubmit = async () => {
       isUploadingFiles.value = false;
     }
 
+    const currentUser = sessionStorage.getUserInfo();
+
+    if (!currentUser) {
+      errorMessage.value =
+        "No se pudo obtener la información del usuario. Por favor inicie sesión nuevamente.";
+      return;
+    }
+
+    const userData = {
+      network_user: currentUser.username,
+      mail: currentUser.email || "",
+      phone: "",
+      full_name: currentUser.full_name || currentUser.username,
+    };
+
+    try {
+      const userResult = await usersService.ensureUserExists(userData);
+
+      if (!userResult.success) {
+        errorMessage.value =
+          "Error al validar/crear usuario. Por favor intente nuevamente.";
+        return;
+      }
+    } catch (error: any) {
+      console.error("Error al validar/crear usuario:", error);
+      errorMessage.value = `Error al validar usuario: ${error.message || "Error desconocido"}`;
+      return;
+    }
+    
+    let ans = ansList.value.find(item => item.id_ans! === form.ticketAns);
     const newTicket: TicketCreate = {
       ticket_title: form.ticketTitle,
       ticket_description: form.ticketDescription,
@@ -1061,6 +1096,7 @@ const handleSubmit = async () => {
       reporter_user: sessionStorage.getUserInfo()?.username || "",
       status_id: form.statusId as number,
       assigned_to: sessionStorage.getUserInfo()?.username || "",
+      estimated_closing_date: await calculateDateEstimatedClosing(ans?.ans_name!, new Date()) || null,
     };
 
     const response = await ticketsService.create(newTicket);
@@ -1086,6 +1122,17 @@ const handleSubmit = async () => {
     isSubmitting.value = false;
     isUploadingFiles.value = false;
   }
+};
+
+const calculateDateEstimatedClosing = async (ans: string, creationDate: Date) => {
+  if(ans === 'Programado'){
+    return null;
+  }
+  const repsonse = await projectDateService.calculateDate(Number(ans), formatDateISOS(creationDate));
+  if (repsonse.data?.response) {
+    return await repsonse.data.response
+  }
+  return null
 };
 
 const closeModal = () => {

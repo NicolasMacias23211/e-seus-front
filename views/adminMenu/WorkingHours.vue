@@ -300,7 +300,6 @@ const handleDeleteConfirm = async () => {
 const loadWorkingHours = async () => {
   try {
     const response = await workingHoursService.getAll()
-    console.log("Response working hours: ", response)
     if (response.data && response.data.results) {
       workingHours.value = response.data.results
     }
