@@ -756,13 +756,19 @@ const projectDateService = new ProjectDateService();
 
 interface Props {
   modelValue: boolean;
+  backlog?: boolean;
 }
 
-const props = defineProps<Props>();
+// const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: false,
+  backlog: false,
+});
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: boolean): void;
   (e: "ticketCreated", ticket: TicketCreate): void;
+  (e: "backlog", value: boolean): void;
 }>();
 
 const form = reactive({
@@ -857,7 +863,15 @@ const loadData = async () => {
     }
 
     if (statusRes.success && statusRes.data?.results) {
-      statusList.value = statusRes.data.results.flat();
+      const statusResults = statusRes.data.results.flat() as Status[];
+
+      if (props.backlog) {
+        statusList.value = statusResults.filter(
+          (item) => item.ordering === 1 || item.is_backlog === true,
+        );
+      } else {
+        statusList.value = statusResults;
+      }
     }
   } catch (error) {
     console.error("Error al cargar los datos:", error);

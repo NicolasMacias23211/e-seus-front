@@ -2395,7 +2395,7 @@ const hideAssignedToDropdown = () => {
 
 const searchTicketById = async () => {
   const ticketId = parseInt(searchQuery.value.trim());
-
+  console.log("Buscando ticket con ID:", ticketId);
   if (isNaN(ticketId) || ticketId <= 0) {
     notification.warning(
       "ID inválido",

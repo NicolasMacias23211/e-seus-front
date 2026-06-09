@@ -453,6 +453,7 @@
     <CreateTicketModal
       v-model="showCreateModal"
       @ticketCreated="handleTicketCreated"
+      :backlog=true
     />
   </div>
 </template>
