@@ -126,14 +126,14 @@ import { useNotification } from "../../utils/useNotification";
 import { AnsService } from "../../services/ansService";
 import type { ANS } from "../../models/ANS";
 import ConfirmDialog from "../../components/ConfirmDialog.vue";
-import type { PaginationState } from "../../components/Pagination.vue";
+import type { PaginationState, } from "../../components/Pagination.vue";
 import Pagination from "../../components/Pagination.vue";
 
 const notification = useNotification();
 const ansService = new AnsService();
 const ans = ref<ANS[]>([]);
-const total = ref(0)
-const itemsCount = ref(0)
+const total = ref(0);
+const itemsCount = ref(0);
 
 const loadData = async (pagination?: PaginationState) => {
   try {
@@ -146,8 +146,8 @@ const loadData = async (pagination?: PaginationState) => {
       itemsCount.value = response.data.results.length
     }
   } catch (error) {
-    console.error("Error al cargar los códigos de cierre: ", error)
-    notification.error("Error", "No se pudieron cargar los códigos de cierre")
+    console.error("Error al cargar los ans: ", error)
+    notification.error("Error", "No se pudieron cargar los ans")
   }
 }
 

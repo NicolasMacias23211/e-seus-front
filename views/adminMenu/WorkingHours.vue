@@ -63,6 +63,11 @@
           </tbody>
         </table>
       </div>
+      <Pagination 
+        :total-registers="total"
+        :items-count="itemsCount" 
+        @change="loadWorkingHours" 
+      />
     </div>
     <Teleport to="body">
       <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
@@ -150,6 +155,8 @@ import { useNotification } from "../../utils/useNotification";
 import { WorkingHoursService } from "../../services/WorkingHoursService";
 import type { WorkingHours } from "../../models/WorkingHours";
 import ConfirmDialog from "../../components/ConfirmDialog.vue";
+import type { PaginationState, } from "../../components/Pagination.vue";
+import Pagination from "../../components/Pagination.vue";
 
 const notification = useNotification();
 const workingHoursService = new WorkingHoursService()
@@ -159,6 +166,8 @@ const horarioToDelete = ref<WorkingHours | null>(null);
 const showModal = ref(false);
 const isEditing = ref(false);
 const editingIndex = ref(-1);
+const total = ref(0);
+const itemsCount = ref(0);
 
 const form = reactive({
   id_working_hours: 0,
@@ -297,11 +306,15 @@ const handleDeleteConfirm = async () => {
 
 
 
-const loadWorkingHours = async () => {
+const loadWorkingHours = async (pagination ?: PaginationState) => {
   try {
-    const response = await workingHoursService.getAll()
+    const page = pagination?.currentPage ?? 1
+    const perPage = pagination?.perPage ?? 10
+    const response = await workingHoursService.getAllPaginated(page, perPage)
     if (response.data && response.data.results) {
       workingHours.value = response.data.results
+      total.value = response.data.count
+      itemsCount.value = response.data.results.length
     }
   } catch (error) {
     console.error("Error al cargar los horarios de cierre: ", error)

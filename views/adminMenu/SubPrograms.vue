@@ -78,6 +78,11 @@
           </tbody>
         </table>
       </div>
+      <Pagination 
+        :total-registers="total"
+        :items-count="itemsCount" 
+        @change="loadSubPrograms" 
+      />
     </div>
 
     <Teleport to="body">
@@ -90,16 +95,20 @@
           class="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-scale-in"
         >
           <div
-            <div
             class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white px-6 py-4 rounded-t-2xl"
           >
-            >
             <h2 class="text-xl font-bold">
               {{ isEditing ? "Editar Sub-Programa" : "Nuevo Sub-Programa" }}
             </h2>
           </div>
 
           <form @submit.prevent="handleSubmit" class="p-6 space-y-4">
+            <input
+              id="subProgramNameLast"
+              v-model="form.sub_program_name_last"
+              type="text"
+              hidden
+            />
             <div>
               <label
                 for="subProgramName"
@@ -109,7 +118,7 @@
               </label>
               <input
                 id="subProgramName"
-                v-model="form.subProgramName"
+                v-model="form.sub_program_name"
                 type="text"
                 required
                 maxlength="45"
@@ -127,17 +136,17 @@
               </label>
               <select
                 id="programName"
-                v-model="form.programName"
+                v-model="form.program_name"
                 required
                 class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-white"
               >
                 <option value="" disabled>Seleccione un programa</option>
                 <option
-                  v-for="program in programs"
-                  :key="program"
-                  :value="program"
+                  v-for="subProgram in subPrograms"
+                  :key="subProgram.program_name"
+                  :value="subProgram.program_name"
                 >
-                  {{ program }}
+                  {{ subProgram.program_name }}
                 </option>
               </select>
             </div>
@@ -161,104 +170,229 @@
         </div>
       </div>
     </Teleport>
+    <ConfirmDialog
+      :is-visible="showConfirmDialog"
+      type="delete"
+      title="Confirmar Eliminación"
+      :message="`¿Está seguro de que desea eliminar el cliente '${subProgramToDelete?.sub_program_name}'?`"
+      details="Esta acción eliminará permanentemente el cliente del sistema. Todos los programas y sub-programas asociados también podrían verse afectados."
+      confirm-text="Sí, Eliminar"
+      cancel-text="Cancelar"
+      @confirm="handleDeleteConfirm"
+      @cancel="handleDeleteCancel"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
-import { Layers, Plus, Edit2, Trash2 } from "lucide-vue-next";
+import { ref, reactive, onMounted } from "vue";
+import { Plus, Edit2, Trash2 } from "lucide-vue-next";
 import { useNotification } from "../../utils/useNotification";
-import type { SubProgram } from "../../models/SubProgram";
+import type { Client } from "../../models/Client";
+import ConfirmDialog from "../../components/ConfirmDialog.vue";
+import type { PaginationState } from "../../components/Pagination.vue";
+import Pagination from "../../components/Pagination.vue";
+import { ClientsService } from "../../services/clientsService.ts";
+import type { Program } from "../../models/Program";
+import { ProgramsService } from "../../services/programsService.ts";
+import { SubProgramsService } from "../../services/subProgramService";
+import { SubProgram } from '../../models/SubProgram';
 
 const notification = useNotification();
+const clientService = new ClientsService();
+const clients = ref<Client[]>([]);
+const programsService = new ProgramsService();
+const programs = ref<Program[]>([]);
+const subProgramService = new SubProgramsService();
+const subPrograms = ref<SubProgram[]>([]);
+const total = ref(0)
+const itemsCount = ref(0)
 
-const subPrograms = ref<SubProgram[]>([
-  { sub_program_name: "Sub-Programa 1A", program_name: "Programa Alpha", program_name_display : "" },
-  { sub_program_name: "Sub-Programa 1B", program_name: "Programa Alpha" , program_name_display: "" },
-  { sub_program_name: "Sub-Programa 2A", program_name: "Programa Beta", program_name_display: "" },
-]);
+const loadClients = async () => {
+  try {
+    const response = await clientService.getAll()
+    if (response.data && response.data.results) {
+      clients.value = response.data.results
+    }
+  } catch (error) {
+    console.error("Error al cargar los clientes: ", error)
+    notification.error("Error", "No se pudieron cargar los clientes")
+  }
+}
 
-const programs = ref<string[]>([
-  "Programa Alpha",
-  "Programa Beta",
-  "Programa Gamma",
-]);
+const loadPrograms = async () => {
+  try {
+    const response = await programsService.getAll()
+    if (response.data && response.data.results) {
+      programs.value = response.data.results
+    }
+  } catch (error) {
+    console.error("Error al cargar los clientes: ", error)
+    notification.error("Error", "No se pudieron cargar los clientes")
+  }
+}
 
+const loadSubPrograms = async (pagination?: PaginationState) => {
+  try {
+    const page = pagination?.currentPage ?? 1
+    const perPage = pagination?.perPage ?? 10
+    const response = await subProgramService.getAllPaginated(page, perPage)
+    if (response.data && response.data.results) {
+      subPrograms.value = response.data.results
+      total.value = response.data.count
+      itemsCount.value = response.data.results.length
+    }
+  } catch (error) {
+    console.error("Error al cargar los programas: ", error)
+    notification.error("Error", "No se pudieron cargar los programas")
+  }
+}
+
+const showConfirmDialog = ref(false);
+const subProgramToDelete = ref<SubProgram | null>(null);
 const showModal = ref(false);
 const isEditing = ref(false);
 const editingIndex = ref(-1);
 
 const form = reactive({
-  subProgramName: "",
-  programName: "",
+  sub_program_name_last: "",
+  sub_program_name:"",
+  program_name: ""
 });
 
 const openCreateModal = () => {
   isEditing.value = false;
-  form.subProgramName = "";
-  form.programName = "";
+  form.sub_program_name = "";
+  form.program_name = "";
   showModal.value = true;
 };
 
-const openEditModal = (subProgram: SubProgram) => {
+const openEditModal = (code: SubProgram) => {
   isEditing.value = true;
   editingIndex.value = subPrograms.value.findIndex(
-    (sp) => sp.sub_program_name === subProgram.sub_program_name
-  );
-  form.subProgramName = subProgram.sub_program_name;
-  form.programName = subProgram.program_name;
+    (a) => a.sub_program_name === code.sub_program_name);
+  form.sub_program_name_last = code.sub_program_name ?? "";
+  form.sub_program_name = code.sub_program_name ?? "";
+  form.program_name = code.program_name ?? "";
   showModal.value = true;
 };
 
 const closeModal = () => {
   showModal.value = false;
-  form.subProgramName = "";
-  form.programName = "";
+  form.sub_program_name_last = "";
+  form.sub_program_name = "";
+  form.program_name = "";
   isEditing.value = false;
   editingIndex.value = -1;
 };
 
 const handleSubmit = () => {
   if (isEditing.value) {
-    subPrograms.value[editingIndex.value] = {
-      sub_program_name: form.subProgramName,
-      program_name: form.programName,
-      program_name_display: "",
-    };
-    notification.success(
-      "¡Actualizado!",
-      "El sub-programa ha sido actualizado correctamente"
-    );
+    update();
   } else {
-    subPrograms.value.push({
-      sub_program_name: form.subProgramName,
-      program_name: form.programName,
-      program_name_display: "",
-    });
-    notification.success(
-      "¡Creado!",
-      "El sub-programa ha sido creado correctamente"
-    );
+    create();
   }
-  closeModal();
 };
 
-const confirmDelete = (subProgram: SubProgram) => {
-  if (
-    confirm(
-      `¿Está seguro de eliminar el sub-programa "${subProgram.sub_program_name}"?`
-    )
-  ) {
-    const index = subPrograms.value.findIndex(
-      (sp) => sp.sub_program_name === subProgram.sub_program_name
-    );
-    subPrograms.value.splice(index, 1);
-    notification.success(
-      "¡Eliminado!",
-      "El sub-programa ha sido eliminado correctamente"
-    );
+
+const create = async () => {
+  try {
+    let dataCreate: SubProgram = ({
+      sub_program_name: form.sub_program_name,
+      program_name: form.program_name
+    })
+
+    let response = await subProgramService.create(dataCreate);
+    if (response.success) {
+      notification.success(
+        "¡Creado!",
+        "El cliente ha sido creado correctamente"
+      );
+      loadSubPrograms();
+      closeModal();
+      return
+    }
+    console.error("Error al crear el programa:", response.error);
+    notification.error("Error", "No se logró crear el programa");
+    closeModal();
+  } catch (error) {
+    console.error("Error al crear el programa: ", error);
+    notification.error("Error", "No se logró crear el programa");
+    closeModal();
+  }
+}
+
+
+const update = async () => {
+  try {
+    let data: SubProgram = ({
+      sub_program_name: form.sub_program_name,
+      program_name: form.program_name
+    })
+
+    let response = await subProgramService.update(data, form.sub_program_name_last)
+    if (response.success) {
+      
+      await subProgramService.delete(form.sub_program_name_last)
+      notification.success(
+        "¡Actualizado!",
+        "El programa ha sido actualizado correctamente"
+      );
+      loadSubPrograms();
+      closeModal();
+      return
+    }
+    console.error("Error al actualizar el programa: ", response.error)
+    notification.error("Error", "No se logro actualizar el programa")
+    closeModal();
+  } catch (error) {
+    console.error("Error al actualizar el programa: ", error)
+    notification.error("Error", "No se logró actualizar el programa")
+    closeModal();
+  }
+}
+
+const confirmDelete = (code: SubProgram) => {
+  subProgramToDelete.value = code;
+  showConfirmDialog.value = true;
+};
+
+const handleDeleteCancel = () => {
+  showConfirmDialog.value = false;
+  subProgramToDelete.value = null;
+};
+
+const handleDeleteConfirm = async () => {
+  try {
+    if (subProgramToDelete.value && subProgramToDelete.value.sub_program_name != undefined) {
+      let response = await subProgramService.delete(subProgramToDelete.value.sub_program_name)
+      if (response.success) {
+
+        notification.success(
+          "¡Eliminado!",
+          "El programa ha sido eliminado correctamente"
+        );
+
+        loadSubPrograms();
+        handleDeleteCancel()
+        return
+      }
+      console.error("Error al eliminar el programa: ", response.error)
+      notification.error("Error", "No se logro eliminar el programa")
+      handleDeleteCancel()
+    }
+  } catch (error) {
+    console.error("Error al eliminar el programa: ", error)
+    notification.error("Error", "No se logro eliminar el programa")
+    handleDeleteCancel()
   }
 };
+
+onMounted(() => {
+  loadClients();
+  loadPrograms();
+  loadSubPrograms();
+})
 </script>
 
 <style scoped>

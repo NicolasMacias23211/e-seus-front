@@ -8,6 +8,15 @@ export class UsersService {
         return await http.get<PaginatedResponse<User>>(this.endPoint)
     }
 
+    async getAllPaginated(
+        page: number,
+        pageSize: number,
+      ): Promise<ApiResponse<PaginatedResponse<User>>> {
+        return await http.get<PaginatedResponse<User>>(
+          `${this.endPoint}?page=${page}&page_size=${pageSize}`,
+        );
+      }
+
     async getByNetworkUser(networkUser: string): Promise<ApiResponse<User>> {
         return await http.get<User>(`${this.endPoint}${encodeURIComponent(networkUser)}/`)
     }

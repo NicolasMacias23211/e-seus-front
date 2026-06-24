@@ -74,6 +74,11 @@
           </tbody>
         </table>
       </div>
+      <Pagination 
+        :total-registers="total"
+        :items-count="itemsCount" 
+        @change="loadData" 
+      />
     </div>
 
     <Teleport to="body">
@@ -101,9 +106,13 @@
               >
                 Nombre del Cliente <span class="text-red-500">*</span>
               </label>
+              <div>
+              <input id="clientId" v-model.number="form.id_client" type="number" required hidden
+                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all disabled:bg-slate-100" />
+            </div>
               <input
                 id="clientName"
-                v-model="form.clientName"
+                v-model="form.client_name"
                 type="text"
                 required
                 maxlength="45"
@@ -147,91 +156,176 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { Building2, Plus, Edit2, Trash2 } from "lucide-vue-next";
 import { useNotification } from "../../utils/useNotification";
 import type { Client } from "../../models/Client";
 import ConfirmDialog from "../../components/ConfirmDialog.vue";
+import type { PaginationState } from "../../components/Pagination.vue";
+import Pagination from "../../components/Pagination.vue";
+import { ClientsService } from "../../services/clientsService.ts";
 
 const notification = useNotification();
+const clientService = new ClientsService();
+const clients = ref<Client[]>([]);
+const total = ref(0)
+const itemsCount = ref(0)
 
-const clients = ref<Client[]>([
-  { client_name: "Cliente A - Empresa Tech" },
-  { client_name: "Cliente B - Corporación Global" },
-  { client_name: "Cliente C - Soluciones SA" },
-]);
+const loadData = async (pagination?: PaginationState) => {
+  try {
+    const page = pagination?.currentPage ?? 1
+    const perPage = pagination?.perPage ?? 10
+    const response = await clientService.getAllPaginated(page, perPage)
+    if (response.data && response.data.results) {
+      clients.value = response.data.results
+      total.value = response.data.count
+      itemsCount.value = response.data.results.length
+    }
+  } catch (error) {
+    console.error("Error al cargar los códigos de cierre: ", error)
+    notification.error("Error", "No se pudieron cargar los códigos de cierre")
+  }
+}
 
+const showConfirmDialog = ref(false);
+const clientToDelete = ref<Client | null>(null);
 const showModal = ref(false);
 const isEditing = ref(false);
 const editingIndex = ref(-1);
 
 const form = reactive({
-  clientName: "",
+  id_client: 0,
+  client_name: "",
+  client_name_last:""
 });
-
-const showConfirmDialog = ref(false);
-const clientToDelete = ref<Client | null>(null);
 
 const openCreateModal = () => {
   isEditing.value = false;
-  form.clientName = "";
+  form.id_client = 0;
+  form.client_name = "";
   showModal.value = true;
 };
 
-const openEditModal = (client: Client) => {
+const openEditModal = (code: Client) => {
   isEditing.value = true;
   editingIndex.value = clients.value.findIndex(
-    (c) => c.client_name === client.client_name
-  );
-  form.clientName = client.client_name;
+    (a) => a.client_name === code.client_name);
+  form.client_name = code.client_name ?? "";
+  form.client_name_last = code.client_name ?? "";
   showModal.value = true;
 };
 
 const closeModal = () => {
   showModal.value = false;
-  form.clientName = "";
+  form.client_name = "";
   isEditing.value = false;
   editingIndex.value = -1;
 };
 
 const handleSubmit = () => {
   if (isEditing.value) {
-    clients.value[editingIndex.value] = { client_name: form.clientName };
-    notification.success(
-      "¡Actualizado!",
-      "El cliente ha sido actualizado correctamente"
-    );
+    update();
   } else {
-    clients.value.push({ client_name: form.clientName });
-    notification.success("¡Creado!", "El cliente ha sido creado correctamente");
+    create();
   }
-  closeModal();
 };
 
-const confirmDelete = (client: Client) => {
-  clientToDelete.value = client;
+
+const create = async () => {
+  try {
+    let dataCreate: Client = ({
+      client_name: form.client_name
+    })
+
+    let response = await clientService.create(dataCreate);
+    if (response.success) {
+      notification.success(
+        "¡Creado!",
+        "El cliente ha sido creado correctamente"
+      );
+      loadData();
+      closeModal();
+      return
+    }
+    console.error("Error al crear el cliente:", response.error);
+    notification.error("Error", "No se logró crear el cliente");
+    closeModal();
+  } catch (error) {
+    console.error("Error al crear el cliente: ", error);
+    notification.error("Error", "No se logró crear el cliente");
+    closeModal();
+  }
+}
+
+
+const update = async () => {
+  try {
+    let data: Client = ({
+       client_name : form.client_name,
+    })
+
+    let response = await clientService.update(data, form.client_name_last)
+    if (response.success) {
+      
+      await clientService.delete(form.client_name_last)
+      notification.success(
+        "¡Actualizado!",
+        "El Cliente ha sido actualizado correctamente"
+      );
+      loadData();
+      closeModal();
+      return
+    }
+    console.error("Error al actualizar el cliente: ", response.error)
+    notification.error("Error", "No se logro actualizar el cliente")
+    closeModal();
+  } catch (error) {
+    console.error("Error al actualizar el cliente: ", error)
+    notification.error("Error", "No se logró actualizar el cliente")
+    closeModal();
+  }
+}
+
+const confirmDelete = (code: Client) => {
+  clientToDelete.value = code;
   showConfirmDialog.value = true;
-};
-
-const handleDeleteConfirm = () => {
-  if (clientToDelete.value) {
-    const index = clients.value.findIndex(
-      (c) => c.client_name === clientToDelete.value!.client_name
-    );
-    clients.value.splice(index, 1);
-    notification.success(
-      "¡Eliminado!",
-      "El cliente ha sido eliminado correctamente"
-    );
-  }
-  showConfirmDialog.value = false;
-  clientToDelete.value = null;
 };
 
 const handleDeleteCancel = () => {
   showConfirmDialog.value = false;
   clientToDelete.value = null;
 };
+
+const handleDeleteConfirm = async () => {
+  try {
+    if (clientToDelete.value && clientToDelete.value.client_name != undefined) {
+      let response = await clientService.delete(clientToDelete.value.client_name)
+      if (response.success) {
+
+        notification.success(
+          "¡Eliminado!",
+          "El cliente ha sido eliminado correctamente"
+        );
+
+        loadData();
+        handleDeleteCancel()
+        return
+      }
+      console.error("Error al eliminar el cliente: ", response.error)
+      notification.error("Error", "No se logro eliminar el cliente")
+      handleDeleteCancel()
+    }
+  } catch (error) {
+    console.error("Error al eliminar el cliente: ", error)
+    notification.error("Error", "No se logro eliminar el cliente")
+    handleDeleteCancel()
+  }
+};
+
+onMounted(() => {
+  loadData();
+})
+
 </script>
 
 <style scoped>
@@ -240,6 +334,7 @@ const handleDeleteCancel = () => {
     transform: scale(0.9);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;

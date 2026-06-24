@@ -8,6 +8,15 @@ export class TicketPriorityService {
         return await http.get<PaginatedResponse<TicketPriority>>(this.endPoint);
     }
 
+    async getAllPaginated(
+        page: number,
+        pageSize: number,
+      ): Promise<ApiResponse<PaginatedResponse<TicketPriority>>> {
+        return await http.get<PaginatedResponse<TicketPriority>>(
+          `${this.endPoint}?page=${page}&page_size=${pageSize}`,
+        );
+      }
+
     async create(ticketPriority: TicketPriority): Promise<ApiResponse<TicketPriority>> {
         return await http.post<TicketPriority>(this.endPoint, ticketPriority);
     }
