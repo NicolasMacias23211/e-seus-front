@@ -163,8 +163,8 @@
       </div>
     </div>
     <ConfirmDialog :is-visible="showConfirmDialog" type="delete" title="Confirmar Eliminación"
-      :message="`¿Está seguro de que desea eliminar el horario del día?`"
-      details="Esta acción eliminará permanentemente el horario del sistema. Los ticket relacionados a este horario también podrían verse afectados."
+      :message="`¿Está seguro de que desea eliminar a ${getAtributesUser(employeeScheduleToDelete?.e_user || '').fullName} la programación del día ${employeeScheduleToDelete?.date}?`"
+      details="Esta acción eliminará permanentemente la programación del sistema. Los ticket relacionados a esta programación también podrían verse afectados."
       confirm-text="Sí, Eliminar" cancel-text="Cancelar" @confirm="handleDeleteConfirm" @cancel="handleDeleteCancel" 
       />
   </div>
@@ -372,7 +372,7 @@ const loadEmployeeSchedule = async () => {
       employeeSchedules.value = response.data.results
     }
   } catch (error) {
-    console.error("Error al cargar los E-Users: ", error)
+    console.error("Error al cargar la programación de empleados: ", error)
   }
 }
 
@@ -407,11 +407,11 @@ const create = async (userName: string, date: string) => {
       loadEmployeeSchedule();
       return
     }
-    console.error("Error al crear el horario: ", response.error)
-    notification.error("Error", "No se logro crear el horario")
+    console.error("Error al crear la programación: ", response.error)
+    notification.error("Error", "No se logro crear la programación")
   } catch (error) {
-    console.error("Error al crear el horario: ", error)
-    notification.error("Error", "No se logro crear el horario")
+    console.error("Error al crear la programación: ", error)
+    notification.error("Error", "No se logro crear la programación")
   }
 }
 
@@ -423,10 +423,10 @@ const update = async (object :EmpoyeeSchedule, date: string) => {
       e_user: object.e_user,
       date: `${year}-${month}-${day}`
     })
-    
+
     if(!object.id_employee_schudele) {
-      console.error("Error al actualizar el horario id")
-      notification.error("Error", "No se logro actualizar el horario id")
+      console.error("Error al actualizar la programación id")
+      notification.error("Error", "No se logro actualizar la programación id")
       return
     }
 
@@ -440,11 +440,11 @@ const update = async (object :EmpoyeeSchedule, date: string) => {
       loadEmployeeSchedule();
       return
     }
-    console.error("Error al crear el horario: ", response.error)
-    notification.error("Error", "No se logro crear el horario")
+    console.error("Error al crear la programación: ", response.error)
+    notification.error("Error", "No se logro crear la programación")
   } catch (error) {
-    console.error("Error al crear el horario: ", error)
-    notification.error("Error", "No se logro crear el horario")
+    console.error("Error al crear la programación: ", error)
+    notification.error("Error", "No se logro crear la programación")
   }
 }
 
@@ -471,13 +471,13 @@ const handleDeleteConfirm = async () => {
         handleDeleteCancel()
         return
       }
-      console.error("Error al eliminar el horario: ", response.error)
-      notification.error("Error", "No se logro eliminar el horario")
+      console.error("Error al eliminar la programación: ", response.error)
+      notification.error("Error", "No se logro eliminar la programación")
       handleDeleteCancel()
     }
   } catch (error) {
-    console.error("Error al eliminar el horario: ", error)
-    notification.error("Error", "No se logro eliminar el horario")
+    console.error("Error al eliminar la programación: ", error)
+    notification.error("Error", "No se logro eliminar la programación")
     handleDeleteCancel()
   }
 };
