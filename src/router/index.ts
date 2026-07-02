@@ -117,6 +117,11 @@ const router = createRouter({
       component: () => import("../../views/adminMenu/WorkingHours.vue"),
     },
     {
+      path: "/settings/programacion",
+      name: "settings-progamación",
+      component: () => import("../../views/adminMenu/ScheduleDays.vue"),
+    },
+    {
       path: "/create-ticket",
       name: "create-ticket",
       component: () => import("../../views/externalsUsers/CreateTicket.vue"),
