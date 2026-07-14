@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="boardRef"
     class="h-full flex flex-col bg-gradient-to-br from-slate-50 to-slate-100"
   >
     <div class="bg-white border-b border-slate-200 shadow-sm">
@@ -45,12 +46,131 @@
                 Buscar
               </button>
             </div>
-            <button
-              class="p-2.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all text-slate-600"
-              title="Filtros"
-            >
-              <Filter class="h-4 w-4" />
-            </button>
+            <div class="relative">
+              <button
+                @click="toggleFiltersPanel"
+                :class="[
+                  'relative p-2.5 bg-white border rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all text-slate-600',
+                  showFiltersPanel ? 'ring-2 ring-[#50bdeb]' : '',
+                ]"
+                title="Filtros"
+              >
+                <Filter class="h-4 w-4" />
+                <span
+                  v-if="isFilterActive"
+                  class="absolute top-1 right-1 h-2 w-2 rounded-full bg-[#50bdeb] border border-white"
+                />
+              </button>
+
+              <div
+                v-if="showFiltersPanel"
+                @click.stop
+                class="absolute right-0 mt-2 w-[320px] bg-white border border-slate-200 rounded-3xl shadow-2xl p-4 z-30"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <div>
+                    <p class="text-sm font-semibold text-slate-800">Filtros</p>
+                    <p class="text-xs text-slate-500">
+                      Ajusta la búsqueda general por estado y datos clave.
+                    </p>
+                  </div>
+                  <button
+                    @click="showFiltersPanel = false"
+                    class="text-slate-400 hover:text-slate-700 transition-colors"
+                    aria-label="Cerrar filtros"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div class="space-y-3">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">
+                      Estado
+                    </label>
+                    <select
+                      v-model="filterStatus"
+                      class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent"
+                    >
+                      <option value="">Todos</option>
+                      <option
+                        v-for="column in columns"
+                        :key="column.status"
+                        :value="column.title"
+                      >
+                        {{ column.title }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">
+                      Servicio
+                    </label>
+                    <select
+                      v-model="filterService"
+                      class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent"
+                    >
+                      <option value="">Todos</option>
+                      <option
+                        v-for="service in servicesList"
+                        :key="service.id_services"
+                        :value="service.service_name"
+                      >
+                        {{ service.service_name }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">
+                      ANS
+                    </label>
+                    <select
+                      v-model="filterAns"
+                      class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent"
+                    >
+                      <option value="">Todas</option>
+                      <option
+                        v-for="ans in ansList"
+                        :key="ans.id_ans"
+                        :value="String(ans.id_ans)"
+                      >
+                        {{ ans.ans_name }}
+                      </option>
+                    </select>
+                  </div>
+
+
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">
+                      Palabra clave
+                    </label>
+                    <input
+                      v-model="filterKeyword"
+                      type="text"
+                      placeholder="Título o descripción"
+                      class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#50bdeb] focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div class="mt-4 flex items-center justify-between gap-2">
+                  <button
+                    @click="clearFilters"
+                    class="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all"
+                  >
+                    Limpiar
+                  </button>
+                  <button
+                    @click="applyFilters"
+                    class="flex-1 px-3 py-2 bg-[#021C7D] text-white rounded-lg text-sm font-semibold hover:bg-[#021C7D]/90 transition-all"
+                  >
+                    Aplicar
+                  </button>
+                </div>
+              </div>
+            </div>
             <button
               class="p-2.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all text-slate-600"
               title="Configuración"
@@ -1069,7 +1189,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import TicketCard from "../components/TicketCard.vue";
 import CommentEditor from "../components/CommentEditor.vue";
 import {
@@ -1126,9 +1246,15 @@ const isDeletingZone = ref(false);
 const isCompletingZone = ref(false);
 const draggedTicket = ref<TicketShort | null>(null);
 const showModal = ref(false);
+const showFiltersPanel = ref(false);
+const filterStatus = ref("");
+const filterService = ref("");
+const filterAns = ref("");
+const filterKeyword = ref("");
 const notesService = new NotesService();
 const modalAction = ref<"move" | "delete" | "complete" | "view">("move");
 const targetStatus = ref<number | null>(null);
+const boardRef = ref<HTMLElement | null>(null);
 const SessionStorageServiceInstance = new SessionStorageService();
 const CurrentUserInfo: UserInfo =
   SessionStorageServiceInstance.getUserInfo() || {
@@ -1369,6 +1495,7 @@ const loadTickets = async () => {
       CurrentUserInfo.username,
     );
     if (response.data && response.data.results) {
+      console.log(response.data)
       TicketsShort.value = response.data.results.flat();
     }
   } catch (error) {
@@ -1538,6 +1665,81 @@ const calculateEstimatedDateIfNeeded = async () => {
   }
 };
 
+const filteredTickets = computed(() => {
+  return TicketsShort.value.filter((ticket) => {
+    if (filterStatus.value && ticket.status_name !== filterStatus.value) {
+      return false;
+    }
+    if (filterService.value && ticket.service_name !== filterService.value) {
+      return false;
+    }
+    if (filterAns.value) {
+      const selectedAnsId = parseInt(filterAns.value, 10);
+      if (
+        isNaN(selectedAnsId) ||
+        ticket.ticket_ans === null ||
+        ticket.ticket_ans === undefined ||
+        Number(ticket.ticket_ans) !== selectedAnsId
+      ) {
+        return false;
+      }
+    }
+
+    const keyword = filterKeyword.value.trim().toLowerCase();
+    if (keyword) {
+      const titleMatch = ticket.ticket_title
+        .toLowerCase()
+        .includes(keyword);
+      const descriptionMatch = ticket.ticket_description
+        ? ticket.ticket_description.toLowerCase().includes(keyword)
+        : false;
+      if (!titleMatch && !descriptionMatch) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+});
+
+const isFilterActive = computed(() => {
+  return (
+    !!filterStatus.value ||
+    !!filterService.value ||
+    !!filterAns.value ||
+    !!filterKeyword.value
+  );
+});
+
+const toggleFiltersPanel = async () => {
+  showFiltersPanel.value = !showFiltersPanel.value;
+  if (showFiltersPanel.value) {
+    await loadModalData();
+  }
+};
+
+const applyFilters = () => {
+  showFiltersPanel.value = false;
+};
+
+const clearFilters = () => {
+  filterStatus.value = "";
+  filterService.value = "";
+  filterAns.value = "";
+  filterKeyword.value = "";
+};
+
+const handleDocumentClick = (event: MouseEvent) => {
+  const target = event.target as HTMLElement;
+  if (
+    showFiltersPanel.value &&
+    boardRef.value &&
+    !boardRef.value.contains(target)
+  ) {
+    showFiltersPanel.value = false;
+  }
+};
+
 const columns = ref<
   {
     title: string;
@@ -1565,6 +1767,11 @@ onMounted(() => {
   loadColumsByStatus();
   loadTickets();
   loadAns();
+  document.addEventListener("click", handleDocumentClick);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("click", handleDocumentClick);
 });
 
 const ticketsByStatus = computed(() => {
@@ -1573,7 +1780,7 @@ const ticketsByStatus = computed(() => {
     result[column.status] = [];
   });
 
-  TicketsShort.value.forEach((ticket) => {
+  filteredTickets.value.forEach((ticket) => {
     const matchingStatus = Array.from(statusIdMap.value.values()).find(
       (status) =>
         status.status_name.toLowerCase().trim() ===
@@ -1617,17 +1824,27 @@ const handleDragLeave = (_statusId: number) => {};
 const handleDrop = async (event: DragEvent, newStatusId: number) => {
   event.preventDefault();
   if (!draggedTicket.value) return;
-
+  
   const newStatus = statusIdMap.value.get(newStatusId);
   if (!newStatus) {
     notification.error("Error", "Estado no encontrado");
     return;
   }
-
+  
   const oldStatusName = draggedTicket.value.status_name;
   const newStatusName = newStatus.status_name;
+  const oldStatus = Array.from(statusIdMap.value.values()).find(status => {
+    return status.status_name.toLowerCase().trim() === oldStatusName?.toLowerCase().trim()
+  });
 
-  if (oldStatusName !== newStatusName) {
+  const oldOrdering = oldStatus?.ordering ?? 0;
+  const newOrdering = newStatus.ordering ?? 0;
+  if (oldOrdering > newOrdering){
+    notification.error("Error", "No se puede mover el ticket a un estado anterior");
+    return
+  }
+
+  if (oldStatusName !== newStatusName && oldOrdering < newOrdering) {
     await loadModalData();
 
     try {
@@ -2385,7 +2602,7 @@ const hideAssignedToDropdown = () => {
 
 const searchTicketById = async () => {
   const ticketId = parseInt(searchQuery.value.trim());
-
+  console.log("Buscando ticket con ID:", ticketId);
   if (isNaN(ticketId) || ticketId <= 0) {
     notification.warning(
       "ID inválido",

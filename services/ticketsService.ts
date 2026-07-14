@@ -17,9 +17,10 @@ export class TicketsService {
     assigned_to: string,
   ): Promise<ApiResponse<PaginatedResponse<TicketShort>>> {
     return await http.get<PaginatedResponse<TicketShort>>(
-      `/tickets/?assigned_to=${assigned_to}`,
+      `/tickets/?assigned_to=${assigned_to}&cumplimiento__isnull=true`,
     );
   }
+  
   async getAllTicketsWithoutAssignment(
     page: number,
     pageSize: number,
@@ -75,7 +76,6 @@ export class TicketsService {
   }
 
   async create(ticket: TicketCreate): Promise<ApiResponse<Ticket>> {
-    console.log("Datos del ticket a crear:", ticket);
     return await http.post<Ticket, TicketCreate>("/tickets/", ticket);
   }
 

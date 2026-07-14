@@ -14,6 +14,15 @@ export class eUsersService {
     return await http.get<EUser>(`/eusers/${networkUser}/`);
   }
 
+  async getAllPaginated(
+    page: number,
+    pageSize: number,
+  ): Promise<ApiResponse<PaginatedResponse<EUser>>> {
+    return await http.get<PaginatedResponse<EUser>>(
+      `${this.endPoint}?page=${page}&page_size=${pageSize}`,
+    );
+  }
+
   async getAll(): Promise<ApiResponse<PaginatedResponse<EUser>>> {
     return await http.get<PaginatedResponse<EUser>>(this.endPoint);
   }

@@ -55,13 +55,13 @@
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center justify-center gap-2">
-                  <button
+                  <!-- <button
                     @click="openEditModal(priority)"
                     class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all"
                     title="Editar"
                   >
                     <Edit2 class="w-4 h-4" />
-                  </button>
+                  </button> -->
                   <button
                     @click="confirmDelete(priority)"
                     class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all"
@@ -80,6 +80,11 @@
           </tbody>
         </table>
       </div>
+      <Pagination 
+        :total-registers="total"
+        :items-count="itemsCount" 
+        @change="loadPriorities" 
+      />
     </div>
 
     <Teleport to="body">
@@ -153,6 +158,8 @@ import { useNotification } from "../../utils/useNotification";
 import { TicketPriorityService } from "../../services/ticketPriorityService";
 import type { TicketPriority } from "../../models/TicketPriority";
 import ConfirmDialog from "../../components/ConfirmDialog.vue";
+import Pagination from "../../components/Pagination.vue";
+import type { PaginationState } from "../../components/Pagination.vue";
 
 
 const notification = useNotification();
@@ -163,8 +170,8 @@ const clientToDelete = ref<TicketPriority | null>(null);
 const showModal = ref(false);
 const isEditing = ref(false);
 const editingIndex = ref(-1);
-
-
+const total = ref(0)
+const itemsCount = ref(0)
 
 
 const form = reactive({
@@ -297,15 +304,19 @@ const handleDeleteConfirm = async () => {
   }
 };
 
-const loadPriorities = async () => {
+const loadPriorities = async (pagination ?: PaginationState) => {
   try {
-    const response = await ticketPriorityService.getAll()
+    const page = pagination?.currentPage ?? 1
+    const perPage = pagination?.perPage ?? 10
+    const response = await ticketPriorityService.getAllPaginated(page, perPage)
     if (response.data && response.data.results) {
       priorities.value = response.data.results
+      total.value = response.data.count
+      itemsCount.value = response.data.results.length
     }
   } catch (error) {
-    console.error("Error al cargar las prioridades: ", error)
-    notification.error("Error", "No se pudieron cargar las prioridades")
+    console.error("Error al cargar los códigos de cierre: ", error)
+    notification.error("Error", "No se pudieron cargar los códigos de cierre")
   }
 }
 

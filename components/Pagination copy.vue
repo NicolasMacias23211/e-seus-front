@@ -22,7 +22,7 @@
         @click="goToPage(pagination.currentPage + 1)"
         :disabled="pagination.currentPage == pagination.totalPages"
         :class="{
-          'bg-[#021c7d] hover:bg-[#0829a3] cursor-pointer':
+          'bg-[#021c7d] hover:bg-[#0829a3] text-white cursor-pointer':
             pagination.currentPage != pagination.totalPages,
           'bg-white/10 text-white/30 cursor-not-allowed':
             pagination.currentPage == pagination.totalPages,
@@ -65,7 +65,7 @@
               pagination.totalPages < 2
             "
             @click="goToPage(pagination.currentPage - 1)"
-            class="relative inline-flex items-center rounded-lg px-2 py-2 transition-colors"
+            class="relative inline-flex items-center rounded-lg px-2 py-2 text-white/60 transition-colors"
             :class="{
               'hover:bg-[#50bdeb] hover:text-white cursor-pointer':
                 pagination.currentPage != pagination.firstPage,
@@ -85,10 +85,10 @@
             @click="goToPage(pagination.firstPage)"
             :value="pagination.firstPage"
             :class="{
-              'bg-[#50bdeb] text-white cursor-not-allowed': pagination.currentPage == pagination.firstPage,
-              'cursor-pointer hover:bg-[#021c7d] ': pagination.currentPage != pagination.firstPage,
+              'bg-[#50bdeb] text-white':
+                pagination.currentPage == pagination.firstPage,
             }"
-            class="relative z-10 inline-flex items-center rounded-lg px-4 py-2 text-sm hover:text-white transition-colors"
+            class="relative z-10 inline-flex items-center rounded-lg px-4 py-2 text-sm text-white/70 cursor-pointer hover:bg-[#021c7d] hover:text-white transition-colors"
           />
           <span
             v-if="pagination.totalPages > 5"
@@ -106,10 +106,10 @@
             "
             @click="goToPage(pagination.previous!)"
             :class="{
-              'bg-[#50bdeb] text-white cursor-not-allowed': pagination.currentPage == pagination.previous,
-              'cursor-pointer hover:bg-[#021c7d] ': pagination.currentPage != pagination.previous,
+              'bg-[#50bdeb] text-white':
+                pagination.currentPage == pagination.previous,
             }"
-            class="relative z-10 inline-flex items-center rounded-lg px-4 py-2 text-sm hover:text-white transition-colors"
+            class="relative z-10 inline-flex items-center rounded-lg px-4 py-2 text-sm text-white/70 cursor-pointer hover:bg-[#021c7d] hover:text-white transition-colors"
           />
           <input
             v-if="pagination.totalPages > 2"
@@ -118,10 +118,10 @@
             @click="goToPage(pagination.center)"
             :disabled="pagination.currentPage == pagination.center"
             :class="{
-              'bg-[#50bdeb] text-white cursor-not-allowed': pagination.currentPage == pagination.center,
-              'cursor-pointer hover:bg-[#021c7d] ': pagination.currentPage != pagination.center,
+              'bg-[#50bdeb] text-white':
+                pagination.currentPage == pagination.center,
             }"
-            class="relative z-10 inline-flex items-center rounded-lg px-4 py-2 text-sm hover:text-white transition-colors"
+            class="relative z-10 inline-flex items-center rounded-lg px-4 py-2 text-sm text-white/70 cursor-pointer hover:bg-[#021c7d] hover:text-white transition-colors"
           />
           <input
             v-if="pagination.totalPages > 3"
@@ -132,10 +132,10 @@
             "
             @click="goToPage(pagination.next!)"
             :class="{
-              'bg-[#50bdeb] text-white cursor-not-allowed': pagination.currentPage == pagination.next,
-              'cursor-pointer hover:bg-[#021c7d] ': pagination.currentPage != pagination.next,
+              'bg-[#50bdeb] text-white':
+                pagination.currentPage == pagination.next,
             }"
-            class="relative z-10 inline-flex items-center rounded-lg px-4 py-2 text-sm hover:text-white transition-colors"
+            class="relative z-10 inline-flex items-center rounded-lg px-4 py-2 text-sm text-white/70 cursor-pointer hover:bg-[#021c7d] hover:text-white transition-colors"
           />
 
           <span
@@ -150,10 +150,10 @@
             @click="goToPage(pagination.totalPages)"
             :value="pagination.totalPages"
             :class="{
-              'bg-[#50bdeb] text-white cursor-not-allowed': pagination.currentPage == pagination.totalPages,
-              'cursor-pointer hover:bg-[#021c7d] ': pagination.currentPage != pagination.totalPages,
+              'bg-[#50bdeb] text-white':
+                pagination.currentPage == pagination.totalPages,
             }"
-            class="relative z-10 inline-flex items-center rounded-lg px-4 py-2 text-sm hover:text-white transition-colors"
+            class="relative z-10 inline-flex items-center rounded-lg px-4 py-2 text-sm text-white/70 cursor-pointer hover:bg-[#021c7d] hover:text-white transition-colors"
           />
           <button
             type="button"
@@ -165,7 +165,7 @@
               'opacity-30 cursor-not-allowed':
                 pagination.currentPage == pagination.totalPages,
             }"
-            class="relative z-10 inline-flex items-center rounded-lg px-2 py-2 text-sm transition-colors"
+            class="relative z-10 inline-flex items-center rounded-lg px-2 py-2 text-sm text-white/60 transition-colors"
           >
             <ChevronRight class="size-5" aria-hidden="true" />
           </button>

@@ -2,24 +2,28 @@ import { type SubProgram } from "../models/SubProgram";
 import { http, type ApiResponse, type PaginatedResponse } from "./http";
 
 export class SubProgramsService {
-  private endPoint = "/subprograms/";
+  private endPoint = "/sub-programs/";
 
   async getAll(): Promise<ApiResponse<PaginatedResponse<SubProgram>>> {
-    return await http.get<PaginatedResponse<SubProgram>>(this.endPoint);
+          return await http.get<PaginatedResponse<SubProgram>>(this.endPoint)
   }
-
-  async create(subProgram: SubProgram): Promise<ApiResponse<SubProgram>> {
-    return await http.post<SubProgram>(this.endPoint, subProgram);
+  async getAllPaginated(
+      page: number,
+      pageSize: number,
+  ): Promise<ApiResponse<PaginatedResponse<SubProgram>>> {
+      return await http.get<PaginatedResponse<SubProgram>>(
+          `${this.endPoint}?page=${page}&page_size=${pageSize}`,
+      );
   }
-
-  async update(
-    subProgram: SubProgram,
-    id: number,
-  ): Promise<ApiResponse<SubProgram>> {
-    return await http.put<SubProgram>(`${this.endPoint + id}/`, subProgram);
+  
+  async create(sub_program: SubProgram): Promise<ApiResponse<SubProgram>> {
+      return await http.post<SubProgram>(this.endPoint, sub_program);
+    }
+  
+  async update(sub_program: SubProgram, client_name: string): Promise<ApiResponse<SubProgram>> {
+    return await http.put<SubProgram>(`${this.endPoint + sub_program}/`, sub_program);
   }
-
-  async delete(id: number): Promise<ApiResponse<SubProgram>> {
-    return await http.delete<SubProgram>(this.endPoint + id + "/");
+  async delete(sub_program: string): Promise<ApiResponse<SubProgram>> {
+    return await http.delete<SubProgram>(this.endPoint + sub_program + "/");
   }
 }

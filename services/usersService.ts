@@ -8,6 +8,15 @@ export class UsersService {
         return await http.get<PaginatedResponse<User>>(this.endPoint)
     }
 
+    async getAllPaginated(
+        page: number,
+        pageSize: number,
+      ): Promise<ApiResponse<PaginatedResponse<User>>> {
+        return await http.get<PaginatedResponse<User>>(
+          `${this.endPoint}?page=${page}&page_size=${pageSize}`,
+        );
+      }
+
     async getByNetworkUser(networkUser: string): Promise<ApiResponse<User>> {
         return await http.get<User>(`${this.endPoint}${encodeURIComponent(networkUser)}/`)
     }
@@ -24,7 +33,6 @@ export class UsersService {
                 return existingUser;
             }
             
-            console.log("Usuario no existe, creando...");
             return await this.create(user);
         } catch (error: any) {
             if (error.status === 404 || error.code === 404) {

@@ -121,6 +121,11 @@
         </div>
       </div>
     </div>
+    <Pagination 
+      :total-registers="total"
+      :items-count="itemsCount" 
+      @change="loadTeamMembers" 
+    />
   </div>
 </template>
 
@@ -131,6 +136,8 @@ import type { EUser, Role } from "../models";
 import { eUsersService } from "../services/e-usersService";
 import { RolesService } from "../services/rolesService";
 import { useNotification } from "../utils/useNotification";
+import type { PaginationState } from "../components/Pagination.vue";
+import Pagination from "../components/Pagination.vue";
 
 const notification = useNotification();
 const eUsers = new eUsersService();
@@ -143,23 +150,44 @@ interface TeamMemberUI extends EUser {
 const teamMembers = ref<TeamMemberUI[]>([]);
 const availableRoles = ref<Role[]>([]);
 
-const loadTeamMembers = async () => {
+const total = ref(0)
+const itemsCount = ref(0)
+
+
+const loadTeamMembers = async (pagination?: PaginationState) => {
   try {
-    const response = await eUsers.getAll();
+    const page = pagination?.currentPage ?? 1
+    const perPage = pagination?.perPage ?? 10
+    const response = await eUsers.getAllPaginated(page, perPage)
     if (response.data && response.data.results) {
       teamMembers.value = response.data.results.flat().map((member: EUser) => ({
         ...member,
         initials: getInitials(member.name, member.last_name),
       }));
+      total.value = response.data.count
+      itemsCount.value = response.data.results.length
     }
   } catch (error) {
-    notification.error(
-      "Error",
-      "No se pudieron cargar los miembros del equipo."
-    );
+    console.error("Error al cargar los usuarios: ", error)
+    notification.error("Error", "No se pudieron cargar los usuarios")
   }
-};
-
+}
+// const loadTeamMembers = async () => {
+//   try {
+//     const response = await eUsers.getAll();
+//     if (response.data && response.data.results) {
+//       teamMembers.value = response.data.results.flat().map((member: EUser) => ({
+//         ...member,
+//         initials: getInitials(member.name, member.last_name),
+//       }));
+//     }
+//   } catch (error) {
+//     notification.error(
+//       "Error",
+//       "No se pudieron cargar los miembros del equipo."
+//     );
+//   }
+// };
 const getInitials = (name: string, lastName: string): string => {
   const firstInitial = name?.charAt(0).toUpperCase() || "";
   const lastInitial = lastName?.charAt(0).toUpperCase() || "";
