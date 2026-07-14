@@ -1061,6 +1061,7 @@ const handleSubmit = async () => {
       reporter_user: sessionStorage.getUserInfo()?.username || "",
       status_id: form.statusId as number,
       assigned_to: sessionStorage.getUserInfo()?.username || "",
+      estimated_closing_date: null,
     };
 
     const response = await ticketsService.create(newTicket);

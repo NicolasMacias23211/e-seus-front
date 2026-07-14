@@ -220,7 +220,6 @@ import {
   Search,
 } from "lucide-vue-next";
 import { ref, onMounted } from "vue";
-import { toRaw } from 'vue';
 import { TicketsService } from "../services/ticketsService";
 import { AnsService } from "../services/ansService";
 import type { TicketList } from "../models/Ticket";
@@ -233,7 +232,7 @@ import { Holidays } from "../utils/holidays";
 import { eUsersService } from "../services/e-usersService";
 import type { TicketUpdate } from '../models/Ticket';
 import { useNotification } from "../utils/useNotification";
-import { WorkingHours } from "../models/WorkingHours";
+import type { WorkingHours } from "../models/WorkingHours";
 import { WorkingHoursService } from "../services/WorkingHoursService";
 
 interface loadDataParams {
@@ -360,7 +359,7 @@ class calculateTimeInElapsed {
   public combineDateAndTime(date: Date, end_time: string): Date {
     const [hours, minutes, seconds] = end_time.split(':').map(Number);
     const newDate = new Date(date);
-    newDate.setHours(hours, minutes, seconds || 0, 0);
+    newDate.setHours(hours ?? 0, minutes ?? 0, seconds || 0, 0);
     return newDate;
   }
 
@@ -389,7 +388,7 @@ class calculateTimeInElapsed {
   }
 
   public isWorkingDay(date: Date): boolean {
-    if (holidays.value.includes(date.toISOString().split('T')[0])) {
+    if (holidays.value.includes(date.toISOString().split('T')[0] ?? '')) {
       return false;
     }
     const response = workingHours.value?.some(element => {
