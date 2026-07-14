@@ -144,7 +144,8 @@
     <ConfirmDialog :is-visible="showConfirmDialog" type="delete" title="Confirmar Eliminación"
       :message="`¿Está seguro de que desea eliminar el horario del día '${horarioToDelete?.week_day}'?`"
       details="Esta acción eliminará permanentemente el horario del sistema. Los ticket relacionados a este horario también podrían verse afectados."
-      confirm-text="Sí, Eliminar" cancel-text="Cancelar" @confirm="handleDeleteConfirm" @cancel="handleDeleteCancel" />
+      confirm-text="Sí, Eliminar" cancel-text="Cancelar" @confirm="handleDeleteConfirm" @cancel="handleDeleteCancel" 
+      />
   </div>
 </template>
 
