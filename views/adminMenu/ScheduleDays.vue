@@ -180,7 +180,7 @@ import {
 import { useNotification } from "../../utils/useNotification";
 import { eUsersService } from '../../services/e-usersService';
 import type { EUser } from "../../models/EUser";
-import { EmpoyeeSchedule } from '../../models/EmployeeSchedule';
+import type { EmployeeSchedule } from '../../models/EmployeeSchedule';
 import { EmployeeScheduleService } from '../../services/employeeSchedule';
 import ConfirmDialog from "../../components/ConfirmDialog.vue";
 import { Holidays } from "../../utils/holidays.ts";
@@ -189,14 +189,14 @@ const notification = useNotification();
 const eUsersServices = new eUsersService();
 const eUsers = ref<EUser[]>([]);
 const employeeScheduleService = new EmployeeScheduleService() // Debe ser optimizado para buscar en el rango de fecha de masximo 3 semanas.
-const employeeSchedules = ref<EmpoyeeSchedule[]>([])
+const employeeSchedules = ref<EmployeeSchedule[]>([])
 const currentWeekStart = ref(new Date());
 const search = ref('');
-const employeeScheduleToDelete = ref<EmpoyeeSchedule | null>(null);
+const employeeScheduleToDelete = ref<EmployeeSchedule | null>(null);
 const showConfirmDialog = ref(false);
 const holidayServices = new Holidays();
 const holidays = ref<string[]>(holidayServices.getLocalStorage() || []);
-const draggedElement = ref<EmpoyeeSchedule | EUser | null>(null);
+const draggedElement = ref<EmployeeSchedule | EUser | null>(null);
 const filteredEUser = computed(() => {
   return eUsers.value.filter((user) => user.full_name.toLowerCase().includes(search.value.toLowerCase()))
 })
@@ -248,14 +248,13 @@ const currentYearLabel = computed(() => {
 });
 
 const employeeSchedulesByDate = computed(() => {
-  const grouped: Record<string, EmpoyeeSchedule[]> = {};
+  const grouped: Record<string, EmployeeSchedule[]> = {};
 
   employeeSchedules.value.forEach(schedule => {
     if (!grouped[schedule.date]) {
       grouped[schedule.date] = [];
     }
-
-    grouped[schedule.date].push(schedule);
+    grouped[schedule.date]!.push(schedule);
   });
 
   return grouped;
@@ -307,12 +306,12 @@ const goToToday = () => {
 };
 
 function elementIsEUser(
-  object: EUser | EmpoyeeSchedule
+  object: EUser | EmployeeSchedule
 ): object is EUser {
   return "network_user" in object;
 }
 
-const handleDragStart = (event: DragEvent, object: EUser | EmpoyeeSchedule) => {
+const handleDragStart = (event: DragEvent, object: EUser | EmployeeSchedule) => {
   if (event.dataTransfer) {
     event.dataTransfer.effectAllowed = "copy";
   }
@@ -392,7 +391,7 @@ const create = async (userName: string, date: string) => {
   try {
     const [year, month, day] = date.split("-").map(Number);
 
-    let dataCreate: EmpoyeeSchedule = ({
+    let dataCreate: EmployeeSchedule = ({
       e_user: userName,
       date: `${year}-${month}-${day}`
     })
@@ -415,11 +414,11 @@ const create = async (userName: string, date: string) => {
   }
 }
 
-const update = async (object :EmpoyeeSchedule, date: string) => {
+const update = async (object :EmployeeSchedule, date: string) => {
   try {
     const [year, month, day] = date.split("-").map(Number);
 
-    let dataCreate: EmpoyeeSchedule = ({
+    let dataCreate: EmployeeSchedule = ({
       e_user: object.e_user,
       date: `${year}-${month}-${day}`
     })
@@ -448,7 +447,7 @@ const update = async (object :EmpoyeeSchedule, date: string) => {
   }
 }
 
-const confirmDelete = (code: EmpoyeeSchedule) => {
+const confirmDelete = (code: EmployeeSchedule) => {
   employeeScheduleToDelete.value = code;
   showConfirmDialog.value = true;
 };
@@ -488,6 +487,7 @@ const getAtributesUser = (user: string) => {
   const fullName = userFound?.full_name
   return {rolName: rolName, fullName: fullName}
 }
+
 
 onMounted(async () => {
   await loadEusers();

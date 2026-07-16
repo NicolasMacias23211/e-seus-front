@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<title>Modales Novedades</title>
+</head>
+
+<body class="bg-slate-100 p-10 space-y-10">
+
+<!-- ========================= -->
+<!-- MODAL CREAR NOVEDAD -->
+<!-- ========================= -->
+
+<div
+class="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden">
+
+    <div class="border-b p-6">
+
+        <h2 class="text-2xl font-bold">
+            Nueva Novedad
+        </h2>
+
+        <p class="text-slate-500">
+            Registrar vacaciones, permisos o incapacidades
+        </p>
+
+    </div>
+
+    <div class="p-6">
+
+        <div class="grid md:grid-cols-2 gap-5">
+
+            <div>
+
+                <label class="block mb-2 text-sm font-medium">
+                    Empleado
+                </label>
+
+                <input
+                    class="w-full border rounded-xl px-4 py-3">
+
+            </div>
+
+            <div>
+
+                <label class="block mb-2 text-sm font-medium">
+                    Tipo
+                </label>
+
+                <select
+                    class="w-full border rounded-xl px-4 py-3">
+
+                    <option>Vacaciones</option>
+                    <option>Permiso</option>
+                    <option>Incapacidad</option>
+
+                </select>
+
+            </div>
+
+            <div>
+
+                <label class="block mb-2 text-sm font-medium">
+                    Fecha inicio
+                </label>
+
+                <input
+                    type="date"
+                    class="w-full border rounded-xl px-4 py-3">
+
+            </div>
+
+            <div>
+
+                <label class="block mb-2 text-sm font-medium">
+                    Fecha fin
+                </label>
+
+                <input
+                    type="date"
+                    class="w-full border rounded-xl px-4 py-3">
+
+            </div>
+
+        </div>
+
+        <div class="mt-5">
+
+            <label class="block mb-2 text-sm font-medium">
+                Observaciones
+            </label>
+
+            <textarea
+                rows="4"
+                class="w-full border rounded-xl px-4 py-3"></textarea>
+
+        </div>
+
+    </div>
+
+    <div class="border-t p-6 flex justify-end gap-3">
+
+        <button
+            class="px-5 py-3 rounded-xl border">
+
+            Cancelar
+
+        </button>
+
+        <button
+            class="bg-indigo-600 text-white px-5 py-3 rounded-xl">
+
+            Guardar
+
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- MODAL DETALLE -->
+<!-- ========================= -->
+
+<div
+class="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden">
+
+    <div class="p-6 border-b">
+
+        <div class="flex justify-between items-center">
+
+            <h2 class="text-2xl font-bold">
+
+                Detalle de Solicitud
+
+            </h2>
+
+            <span
+                class="bg-amber-100 text-amber-700 px-4 py-2 rounded-full">
+
+                Pendiente
+
+            </span>
+
+        </div>
+
+    </div>
+
+    <div class="p-6">
+
+        <div class="grid md:grid-cols-2 gap-6">
+
+            <div>
+
+                <label class="text-slate-500 text-sm">
+                    Empleado
+                </label>
+
+                <p class="font-semibold">
+                    Juan Pérez
+                </p>
+
+            </div>
+
+            <div>
+
+                <label class="text-slate-500 text-sm">
+                    Tipo
+                </label>
+
+                <p class="font-semibold">
+                    Vacaciones
+                </p>
+
+            </div>
+
+            <div>
+
+                <label class="text-slate-500 text-sm">
+                    Fecha inicio
+                </label>
+
+                <p class="font-semibold">
+                    01/07/2026
+                </p>
+
+            </div>
+
+            <div>
+
+                <label class="text-slate-500 text-sm">
+                    Fecha fin
+                </label>
+
+                <p class="font-semibold">
+                    10/07/2026
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="mt-8">
+
+            <label class="text-slate-500 text-sm">
+                Observaciones
+            </label>
+
+            <div class="mt-2 bg-slate-50 rounded-xl p-4">
+
+                Solicitud de vacaciones correspondiente al periodo anual.
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="border-t p-6 flex justify-end gap-3">
+
+        <button
+            class="bg-red-500 text-white px-5 py-3 rounded-xl">
+
+            Rechazar
+
+        </button>
+
+        <button
+            class="bg-green-600 text-white px-5 py-3 rounded-xl">
+
+            Aprobar
+
+        </button>
+
+    </div>
+
+</div>
+
+</body>
+</html>
