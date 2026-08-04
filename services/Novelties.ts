@@ -22,7 +22,7 @@ export class NoveltiesService {
         filters?: NoveltiesFiltered
     ): Promise<ApiResponse<PaginatedResponse<Novelties>>> {
         return await http.get<PaginatedResponse<Novelties>>(
-            `${this.endPoint}?e_user=${filters?.e_user || ''}&status=${filters?.status || 'pendiente'}&leave_type=${filters?.leave_type || ''}&start_date=${filters?.start_date || ''}&end_date=${filters?.end_date || ''}&page=${page}&page_size=${pageSize}`
+            `${this.endPoint}?e_user=${filters?.e_user || ''}&status=${filters?.status == undefined ? 'pendiente' : filters?.status}&leave_type=${filters?.leave_type || ''}&start_date=${filters?.start_date || ''}&end_date=${filters?.end_date || ''}&page=${page}&page_size=${pageSize}`
         );
     }
 

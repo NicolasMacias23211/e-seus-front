@@ -142,6 +142,16 @@ const router = createRouter({
       name: "reports",
       component: () => import("../../views/Reports.vue"),
     },
+    {
+      path: "/novelties",
+      name: "novelties",
+      component: () => import("../../views/Novelties.vue"),
+    },
+    {
+      path: "/schedule",
+      name: "schedule",
+      component: () => import("../../views/Schedule.vue"),
+    },
   ],
 });
 

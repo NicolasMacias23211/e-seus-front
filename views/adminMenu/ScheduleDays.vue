@@ -331,7 +331,9 @@ const handleDragStart = (event: DragEvent, object: EUser | EmployeeSchedule) => 
 const handleDrop = (event: DragEvent, date: string | undefined) => {
   event.preventDefault();
 
-  if(holidays.value.includes(date || '')){
+  if (!draggedElement.value || !date) return;
+
+  if(holidays.value.includes(date)){
     notification.error(
       "Error",
       "No se pueden agregar registros en días festivos",
@@ -339,8 +341,6 @@ const handleDrop = (event: DragEvent, date: string | undefined) => {
     draggedElement.value = null;
     return;
   }
-
-  if (!draggedElement.value || !date) return;
   
   if (previousDateToday(date)) {
     notification.error(

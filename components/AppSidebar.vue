@@ -57,6 +57,8 @@ import {
   Clock,
   Search,
   Layers,
+  MessageSquareWarning,
+  CalendarDays
 } from "lucide-vue-next";
 
 const searchQuery = ref("");
@@ -69,5 +71,7 @@ const navigation = [
   { name: "Equipo", href: "/team", icon: Users },
   { name: "Reportes", href: "/reports", icon: BarChart3 },
   { name: "Tiempo", href: "/timetracking", icon: Clock },
+  { name: "Novedades", href: "/novelties", icon: MessageSquareWarning },
+  { name: "Programación", href: "/schedule", icon: CalendarDays },
 ];
 </script>

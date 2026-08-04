@@ -276,7 +276,7 @@
           <div
             class="p-3 rounded-lg bg-gradient-to-br from-blue-200 to-blue-100 group-hover:from-[#021C7D] group-hover:to-[#50bdeb] transition-all"
           >
-          <CalendarClock class="w-6 h-6 text-blue-800 group-hover:text-white" />
+          <MessageSquareWarning class="w-6 h-6 text-blue-800 group-hover:text-white" />
           </div>
           <div class="flex-1">
             <h3 class="text-lg font-bold text-[#021C7D] mb-1">Novedades</h3>
@@ -303,7 +303,8 @@ import {
   UserCog,
   Users, 
   List,
-  CalendarClock
+  CalendarClock,
+  MessageSquareWarning
 } from "lucide-vue-next";
 
 </script>

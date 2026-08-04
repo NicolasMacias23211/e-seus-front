@@ -83,9 +83,9 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div class="flex gap-6">
       <!-- Tabla -->
-      <div class="xl:col-span-2">
+      <div class="w-full">
         <div class="bg-white rounded-xl border-2 shadow-sm overflow-hidden">
           <table class="w-full">
             <thead class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white">
@@ -146,7 +146,7 @@
         </div>
       </div>
       <!-- Calendario -->
-      <div class="xl:col-span-1 bg-white rounded-xl shadow-sm overflow-hidden">
+      <div class="min-w-[380px] bg-white rounded-xl shadow-sm overflow-hidden">
         <div class="flex items-center justify-between gap-3 px-5">
           <div class="flex items-center gap-3 px-5 h-13">
 
@@ -510,6 +510,7 @@ const filters = ref({
 watch(selectedDates, (dates) => {
   if (dates) {
     const dateStart = new Date(dates[0]);
+    
     const dateEnd = new Date(dates[1]);
     const stringDateStart = formatDateISOS(setDateWithoutTime(dateStart.getFullYear(), dateStart.getMonth(), dateStart.getDate()))
     const stringDateEnd = formatDateISOS(setDateWithoutTime(dateEnd.getFullYear(), dateEnd.getMonth(), dateEnd.getDate()))
@@ -630,7 +631,7 @@ const loadEusers = async () => {
   }
 }
 
-const countNoveltiesEarrings = async (status: string) => {
+const countNoveltiesByStatus = async (status: string) => {
   try {
     const response = await noveltiesService.getAllByStatus(status)
     if (response.data && response.data.results) {
@@ -645,7 +646,8 @@ const countElementsByLeaveType = async (status: string, date: string) => {
   try {
     const response = await noveltiesService.getAllByLeaveType(status, date)
     if (response.data && response.data.results) {
-      return response.data?.count ?? 0
+      const result = response.data?.results.filter(item => (item.status === 'Aprobado'))
+      return result.length ?? 0
     }
   } catch (error) {
     console.error("Error al cargar las novedades pendientes: ", error)
@@ -672,7 +674,7 @@ const deleteNovelty = async () => {
         );
 
         loadNovelties();
-        countNoveltiesEarrings('pendiente');
+        countNoveltiesByStatus('pendiente');
         handleDeleteCancel()
         return
       }
@@ -707,16 +709,16 @@ const create = async () => {
       );
       // loadNovelties();
       handleFilters();
-      countNoveltiesEarrings('pendiente');
+      countNoveltiesByStatus('pendiente');
       closeModal();
       return
     }
-    console.error("Error al crear el horario: ", response.error)
-    notification.error("Error", "No se logro crear el horario")
+    console.error("Error al crear la novedad: ", response.error)
+    notification.error("Error", "No se logro crear la novedad")
     closeModal();
   } catch (error) {
-    console.error("Error al crear el horario: ", error)
-    notification.error("Error", "No se logro crear el horario")
+    console.error("Error al crear la novedad: ", error)
+    notification.error("Error", "No se logro crear la novedad")
     closeModal();
   }
 }
@@ -745,7 +747,7 @@ const update = async () => {
       );
       // loadNovelties();
       handleFilters();
-      countNoveltiesEarrings('pendiente');
+      countNoveltiesByStatus('pendiente');
       loadLeaveTypes();
       closeModal();
       return
@@ -772,7 +774,7 @@ const aproveNovelty = async (id_novelty: number, status: string) => {
         "La novedad ha sido actualizada correctamente"
       );
       handleFilters();
-      countNoveltiesEarrings('pendiente');
+      countNoveltiesByStatus('pendiente');
       closeModal();
       return
     }
@@ -878,7 +880,7 @@ watch([weekDays, leaveTypes], async () => {
 onMounted(async () => {
   await loadEusers();
   await loadLeaveTypes();
-  await countNoveltiesEarrings('pendiente');
+  await countNoveltiesByStatus('pendiente');
   await loadNovelties();
   initializeWeek()
 });
