@@ -37,25 +37,6 @@
       </router-link>
 
       <router-link
-        to="/settings/sub-programa"
-        class="group bg-white rounded-xl border-2 border-slate-200 p-6 hover:border-[#50bdeb] hover:shadow-lg transition-all duration-200"
-      >
-        <div class="flex items-start gap-4">
-          <div
-            class="p-3 rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 group-hover:from-[#021C7D] group-hover:to-[#50bdeb] transition-all"
-          >
-            <Users class="w-6 h-6 text-purple-600 group-hover:text-white" />
-          </div>
-          <div class="flex-1">
-            <h3 class="text-lg font-bold text-[#021C7D] mb-1">Sub-Programa</h3>
-            <p class="text-xs text-slate-600">
-              Administra sub-programas asociados
-            </p>
-          </div>
-        </div>
-      </router-link>
-
-      <router-link
         to="/settings/programa"
         class="group bg-white rounded-xl border-2 border-slate-200 p-6 hover:border-[#50bdeb] hover:shadow-lg transition-all duration-200"
       >
@@ -71,6 +52,25 @@
             <h3 class="text-lg font-bold text-[#021C7D] mb-1">Programa</h3>
             <p class="text-xs text-slate-600">
               Configura programas y proyectos
+            </p>
+          </div>
+        </div>
+      </router-link>
+
+      <router-link
+        to="/settings/sub-programa"
+        class="group bg-white rounded-xl border-2 border-slate-200 p-6 hover:border-[#50bdeb] hover:shadow-lg transition-all duration-200"
+      >
+        <div class="flex items-start gap-4">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 group-hover:from-[#021C7D] group-hover:to-[#50bdeb] transition-all"
+          >
+            <Users class="w-6 h-6 text-purple-600 group-hover:text-white" />
+          </div>
+          <div class="flex-1">
+            <h3 class="text-lg font-bold text-[#021C7D] mb-1">Sub-Programa</h3>
+            <p class="text-xs text-slate-600">
+              Administra sub-programas asociados
             </p>
           </div>
         </div>
@@ -240,12 +240,48 @@
           <div
             class="p-3 rounded-lg bg-gradient-to-br from-emerald-50 to-emerald-100 group-hover:from-[#021C7D] group-hover:to-[#50bdeb] transition-all"
           >
-            <Clock class="w-6 h-6 text-emerald-600 group-hover:text-white" />
+          <Clock class="w-6 h-6 text-emerald-600 group-hover:text-white" />
           </div>
           <div class="flex-1">
             <h3 class="text-lg font-bold text-[#021C7D] mb-1">Horarios</h3>
             <p class="text-xs text-slate-600">
               Horarios de trabajo en el área.
+            </p>
+          </div>
+        </div>
+      </router-link>
+      <router-link
+        to="/settings/programacion"
+        class="group bg-white rounded-xl border-2 border-slate-200 p-6 hover:border-[#50bdeb] hover:shadow-lg transition-all duration-200"
+      >
+        <div class="flex items-start gap-4">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-blue-200 to-blue-100 group-hover:from-[#021C7D] group-hover:to-[#50bdeb] transition-all"
+          >
+          <CalendarClock class="w-6 h-6 text-blue-800 group-hover:text-white" />
+          </div>
+          <div class="flex-1">
+            <h3 class="text-lg font-bold text-[#021C7D] mb-1">Programación</h3>
+            <p class="text-xs text-slate-600">
+              Pogramación de días en sede.
+            </p>
+          </div>
+        </div>
+      </router-link>
+      <router-link
+        to="/settings/novedades"
+        class="group bg-white rounded-xl border-2 border-slate-200 p-6 hover:border-[#50bdeb] hover:shadow-lg transition-all duration-200"
+      >
+        <div class="flex items-start gap-4">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-blue-200 to-blue-100 group-hover:from-[#021C7D] group-hover:to-[#50bdeb] transition-all"
+          >
+          <MessageSquareWarning class="w-6 h-6 text-blue-800 group-hover:text-white" />
+          </div>
+          <div class="flex-1">
+            <h3 class="text-lg font-bold text-[#021C7D] mb-1">Novedades</h3>
+            <p class="text-xs text-slate-600">
+              Novedades y permisos.
             </p>
           </div>
         </div>
@@ -266,7 +302,9 @@ import {
   Shield,
   UserCog,
   Users, 
-  List
+  List,
+  CalendarClock,
+  MessageSquareWarning
 } from "lucide-vue-next";
 
 </script>

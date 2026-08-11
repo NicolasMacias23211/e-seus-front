@@ -78,6 +78,11 @@
           </tbody>
         </table>
       </div>
+      <Pagination 
+        :total-registers="total"
+        :items-count="itemsCount" 
+        @change="loadEusers" 
+      />
     </div>
 
     <Teleport to="body">
@@ -241,6 +246,8 @@ import { RolesService } from "../../services/rolesService";
 import type { Client } from "../../models/Client";
 import type { Service } from "../../models/Service";
 import type { Role } from "../../models/Role";
+import type { PaginationState } from "../../components/Pagination.vue";
+import Pagination from "../../components/Pagination.vue";
 
 const notification = useNotification();
 
@@ -253,6 +260,9 @@ const eusers = ref<EUser[]>([]);
 const clients = ref<Client[]>([]);
 const services = ref<Service[]>([]);
 const roles = ref<Role[]>([]);
+
+const total = ref(0)
+const itemsCount = ref(0)
 
 const showConfirmDialog = ref(false);
 const clientToDelete = ref<EUser | null>(null);
@@ -454,15 +464,19 @@ const handleDeleteConfirm = async () => {
   }
 }
 
-const loadEusers = async () => {
+const loadEusers = async (pagination?: PaginationState) => {
   try {
-    const response = await eusersService.getAll();
+    const page = pagination?.currentPage ?? 1
+    const perPage = pagination?.perPage ?? 10
+    const response = await eusersService.getAllPaginated(page, perPage)
     if (response.data && response.data.results) {
-      eusers.value = response.data.results;
+      eusers.value = response.data.results
+      total.value = response.data.count
+      itemsCount.value = response.data.results.length
     }
   } catch (error) {
-    console.error("Error al cargar los usuarios:", error);
-    notification.error("Error", "No se logró cargar los usuarios");
+    console.error("Error al cargar los usuarios: ", error)
+    notification.error("Error", "No se pudieron cargar los usuarios")
   }
 }
 

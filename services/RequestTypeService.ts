@@ -9,6 +9,15 @@ export class RequestTypeService {
     return await http.get<PaginatedResponse<Service>>(this.endPoint);
   }
 
+  async getAllPaginated(
+      page: number,
+      pageSize: number,
+    ): Promise<ApiResponse<PaginatedResponse<Service>>> {
+      return await http.get<PaginatedResponse<Service>>(
+        `${this.endPoint}?page=${page}&page_size=${pageSize}`,
+      );
+    }
+
   async create(service: Service): Promise<ApiResponse<Service>> {
     return await http.post<Service>(this.endPoint, service);
   }

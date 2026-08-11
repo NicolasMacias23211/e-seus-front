@@ -51,6 +51,11 @@
           </tbody>
         </table>
       </div>
+      <Pagination 
+        :total-registers="total"
+        :items-count="itemsCount" 
+        @change="loadUsers" 
+      />
     </div>
   </div>
 </template>
@@ -61,16 +66,24 @@ import { Users } from "lucide-vue-next";
 import { useNotification } from "../../utils/useNotification";
 import type { User } from "../../models/User";
 import { UsersService } from "../../services/usersService";
+import type { PaginationState, } from "../../components/Pagination.vue";
+import Pagination from "../../components/Pagination.vue";
 
 const notification = useNotification();
 const usersService = new UsersService();
 const users = ref<User[]>([]);
+const total = ref(0)
+const itemsCount = ref(0)
 
-const loadUsers = async () => {
+const loadUsers = async (pagination ?: PaginationState) => {
   try {
-    const response = await usersService.getAll()
+    const page = pagination?.currentPage ?? 1
+    const perPage = pagination?.perPage ?? 10
+    const response = await usersService.getAllPaginated(page, perPage)
     if (response.data && response.data.results) {
       users.value = response.data.results
+      total.value = response.data.count
+      itemsCount.value = response.data.results.length
     }
   } catch (error) {
     console.error("Error al cargar los usuarios: ", error)

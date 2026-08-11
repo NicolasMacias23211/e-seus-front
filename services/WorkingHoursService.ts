@@ -9,15 +9,24 @@ export class WorkingHoursService {
         return await http.get<PaginatedResponse<WorkingHours>>(this.endPoint)
     }
 
+    async getAllPaginated(
+        page: number,
+        pageSize: number,
+    ): Promise<ApiResponse<PaginatedResponse<WorkingHours>>> {
+        return await http.get<PaginatedResponse<WorkingHours>>(
+            `${this.endPoint}?page=${page}&page_size=${pageSize}`,
+        );
+    }
+
     async create(workingHours: WorkingHours): Promise<ApiResponse<WorkingHours>> {
         return await http.post<WorkingHours>(this.endPoint, workingHours)
     }
 
     async update(workingHours: WorkingHours, id: number): Promise<ApiResponse<WorkingHours>> {
-        return await http.put<WorkingHours>(`${this.endPoint+id}/`, workingHours)
+        return await http.put<WorkingHours>(`${this.endPoint + id}/`, workingHours)
     }
 
     async delete(id: number): Promise<ApiResponse<WorkingHours>> {
-        return await http.delete<WorkingHours>(this.endPoint+id+"/")
+        return await http.delete<WorkingHours>(this.endPoint + id + "/")
     }
 }

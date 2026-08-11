@@ -39,13 +39,13 @@
                 {{ object.status_description }}
               </td>
               <td class="px-6 py-4 text-sm text-slate-600">
-                {{ object.is_backlog ? '1' : '0' }}
+                {{ object.is_backlog ? 'Sí' : 'No' }}
               </td>
               <td class="px-6 py-4 text-sm text-slate-600">
-                {{ object.is_completion ? '1' : '0' }}
+                {{ object.is_completion ? 'Sí' : 'No' }}
               </td>
               <td class="px-6 py-4 text-sm text-slate-600">
-                {{ object.ordering }}
+                {{ object.ordering ?? '0'}}
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center justify-center gap-2">

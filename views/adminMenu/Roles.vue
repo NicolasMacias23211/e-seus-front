@@ -34,6 +34,7 @@
                 Nombre del Rol
               </th>
               <th class="px-6 py-4 text-left text-sm font-bold">Descripción</th>
+              <th class="px-6 py-4 text-left text-sm font-bold">Icono</th>
               <th class="px-6 py-4 text-center text-sm font-bold">Acciones</th>
             </tr>
           </thead>
@@ -49,15 +50,11 @@
               <td class="px-6 py-4 text-sm text-slate-600">
                 {{ role.description }}
               </td>
+              <td class="px-6 py-4 text-sm text-slate-600">
+                {{ role.icon }}
+              </td>
               <td class="px-6 py-4">
                 <div class="flex items-center justify-center gap-2">
-                  <button
-                    @click="openEditModal(role)"
-                    class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all"
-                    title="Editar"
-                  >
-                    <Edit2 class="w-4 h-4" />
-                  </button>
                   <button
                     @click="confirmDelete(role)"
                     class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all"
@@ -76,6 +73,11 @@
           </tbody>
         </table>
       </div>
+      <Pagination 
+        :total-registers="total"
+        :items-count="itemsCount" 
+        @change="loadRoles" 
+      />
     </div>
 
     <Teleport to="body">
@@ -130,6 +132,22 @@
                 placeholder="Descripción del rol"
               ></textarea>
             </div>
+            <div>
+              <label
+                for="rolName"
+                class="block text-sm font-bold text-slate-700 mb-2"
+              >
+              Icono<span class="text-red-500">*</span>
+              </label>
+              <input
+                id="icon"
+                v-model="form.icon"
+                type="text"
+                maxlength="45"
+                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-[#50bdeb] focus:border-[#50bdeb] transition-all"
+                placeholder="Ingrese el nombre del icono"
+              />
+            </div>
 
             <div class="flex gap-3 pt-4">
               <button
@@ -150,6 +168,10 @@
         </div>
       </div>
     </Teleport>
+    <ConfirmDialog :is-visible="showConfirmDialog" type="delete" title="Confirmar Eliminación"
+      :message="`¿Está seguro de que desea eliminar el rol '${rolToDelete?.rol_name}'?`"
+      details="Esta acción eliminará permanente el rol del sistema" confirm-text="Sí, eliminar" cancel-text="Cancelar"
+      @confirm="handleDeleteConfirm" @cancel="handleDeleteCancel" />
   </div>
 </template>
 
@@ -159,12 +181,19 @@ import { Shield, Plus, Edit2, Trash2 } from "lucide-vue-next";
 import { useNotification } from "../../utils/useNotification";
 import type { Role } from "../../models/Role";
 import { RolesService } from "../../services/rolesService";
+import type { PaginationState, } from "../../components/Pagination.vue";
+import Pagination from "../../components/Pagination.vue";
+import ConfirmDialog from "../../components/ConfirmDialog.vue";
 
 const notification = useNotification();
 const rolesService = new RolesService();
+const total = ref(0)
+const itemsCount = ref(0)
 
 const roles = ref<Role[]>([]);
 
+const showConfirmDialog = ref(false);
+const rolToDelete = ref<Role | null>(null);
 const showModal = ref(false);
 const isEditing = ref(false);
 const editingIndex = ref(-1);
@@ -172,12 +201,14 @@ const editingIndex = ref(-1);
 const form = reactive({
   rolName: "",
   description: "",
+  icon: "",
 });
 
 const openCreateModal = () => {
   isEditing.value = false;
   form.rolName = "";
   form.description = "";
+  form.icon = "";
   showModal.value = true;
 };
 
@@ -186,6 +217,7 @@ const openEditModal = (role: Role) => {
   editingIndex.value = roles.value.findIndex((r) => r.rol_name === role.rol_name);
   form.rolName = role.rol_name;
   form.description = role.description || "";
+  form.icon = role.icon || "";
   showModal.value = true;
 };
 
@@ -193,48 +225,88 @@ const closeModal = () => {
   showModal.value = false;
   form.rolName = "";
   form.description = "";
+  form.icon = "";
   isEditing.value = false;
   editingIndex.value = -1;
 };
 
-const handleSubmit = () => {
-  if (isEditing.value) {
-    roles.value[editingIndex.value] = {
+const create = async () => {
+  try {
+    let dataCreate: Role = ({
       rol_name: form.rolName,
       description: form.description,
-      icon : ""
-    };
-    notification.success(
-      "¡Actualizado!",
-      "El rol ha sido actualizado correctamente"
-    );
-  } else {
-    roles.value.push({
-      rol_name: form.rolName,
-      description: form.description,
-      icon : ""
-    });
-    notification.success("¡Creado!", "El rol ha sido creado correctamente");
+      icon : form.icon
+    })
+
+    let response = await rolesService.create(dataCreate);
+    if (response.success) {
+      notification.success(
+        "¡Creado!",
+        "El rol ha sido creado correctamente"
+      );
+      loadRoles();
+      closeModal();
+      return
+    }
+    console.error("Error al crear el rol:", response.error);
+    notification.error("Error", "No se logró crear el rol");
+    closeModal();
+  } catch (error) {
+    console.error("Error al crear el rol: ", error);
+    notification.error("Error", "No se logró crear el rol");
+    closeModal();
   }
-  closeModal();
+}
+
+const handleSubmit = () => {
+    create();
 };
 
-const confirmDelete = (role: Role) => {
-  if (confirm(`¿Está seguro de eliminar el rol "${role.rol_name}"?`)) {
-    const index = roles.value.findIndex((r) => r.rol_name === role.rol_name);
-    roles.value.splice(index, 1);
-    notification.success(
-      "¡Eliminado!",
-      "El rol ha sido eliminado correctamente"
-    );
+const confirmDelete = (code: Role) => {
+  rolToDelete.value = code;
+  showConfirmDialog.value = true;
+};
+
+const handleDeleteCancel = () => {
+  showConfirmDialog.value = false;
+  rolToDelete.value = null;
+};
+
+const handleDeleteConfirm = async () => {
+  try {
+    if (rolToDelete.value && rolToDelete.value.rol_name != undefined) {
+      let response = await rolesService.delete(rolToDelete.value.rol_name)
+      if (response.success) {
+
+        notification.success(
+          "¡Eliminado!",
+          "El rol ha sido eliminado correctamente"
+        );
+
+        loadRoles();
+        handleDeleteCancel()
+        return
+      }
+      console.error("Error al eliminar el rol: ", response.error)
+      notification.error("Error", "No se logro eliminar el rol")
+      handleDeleteCancel()
+    }
+  } catch (error) {
+    console.error("Error al eliminar el rol: ", error)
+    notification.error("Error", "No se logro eliminar el rol")
+    handleDeleteCancel()
   }
 };
 //con esta funcion mas en Onmute se cargan los roles cuando se carga la pantalla
-const loadRoles = async () => {
+const loadRoles = async (pagination ?: PaginationState) => {
   try {
-    const response = await rolesService.getAll();
+    const page = pagination?.currentPage ?? 1
+    const perPage = pagination?.perPage ?? 10
+    const response = await rolesService.getAllPaginated(page, perPage)
     if (response.data && response.data.results) {
-      roles.value = response.data.results;
+      roles.value = response.data.results
+      total.value = response.data.count
+      itemsCount.value = response.data.results.length
     }
   } catch (error) {
     console.error("Error al cargar roles:", error);

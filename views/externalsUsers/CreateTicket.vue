@@ -2357,7 +2357,6 @@ const handleSubmit = async () => {
     
     // Crear objeto que coincida con TicketCreate del backend
     let ans = ansList.value.find(item => item.id_ans! === form.ticket_ans);
-    console.log("ANS seleccionado:", ans);
     const ticketData: TicketCreate = {
       ticket_title: form.ticket_title,
       ticket_description: form.ticket_description,

@@ -3,18 +3,15 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div
-            class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#021C7D] to-[#50bdeb] flex items-center justify-center"
-            
-          > 
+            class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#021C7D] to-[#50bdeb] flex items-center justify-center">
             <FileText class="w-5 h-5 text-white" />
           </div>
-          <div> 
+          <div>
             <h1 class="text-2xl font-bold text-[#021C7D]">Tipos de Servicio</h1>
             <p class="text-xs text-slate-500">Gestión de servicios del sistema</p>
           </div>
         </div>
-        <button
-          @click="openCreateModal"
+        <button @click="openCreateModal"
           class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white rounded-lg hover:shadow-lg transition-all font-medium">
           <Plus class="w-5 h-5" />
           Nuevo Servicio
@@ -41,22 +38,16 @@
                   {{ service.service_description }}
                 </td>
                 <td class="px-6 py-4 text-sm text-slate-600">
-                  {{ service.estimated_solution_time   }}
+                  {{ service.estimated_solution_time }}
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex items-center justify-center gap-2">
-                    <button
-                      @click="openEditModal(service)"
-                      class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all"
-                      title="Editar"
-                    >
+                    <button @click="openEditModal(service)"
+                      class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all" title="Editar">
                       <Edit2 class="w-4 h-4" />
                     </button>
-                    <button
-                      @click="confirmDelete(service)"
-                      class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all"
-                      title="Eliminar"
-                    >
+                    <button @click="confirmDelete(service)"
+                      class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all" title="Eliminar">
                       <Trash2 class="w-4 h-4" />
                     </button>
                   </div>
@@ -70,22 +61,19 @@
             </tbody>
           </table>
         </div>
+        <Pagination 
+        :total-registers="total"
+        :items-count="itemsCount" 
+        @change="loadServices" 
+      />
       </div>
 
       <Teleport to="body">
-        <div
-          v-if="showModal"
-          class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          @click.self="closeModal"
-        >
-          <div
-            class="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-scale-in"
-          >
-            <div
-              <div
-              class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white px-6 py-4 rounded-t-2xl"
-            >
-              
+        <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          @click.self="closeModal">
+          <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-scale-in">
+            <div <div class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white px-6 py-4 rounded-t-2xl">
+
               <h2 class="text-xl font-bold">
                 {{ isEditing ? "Editar Servicio" : "Nuevo Servicio" }}
               </h2>
@@ -94,73 +82,44 @@
             <form @submit.prevent="handleSubmit" class="p-6 space-y-4">
               <div>
                 <input id="codeId" v-model.number="form.id_services" type="number" hidden :disabled="isEditing"
-                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all disabled:bg-slate-100"
-                placeholder="ID del servicio"/>
-              </div>
-              
-              <div>
-                <label
-                  for="serviceName"
-                  class="block text-sm font-bold text-slate-700 mb-2"
-                >
-                  Nombre del Servicio <span class="text-red-500">*</span>
-                </label>
-                <input
-                  id="serviceName"
-                  v-model="form.service_name"
-                  type="text"
-                  required
-                  maxlength="45"
-                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all"
-                  placeholder="Ingrese el nombre del servicio"
-                />
+                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all disabled:bg-slate-100"
+                  placeholder="ID del servicio" />
               </div>
 
               <div>
-                <label
-                  for="serviceDescription"
-                  class="block text-sm font-bold text-slate-700 mb-2"
-                >
+                <label for="serviceName" class="block text-sm font-bold text-slate-700 mb-2">
+                  Nombre del Servicio <span class="text-red-500">*</span>
+                </label>
+                <input id="serviceName" v-model="form.service_name" type="text" required maxlength="45"
+                  class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all"
+                  placeholder="Ingrese el nombre del servicio" />
+              </div>
+
+              <div>
+                <label for="serviceDescription" class="block text-sm font-bold text-slate-700 mb-2">
                   Descripción
                 </label>
-                <textarea
-                  id="serviceDescription"
-                  v-model="form.service_description"
-                  maxlength="100"
-                  rows="3"
+                <textarea id="serviceDescription" v-model="form.service_description" maxlength="100" rows="3"
                   class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all resize-none"
-                  placeholder="Descripción del servicio"
-                ></textarea>
+                  placeholder="Descripción del servicio"></textarea>
               </div>
               <div>
-                <label 
-                  for="estimatedTime"
-                  class="block text-sm font-bold text-slate-700 mb-2"
-                  >
+                <label for="estimatedTime" class="block text-sm font-bold text-slate-700 mb-2">
                   Tiempo Estimado (HH:MM:SS)
                 </label>
-                <input
-                  id="estimatedTime"
-                  v-model="form.estimated_solution_time"
-                  type="text"
+                <input id="estimatedTime" v-model="form.estimated_solution_time" type="text"
                   pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
                   class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all"
-                  placeholder="Ejemplo: 02:30:00"
-                />
+                  placeholder="Ejemplo: 02:30:00" />
               </div>
 
               <div class="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  @click="closeModal"
-                  class="flex-1 px-4 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 transition-all font-medium"
-                >
+                <button type="button" @click="closeModal"
+                  class="flex-1 px-4 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 transition-all font-medium">
                   Cancelar
                 </button>
-                <button
-                  type="submit"
-                  class="flex-1 px-4 py-3 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white rounded-xl hover:shadow-lg transition-all font-medium"
-                >
+                <button type="submit"
+                  class="flex-1 px-4 py-3 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white rounded-xl hover:shadow-lg transition-all font-medium">
                   {{ isEditing ? "Actualizar" : "Crear" }}
                 </button>
               </div>
@@ -168,207 +127,211 @@
           </div>
         </div>
       </Teleport>
-      <ConfirmDialog
-        :is-visible="showConfirmDialog"
-        type="delete" title="Confirmar Eliminación"
+      <ConfirmDialog :is-visible="showConfirmDialog" type="delete" title="Confirmar Eliminación"
         :message="`¿Está seguro de que desea eliminar este servicio? '${clientToDelete?.service_name}'?`"
-        details="Esta acción no se puede deshacer."
-        confirm-text="Si, Eliminar"
-        cancel-text="Cancelar"
-        @confirm="handleDeleteConfirm"
-        @cancel="handleDeleteCancel"/>
+        details="Esta acción no se puede deshacer." confirm-text="Si, Eliminar" cancel-text="Cancelar"
+        @confirm="handleDeleteConfirm" @cancel="handleDeleteCancel" />
     </div>
   </template>
 
-  <script setup lang="ts">
-  import { ref, reactive, onMounted } from "vue";
-  import { FileText, Plus, Edit2, Trash2 } from "lucide-vue-next";
-  import { useNotification } from "../../utils/useNotification";
-  import { RequestTypeService } from "../../services/RequestTypeService";
-  import type { Service } from "../../models/Service";
-  import ConfirmDialog from "../../components/ConfirmDialog.vue";
+<script setup lang="ts">
+import { ref, reactive, onMounted } from "vue";
+import { FileText, Plus, Edit2, Trash2 } from "lucide-vue-next";
+import { useNotification } from "../../utils/useNotification";
+import { RequestTypeService } from "../../services/RequestTypeService";
+import type { Service } from "../../models/Service";
+import ConfirmDialog from "../../components/ConfirmDialog.vue";
+import type { PaginationState, } from "../../components/Pagination.vue";
+import Pagination from "../../components/Pagination.vue";
 
-  const notification = useNotification();
-  const requestTypeService = new RequestTypeService();
-  const services = ref<Service[]>([]);
-  const showConfirmDialog = ref(false);
-  const clientToDelete = ref<Service | null>(null);
-  const showModal = ref(false);
-  const isEditing = ref(false);
-  const editingIndex = ref(-1);
+const notification = useNotification();
+const requestTypeService = new RequestTypeService();
+const services = ref<Service[]>([]);
+const showConfirmDialog = ref(false);
+const clientToDelete = ref<Service | null>(null);
+const showModal = ref(false);
+const isEditing = ref(false);
+const editingIndex = ref(-1);
+const total = ref(0)
+const itemsCount = ref(0)
 
 
-  const form = reactive({
-    id_services: 0,
-    service_name: "",
-    service_description: "",
-    estimated_solution_time: "",
-  });
+const form = reactive({
+  id_services: 0,
+  service_name: "",
+  service_description: "",
+  estimated_solution_time: "",
+});
 
-  const openCreateModal = () => {
-    isEditing.value = false;
-    form.id_services = 0;
-    form.service_name = "";
-    form.service_description = "";
-    form.estimated_solution_time = "";
-    showModal.value = true;
-  };
+const openCreateModal = () => {
+  isEditing.value = false;
+  form.id_services = 0;
+  form.service_name = "";
+  form.service_description = "";
+  form.estimated_solution_time = "";
+  showModal.value = true;
+};
 
-  const openEditModal = (service: Service) => {
-    isEditing.value = true;
-    editingIndex.value = services.value.findIndex(
-      (s) => s.id_services === service.id_services
-    );
-    form.id_services = service.id_services ?? 0;
-    form.service_name = service.service_name;
-    form.service_description = service.service_description ?? "";
-    form.estimated_solution_time = service.estimated_solution_time ?? "";
-    showModal.value = true;
-  };
+const openEditModal = (service: Service) => {
+  isEditing.value = true;
+  editingIndex.value = services.value.findIndex(
+    (s) => s.id_services === service.id_services
+  );
+  form.id_services = service.id_services ?? 0;
+  form.service_name = service.service_name;
+  form.service_description = service.service_description ?? "";
+  form.estimated_solution_time = service.estimated_solution_time ?? "";
+  showModal.value = true;
+};
 
-  const closeModal = () => {
-    showModal.value = false;
-    form.id_services = 0;
-    form.service_name = "";
-    form.service_description = "";
-    form.estimated_solution_time = "";
-    isEditing.value = false;
-    editingIndex.value = -1;
-  };
+const closeModal = () => {
+  showModal.value = false;
+  form.id_services = 0;
+  form.service_name = "";
+  form.service_description = "";
+  form.estimated_solution_time = "";
+  isEditing.value = false;
+  editingIndex.value = -1;
+};
 
-  const handleSubmit = () => {
-    if (isEditing.value) {
-      update();
-    } else {
-      create();
-    }
-  };
-
-  const create = async () => {
-    try {
-      let dataCreate: Service = ({
-        service_name: form.service_name,
-        service_description: form.service_description,
-        estimated_solution_time: form.estimated_solution_time,
-      })
-
-      let response = await requestTypeService.create(dataCreate)
-      if (response.success) {
-        notification.success(
-          "¡Creado!",
-          "El servicio ha sido creado correctamente"
-        );
-        loadServices();
-        closeModal();
-        return;
-      }
-      console.error("Error creando el servicio:", response.error);
-      notification.error("Error", "No se pudo crear el servicio");
-      closeModal();
-    } catch (error) {
-      console.error("Error creando el servicio:", error);
-      notification.error("Error", "No se pudo crear el servicio");
-      closeModal();
-    }
+const handleSubmit = () => {
+  if (isEditing.value) {
+    update();
+  } else {
+    create();
   }
+};
 
+const create = async () => {
+  try {
+    let dataCreate: Service = ({
+      service_name: form.service_name,
+      service_description: form.service_description,
+      estimated_solution_time: form.estimated_solution_time,
+    })
 
-  const update = async () => {
-    try {
-      let data: Service = ({
-        service_name: form.service_name,
-        service_description: form.service_description,
-        estimated_solution_time: form.estimated_solution_time,
-      })
-
-      let response = await requestTypeService.update(data, form.id_services)
-      if (response.success) {
-        notification.success(
-          "¡Actualizado!",
-          "El servicio ha sido actualizado correctamente"
-        );
-        loadServices();
-        closeModal();
-        return;
-      }
-      console.error("Error actualizando el servicio:", response.error);
-      notification.error("Error", "No se logró actualizar el servicio");
+    let response = await requestTypeService.create(dataCreate)
+    if (response.success) {
+      notification.success(
+        "¡Creado!",
+        "El servicio ha sido creado correctamente"
+      );
+      loadServices();
       closeModal();
-    } catch (error) {
-      console.error("Error actualizando el servicio:", error);
-      notification.error("Error", "No se logró actualizar el servicio");
-      closeModal();
+      return;
     }
+    console.error("Error creando el servicio:", response.error);
+    notification.error("Error", "No se pudo crear el servicio");
+    closeModal();
+  } catch (error) {
+    console.error("Error creando el servicio:", error);
+    notification.error("Error", "No se pudo crear el servicio");
+    closeModal();
   }
+}
 
-  const confirmDelete = (code: Service) => {
-    clientToDelete.value = code;
-    showConfirmDialog.value = true;
-  };
 
-  const handleDeleteCancel = () => {
-    showConfirmDialog.value = false;
-    clientToDelete.value = null;
-  };
+const update = async () => {
+  try {
+    let data: Service = ({
+      service_name: form.service_name,
+      service_description: form.service_description,
+      estimated_solution_time: form.estimated_solution_time,
+    })
 
-  const handleDeleteConfirm = async () => {
-    try {
-      if (clientToDelete.value && clientToDelete.value.id_services != undefined) {
-        let response = await requestTypeService.delete(clientToDelete.value.id_services)
-        if (response.success) {
+    let response = await requestTypeService.update(data, form.id_services)
+    if (response.success) {
+      notification.success(
+        "¡Actualizado!",
+        "El servicio ha sido actualizado correctamente"
+      );
+      loadServices();
+      closeModal();
+      return;
+    }
+    console.error("Error actualizando el servicio:", response.error);
+    notification.error("Error", "No se logró actualizar el servicio");
+    closeModal();
+  } catch (error) {
+    console.error("Error actualizando el servicio:", error);
+    notification.error("Error", "No se logró actualizar el servicio");
+    closeModal();
+  }
+}
 
-          notification.success(
-            "¡Eliminado!",
-            "El servicio ha sido eliminado correctamente"
-          );
+const confirmDelete = (code: Service) => {
+  clientToDelete.value = code;
+  showConfirmDialog.value = true;
+};
 
-          loadServices();
-          handleDeleteCancel()
-          return
-        }
-        console.error("Error al eliminar el servicio: ", response.error)
-        notification.error("Error", "No se logró eliminar el servicio, hay registros asociados a este servicio")
+const handleDeleteCancel = () => {
+  showConfirmDialog.value = false;
+  clientToDelete.value = null;
+};
+
+const handleDeleteConfirm = async () => {
+  try {
+    if (clientToDelete.value && clientToDelete.value.id_services != undefined) {
+      let response = await requestTypeService.delete(clientToDelete.value.id_services)
+      if (response.success) {
+
+        notification.success(
+          "¡Eliminado!",
+          "El servicio ha sido eliminado correctamente"
+        );
+
+        loadServices();
         handleDeleteCancel()
+        return
       }
-    } catch (error) {
-      console.error("Error al eliminar el servicio: ", error)
+      console.error("Error al eliminar el servicio: ", response.error)
       notification.error("Error", "No se logró eliminar el servicio, hay registros asociados a este servicio")
       handleDeleteCancel()
     }
-  };
+  } catch (error) {
+    console.error("Error al eliminar el servicio: ", error)
+    notification.error("Error", "No se logró eliminar el servicio, hay registros asociados a este servicio")
+    handleDeleteCancel()
+  }
+};
 
-  const loadServices = async () => {
-    try {
-      const response = await requestTypeService.getAll()
-      if (response.data && response.data.results) {
-        services.value = response.data.results
-      }
-    } catch (error) {
-      console.error("Error al cargar los servicios: ", error)
-      notification.error("Error", "No se pudieron cargar los servicios")
+const loadServices = async (pagination ?: PaginationState) => {
+  try {
+    const page = pagination?.currentPage ?? 1
+    const perPage = pagination?.perPage ?? 10
+    const response = await requestTypeService.getAllPaginated(page, perPage)
+    if (response.data && response.data.results) {
+      services.value = response.data.results
+      total.value = response.data.count
+      itemsCount.value = response.data.results.length
     }
+  } catch (error) {
+    console.error("Error al cargar los servicios: ", error)
+    notification.error("Error", "No se pudieron cargar los servicios")
+  }
+}
+
+onMounted(() => {
+  loadServices();
+})
+
+
+</script>
+
+<style scoped>
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
   }
 
-  onMounted(() => {
-    loadServices();
-  })
-
-
-  </script>
-
-  <style scoped>
-  @keyframes scaleIn {
-    from {
-      transform: scale(0.9);
-      opacity: 0;
-    }
-    to {
-      transform: scale(1);
-      opacity: 1;
-    }
+  to {
+    transform: scale(1);
+    opacity: 1;
   }
+}
 
-  .animate-scale-in {
-    animation: scaleIn 0.3s ease-out;
-  }
-  </style>
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
+</style>

@@ -9,6 +9,15 @@ export class ClosingCodeService {
         return await http.get<PaginatedResponse<ClosingCode>>(this.endPoint)
     }
 
+    async getAllPaginated(
+        page: number,
+        pageSize: number,
+    ): Promise<ApiResponse<PaginatedResponse<ClosingCode>>> {
+        return await http.get<PaginatedResponse<ClosingCode>>(
+            `${this.endPoint}?page=${page}&page_size=${pageSize}`,
+        );
+    }
+
     async create(closingCode: ClosingCode): Promise<ApiResponse<ClosingCode>> {
         return await http.post<ClosingCode>(this.endPoint, closingCode)
     }

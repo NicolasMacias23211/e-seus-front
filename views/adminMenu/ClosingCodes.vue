@@ -59,6 +59,11 @@
           </tbody>
         </table>
       </div>
+      <Pagination 
+        :total-registers="total"
+        :items-count="itemsCount" 
+        @change="loadClosingCodes" 
+      />
     </div>
 
     <Teleport to="body">
@@ -131,6 +136,8 @@ import { useNotification } from "../../utils/useNotification";
 import { ClosingCodeService } from "../../services/closingCode";
 import type { ClosingCode } from "../../models/ClosingCode";
 import ConfirmDialog from "../../components/ConfirmDialog.vue";
+import type { PaginationState, } from "../../components/Pagination.vue";
+import Pagination from "../../components/Pagination.vue";
 
 const notification = useNotification();
 const closingCodeService = new ClosingCodeService()
@@ -140,6 +147,8 @@ const clientToDelete = ref<ClosingCode | null>(null);
 const showModal = ref(false);
 const isEditing = ref(false);
 const editingIndex = ref(-1);
+const total = ref(0)
+const itemsCount = ref(0)
 
 const form = reactive({
   id_closing_code: 0,
@@ -273,11 +282,15 @@ const handleDeleteConfirm = async () => {
 
 
 
-const loadClosingCodes = async () => {
+const loadClosingCodes = async (pagination ?: PaginationState) => {
   try {
-    const response = await closingCodeService.getAll()
+    const page = pagination?.currentPage ?? 1
+    const perPage = pagination?.perPage ?? 10
+    const response = await closingCodeService.getAllPaginated(page, perPage)
     if (response.data && response.data.results) {
       closingCodes.value = response.data.results
+      total.value = response.data.count
+      itemsCount.value = response.data.results.length
     }
   } catch (error) {
     console.error("Error al cargar los códigos de cierre: ", error)
