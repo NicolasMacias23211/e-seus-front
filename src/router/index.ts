@@ -122,6 +122,11 @@ const router = createRouter({
       component: () => import("../../views/adminMenu/ScheduleDays.vue"),
     },
     {
+      path: "/settings/novedades",
+      name: "settings-novelties",
+      component: () => import("../../views/adminMenu/Novelties.vue"),
+    },
+    {
       path: "/create-ticket",
       name: "create-ticket",
       component: () => import("../../views/externalsUsers/CreateTicket.vue"),
@@ -136,6 +141,16 @@ const router = createRouter({
       path: "/reports",
       name: "reports",
       component: () => import("../../views/Reports.vue"),
+    },
+    {
+      path: "/novelties",
+      name: "novelties",
+      component: () => import("../../views/Novelties.vue"),
+    },
+    {
+      path: "/schedule",
+      name: "schedule",
+      component: () => import("../../views/Schedule.vue"),
     },
   ],
 });

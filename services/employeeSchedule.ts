@@ -1,32 +1,32 @@
-import { EmpoyeeSchedule } from './../models/EmployeeSchedule';
+import { EmployeeSchedule } from './../models/EmployeeSchedule';
 import { http, type ApiResponse, type PaginatedResponse } from "./http";
 
 
 export class EmployeeScheduleService {
     private endPoint = "/employee-schedule/"
 
-    async getAll(): Promise<ApiResponse<PaginatedResponse<EmpoyeeSchedule>>> {
-        return await http.get<PaginatedResponse<EmpoyeeSchedule>>(this.endPoint)
+    async getAll(): Promise<ApiResponse<PaginatedResponse<EmployeeSchedule>>> {
+        return await http.get<PaginatedResponse<EmployeeSchedule>>(this.endPoint)
     }
 
     async getAllPaginated(
         page: number,
         pageSize: number,
-    ): Promise<ApiResponse<PaginatedResponse<EmpoyeeSchedule>>> {
-        return await http.get<PaginatedResponse<EmpoyeeSchedule>>(
+    ): Promise<ApiResponse<PaginatedResponse<EmployeeSchedule>>> {
+        return await http.get<PaginatedResponse<EmployeeSchedule>>(
             `${this.endPoint}?page=${page}&page_size=${pageSize}`,
         );
     }
 
-    async create(empoyeeSchedule: EmpoyeeSchedule): Promise<ApiResponse<EmpoyeeSchedule>> {
-        return await http.post<EmpoyeeSchedule>(this.endPoint, empoyeeSchedule)
+    async create(EmployeeSchedule: EmployeeSchedule): Promise<ApiResponse<EmployeeSchedule>> {
+        return await http.post<EmployeeSchedule>(this.endPoint, EmployeeSchedule)
     }
 
-    async update(empoyeeSchedule: EmpoyeeSchedule, id: number): Promise<ApiResponse<EmpoyeeSchedule>> {
-        return await http.put<EmpoyeeSchedule>(`${this.endPoint + id}/`, empoyeeSchedule)
+    async update(EmployeeSchedule: EmployeeSchedule, id: number): Promise<ApiResponse<EmployeeSchedule>> {
+        return await http.put<EmployeeSchedule>(`${this.endPoint + id}/`, EmployeeSchedule)
     }
 
-    async delete(id: number): Promise<ApiResponse<EmpoyeeSchedule>> {
-        return await http.delete<EmpoyeeSchedule>(this.endPoint + id + "/")
+    async delete(id: number): Promise<ApiResponse<EmployeeSchedule>> {
+        return await http.delete<EmployeeSchedule>(this.endPoint + id + "/")
     }
 }

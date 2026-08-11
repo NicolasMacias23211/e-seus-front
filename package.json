@@ -9,8 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vuepic/vue-datepicker": "^14.0.0",
     "echarts": "^6.0.0",
-    "exceljs": "^4.4.0",
+    "exceljs": "^3.4.0",
     "jspdf": "^4.0.0",
     "jspdf-autotable": "^5.0.7",
     "lucide-vue-next": "^0.553.0",

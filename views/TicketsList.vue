@@ -67,7 +67,7 @@
         </div>
 
         <select v-model="serchFilters.ans" @change="handleSearch" placeholder="ANS"
-          class="px-4 py-2.5 border-2 border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-nonefocus:border-[#50bdeb] transition-colors">
+          class="px-4 py-2.5 border-2 border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-none focus:border-[#50bdeb] transition-colors">
           <option value="" selected>ANS</option>
           <option v-for="ans in filterAns" :value="ans.ans_name">{{ ans.ans_name === "Programado" ? ans.ans_name :
             ans.ans_name + " horas" }} </option>
@@ -220,7 +220,6 @@ import {
   Search,
 } from "lucide-vue-next";
 import { ref, onMounted } from "vue";
-import { toRaw } from 'vue';
 import { TicketsService } from "../services/ticketsService";
 import { AnsService } from "../services/ansService";
 import type { TicketList } from "../models/Ticket";
