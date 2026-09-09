@@ -317,7 +317,7 @@ const handleDragStart = (event: DragEvent, object: EUser | EmployeeSchedule) => 
   }
 
   if(elementIsEUser(object)){
-    draggedElement.value = employeeSchedules.value.find(item => item.e_user === object.network_user) || null
+    draggedElement.value = eUsers.value.find(item => item.network_user === object.network_user) || null
     return
   }
 
@@ -330,9 +330,8 @@ const handleDragStart = (event: DragEvent, object: EUser | EmployeeSchedule) => 
 
 const handleDrop = (event: DragEvent, date: string | undefined) => {
   event.preventDefault();
-
   if (!draggedElement.value || !date) return;
-
+  
   if(holidays.value.includes(date)){
     notification.error(
       "Error",
@@ -350,17 +349,21 @@ const handleDrop = (event: DragEvent, date: string | undefined) => {
     draggedElement.value = null;
     return;
   }
-
+  
   if(elementIsEUser(draggedElement.value)){
     create(draggedElement.value.network_user, date)
     return
   }
-
-  if(dateSameDateObject(date, draggedElement.value.date)){
+  
+  if(!dateSameDateObject(date, draggedElement.value.date)){
+    create(draggedElement.value.e_user, date)
     return
   }
   
-  update(draggedElement.value, date)
+  if(dateSameDateObject(date, draggedElement.value.date)){
+    return
+  }
+
 };
 
 const loadEmployeeSchedule = async () => {
