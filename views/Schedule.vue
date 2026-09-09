@@ -33,10 +33,6 @@
           Hoy
         </button>
       </div>
-      <button @click="openModal()"
-        class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] cursor-pointer text-white px-5 py-3 rounded-xl shadow min-w-[200px] max-w-[200px] w-full">
-        + Nueva novedad
-      </button>
     </div>
     <div class="bg-white rounded-xl border-2 shadow-sm overflow-hidden">
       <div class="grid grid-cols-5 border-b-2 bg-slate-50">
@@ -80,16 +76,10 @@
         }">
           <div v-for="object in employeeSchedulesByDate[day.date]" :key="object.id_employee_schudele">
             <div v-if="day.date === object.date"
-              class="bg-white rounded-lg border-l-4 border-l-[#021C7D] border-2 border-slate-200 p-3 hover:border-[#50bdeb] hover:shadow-md transition-all group relative"
+              class="bg-white rounded-lg border-l-4 border-l-[#021C7D] border-2 border-slate-200 p-3 transition-all group relative"
               :class="{
                 'opacity-65': previousDateToday(object.date),
-                'cursor-move': !previousDateToday(object.date),
-                'cursor-default': previousDateToday(object.date)
               }">
-              <button v-if="!previousDateToday(object.date)" @click="confirmDelete(object)"
-                class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-xs font-bold cursor-pointer">
-                X
-              </button>
               <div class="flex items-center gap-2 mb-2">
                 <p class="text-xs font-bold text-[#50bdeb]">
                   {{ getAtributesUser(object.e_user).rolName }}
@@ -103,46 +93,6 @@
         </div>
       </div>
     </div>
-    <Teleport to="body">
-      <div v-if="showModal"
-        class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 w-full overflow-auto"
-        @click.self="closeModal">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[95vh] overflow-hidden animate-scale-in">
-          <div class="bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white px-6 py-4 rounded-t-2xl">
-            <h2 class="text-xl font-bold">
-              Creación de Novedades
-            </h2>
-          </div>
-
-          <form @submit.prevent="handleSubmit" class="p-6 space-y-4 max-h-[calc(95vh-180px)] overflow-auto">
-            <div>
-              <input id="ansId" v-model.number="form.id_novelty" type="number" hidden
-                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all disabled:bg-slate-100"
-                placeholder="ID de la novedad" />
-            </div>
-            <select v-model="form.leave_type" class="border rounded-xl px-4 py-3 w-full ">
-              <option value="">Seleccionar...</option>
-              <option v-for="type in leaveTypes" :value="type.leave_type">
-                {{ type.leave_type_name }}
-              </option>
-            </select>
-            <VueDatePicker v-model="selectedDates" range format="YYYY-MM-DD" :disabled-dates="holidays"
-              placeholder="Seleccionar rango de fechas" />
-
-            <div class="flex gap-3 pt-4">
-              <button type="button" @click="closeModal"
-                class="flex-1 px-4 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 transition-all font-medium cursor-pointer">
-                Cancelar
-              </button>
-              <button type="submit"
-                class="flex-1 px-4 py-3 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white rounded-xl hover:shadow-lg transition-all font-medium cursor-pointer">
-                {{ isEditing ? "Actualizar" : "Crear" }}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </Teleport>
     <Teleport to="body">
       <div v-if="showModalNovelties"
         class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 w-full overflow-auto"
@@ -191,23 +141,18 @@
           <div class="flex gap-3 pt-4">
 
             <button type="button" @click="closeModal"
-              class="flex-1 px-4 py-3 border-2 border-slate-300 text-slate-700 hover:bg-slate-100 transition-all font-medium cursor-pointer">
+              class="flex-1 px-4 py-3 border-t-2 border-slate-300 text-slate-700 hover:bg-slate-100 transition-all font-medium cursor-pointer" style="border-top-width:1px">
               Cancelar
             </button>
           </div>            
         </div>
       </div>
     </Teleport>
-    <ConfirmDialog :is-visible="showConfirmDialog" type="delete" title="Confirmar Eliminación"
-      :message="`¿Está seguro de que desea eliminar a ${getAtributesUser(employeeScheduleToDelete?.e_user || '').fullName} la programación del día ${employeeScheduleToDelete?.date}?`"
-      details="Esta acción eliminará permanentemente la programación del sistema. Los ticket relacionados a esta programación también podrían verse afectados."
-      confirm-text="Sí, Eliminar" cancel-text="Cancelar" @confirm="handleDeleteConfirm" @cancel="handleDeleteCancel" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, reactive } from "vue";
-import { VueDatePicker } from '@vuepic/vue-datepicker'
+import { ref, computed, onMounted} from "vue";
 // @ts-ignore
 import '@vuepic/vue-datepicker/dist/main.css'
 import {
@@ -216,24 +161,19 @@ import {
   ChevronRight,
   MessageSquareWarning
 } from "lucide-vue-next";
-import { useNotification } from "../utils/useNotification.ts";
 import { eUsersService } from '../services/e-usersService.ts';
 import type { EUser } from "../models/EUser.ts";
 import type { EmployeeSchedule } from '../models/EmployeeSchedule.ts';
 import { EmployeeScheduleService } from '../services/employeeSchedule.ts';
-import ConfirmDialog from "../components/ConfirmDialog.vue";
 import { Holidays } from "../utils/holidays.ts";
 import { NoveltiesService } from '../services/Novelties.ts';
 import type { Novelties, NoveltiesFiltered } from '../models/Novelties.ts'
 import { LeaveTypesService } from "../services/LeaveTypes.ts";
 import type { LeaveType } from "../models/LeaveTypes.ts";
-import { formatDateISOS } from "../utils/Date.ts";
 import { SessionStorageService } from "../services/SessionStorageService.ts";
 
 
 const sessionStorageService = new SessionStorageService();
-const selectedDates = ref<Date[] | null>(null);
-const notification = useNotification();
 const eUsersServices = new eUsersService();
 const noveltiesService = new NoveltiesService();
 const leaveTypesService = new LeaveTypesService();
@@ -241,14 +181,10 @@ const eUsers = ref<EUser[]>([]);
 const employeeScheduleService = new EmployeeScheduleService() // Debe ser optimizado para buscar en el rango de fecha de masximo 3 semanas.
 const employeeSchedules = ref<EmployeeSchedule[]>([])
 const currentWeekStart = ref(new Date());
-const search = ref('');
-const employeeScheduleToDelete = ref<EmployeeSchedule | null>(null);
-const showConfirmDialog = ref(false);
 const holidayServices = new Holidays();
 const holidays = ref<string[]>(holidayServices.getLocalStorage() || []);
 const showModal = ref(false);
 const showModalNovelties = ref(false);
-const isEditing = ref(false);
 const leaveTypes = ref<LeaveType[]>([]);
 const novelties = ref<Novelties[]>([]); // Aquí deberías tener tus novelties
 const noveltiesToShow = ref<Novelties[]>([]); // Aquí deberías tener tus novelties
@@ -273,18 +209,6 @@ interface DayInfo {
   isToday: boolean;
 }
 const dateNoveltiesToShow = ref<DayInfo | null>(null);
-const userInfo = sessionStorageService.getItem('userInfo') as { username?: string } | null;
-
-const form = reactive<Novelties>({
-  id_novelty: undefined,
-  e_user: "",
-  leave_type: "",
-  start_date: "",
-  end_date: "",
-  status: "",
-  comments: ""
-})
-
 
 const weekDays = computed(() => {
   const days = [];
@@ -318,30 +242,12 @@ const closeModal = () => {
   showModal.value = false
   showModalNovelties.value = false
 }
-const openModal = (novelty?: Novelties) => {
-  if (novelty) {
-    noveltySelected.value = novelty
-    showModal.value = false
-    isEditing.value = true
-    return
-  }
-  isEditing.value = false
-  noveltySelected.value = null
-  showModal.value = true
-}
+
 const openModalNovelties = (day: DayInfo) => {
   showModalNovelties.value = true
   noveltiesToShow.value = noveltisByDates[day.date]
   dateNoveltiesToShow.value = day
 }
-
-const handleSubmit = () => {
-  if (isEditing.value) {
-    update()
-    return
-  }
-  create()
-};
 
 const currentWeekLabel = computed(() => {
   const days = weekDays.value;
@@ -473,138 +379,12 @@ const loadLeaveTypes = async () => {
   }
 }
 
-const create = async () => {
-  try {
-    
-    if (previousDateToday(form.start_date) || previousDateToday(form.end_date)) {
-      notification.error("Error", "No se puede seleccionar fechas pasadas")
-      return
-    }
-
-    let data: Novelties = ({
-      leave_type: form.leave_type,
-      e_user: userInfo?.username ?? "",
-      start_date: form.start_date,
-      end_date: form.end_date,
-      status: 'Pendiente',
-      comments: form.comments
-    })
-
-    let response = await noveltiesService.create(data)
-    if (response.success) {
-      notification.success(
-        "¡Creado!",
-        "La novedad ha sido creada correctamente"
-      );
-      loadNovelties();
-      closeModal();
-      return
-    }
-    console.error("Error al crear la novedad: ", response.error)
-    notification.error("Error", "No se logro crear la novedad")
-    closeModal();
-  } catch (error) {
-    console.error("Error al crear la novedad: ", error)
-    notification.error("Error", "No se logro crear la novedad")
-    closeModal();
-  }
-}
-
-const update = async () => {
-  try {
-    if (previousDateToday(form.start_date) || previousDateToday(form.end_date)) {
-      notification.error("Error", "No se puede seleccionar fechas pasadas")
-      return
-    }
-    let data: Novelties = ({
-      leave_type: form.leave_type,
-      e_user: userInfo?.username ?? "",
-      start_date: form.start_date,
-      end_date: form.end_date === "" ? form.start_date : form.end_date,
-      comments: form.comments,
-      status: "Pendiente"
-    })
-
-    if (!form.id_novelty) {
-      notification.error("Error", "ID de novedad no válido")
-      return
-    }
-
-    let response = await noveltiesService.update(data, form.id_novelty)
-    if (response.success) {
-      notification.success(
-        "¡Actualizado!",
-        "La novedad ha sido actualizada correctamente"
-      );
-      loadNovelties();
-      closeModal();
-      return
-    }
-    console.error("Error al actualizar la novedad: ", response.error)
-    notification.error("Error", "No se logro actualizar la novedad")
-    closeModal();
-  } catch (error) {
-    console.error("Error al actualizar la novedad: ", error)
-    notification.error("Error", "No se logro actualizar la novedad")
-    closeModal();
-  }
-}
-
-const confirmDelete = (code: EmployeeSchedule) => {
-  employeeScheduleToDelete.value = code;
-  showConfirmDialog.value = true;
-};
-const handleDeleteCancel = () => {
-  showConfirmDialog.value = false;
-  employeeScheduleToDelete.value = null;
-};
-
-const handleDeleteConfirm = async () => {
-  try {
-    if (employeeScheduleToDelete.value && employeeScheduleToDelete.value.id_employee_schudele != undefined) {
-      let response = await employeeScheduleService.delete(employeeScheduleToDelete.value.id_employee_schudele)
-      if (response.success) {
-        notification.success(
-          "¡Eliminado!",
-          "la novedad ha sido eliminado correctamente"
-        );
-
-        loadEmployeeSchedule();
-        handleDeleteCancel()
-        return
-      }
-      console.error("Error al eliminar la programación: ", response.error)
-      notification.error("Error", "No se logro eliminar la programación")
-      handleDeleteCancel()
-    }
-  } catch (error) {
-    console.error("Error al eliminar la programación: ", error)
-    notification.error("Error", "No se logro eliminar la programación")
-    handleDeleteCancel()
-  }
-};
-
 const getAtributesUser = (user: string) => {
   const userFound = eUsers.value.find(item => item.network_user === user)
   const rolName = userFound?.rol_name
   const fullName = userFound?.full_name
   return { rolName: rolName, fullName: fullName }
 }
-
-watch(selectedDates, (dates) => {
-  if (dates) {
-    const dateStart = new Date(dates[0]);
-    const dateEnd = new Date(dates[1]);
-    const stringDateStart = formatDateISOS(setDateWithoutTime(dateStart.getFullYear(), dateStart.getMonth(), dateStart.getDate()))
-    const stringDateEnd = formatDateISOS(setDateWithoutTime(dateEnd.getFullYear(), dateEnd.getMonth(), dateEnd.getDate()))
-
-    form.start_date = stringDateStart.split('T')[0];
-    form.end_date = stringDateEnd.split('T')[0];
-    return
-  }
-  form.start_date = "";
-  form.end_date = "";
-})
 
 onMounted(async () => {
   await loadEusers();
