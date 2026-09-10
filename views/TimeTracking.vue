@@ -57,7 +57,12 @@
           v-for="day in weekDays"
           :key="day.date"
           class="p-4 text-center border-r-2 last:border-r-0"
-          :class="{ 'bg-blue-50': day.isToday }"
+          :class="{
+            'bg-blue-50': day.isToday,
+            'bg-red-100 opacity-65': isFullDayLeave(day.date),
+            'bg-gray-300 opacity-65': isHoliday(day.date),
+          }"
+          :title="getDayRestrictionTitle(day.date)"
         >
           <p
             class="text-xs font-bold uppercase mb-1"
@@ -77,7 +82,7 @@
               {{ day.date ? getDayTotal(day.date) : "0h" }}
             </p>
             <p class="text-xs text-slate-500">
-              of {{ day.date ? getTotalExpected(day.date) : "8" }}h
+              of {{ getTotalExpected(day.date) }}
             </p>
           </div>
         </div>
@@ -94,6 +99,7 @@
               draggable="true"
               @dragstart="handleDragStart($event, ticket)"
               class="bg-white rounded-lg border-l-4 border-l-[#021C7D] border-2 border-slate-200 p-3 cursor-move hover:border-[#50bdeb] hover:shadow-md transition-all"
+              
             >
               <div class="flex items-center gap-2 mb-1">
                 <div class="w-2 h-2 rounded-full bg-green-500"></div>
@@ -112,7 +118,11 @@
           v-for="day in weekDays"
           :key="day.date"
           class="border-r-2 last:border-r-0 p-3 space-y-2"
-          :class="{ 'bg-blue-50/20': day.isToday }"
+          :class="{
+            'bg-blue-50/20': day.isToday,
+            'bg-red-100 opacity-65': isFullDayLeave(day.date),
+            'bg-gray-300 opacity-65': isHoliday(day.date),
+          }"
           @dragover.prevent
           @drop="handleDrop($event, day.date)"
         >
@@ -120,15 +130,15 @@
             v-for="entry in getEntriesForDay(day.date)"
             :key="entry.id"
             class="bg-white rounded-lg border-l-4 border-l-[#021C7D] border-2 border-slate-200 p-3 hover:border-[#50bdeb] hover:shadow-md transition-all group relative"
-            :class="{ 'opacity-75': isPastDate(entry.date) }"
+            :class="{ 'opacity-75': isEntryReadOnly(entry.date) }"
           >
-            <button
-              v-if="!isPastDate(entry.date)"
-              @click="removeEntry(entry.id, entry.date)"
-              class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-xs font-bold"
-            >
-              ×
-            </button>
+              <button
+                v-if="!isEntryReadOnly(entry.date)"
+                @click="removeEntry(entry.id, entry.date)"
+                class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-xs font-bold"
+              >
+                ×
+              </button>
             <div class="flex items-center gap-2 mb-2">
               <div class="w-2 h-2 rounded-full bg-green-500"></div>
               <p class="text-xs font-bold text-[#50bdeb]">
@@ -146,7 +156,7 @@
                 min="0"
                 max="24"
                 placeholder="0"
-                :disabled="isPastDate(entry.date)"
+                :disabled="isEntryReadOnly(entry.date)"
                 class="w-12 px-2 py-1.5 border-2 border-slate-200 rounded-lg text-center text-sm font-bold text-[#021C7D] focus:outline-none focus:border-[#50bdeb] transition-colors disabled:bg-slate-100 disabled:cursor-not-allowed"
               />
               <span class="text-xs text-slate-600 font-bold">h</span>
@@ -157,7 +167,7 @@
                 min="0"
                 max="59"
                 placeholder="0"
-                :disabled="isPastDate(entry.date)"
+                :disabled="isEntryReadOnly(entry.date)"
                 class="w-12 px-2 py-1.5 border-2 border-slate-200 rounded-lg text-center text-sm font-bold text-[#021C7D] focus:outline-none focus:border-[#50bdeb] transition-colors disabled:bg-slate-100 disabled:cursor-not-allowed"
               />
               <span class="text-xs text-slate-600 font-bold">m</span>
@@ -190,10 +200,14 @@
           </div>
 
           <button
+            v-if="!isHoliday(day.date)"
             @click="showAddModal(day.date)"
+            :disabled="isEntryReadOnly(day.date)"
+            :title="getDayRestrictionTitle(day.date) || undefined"
             class="w-full py-2 border-2 border-dashed border-slate-300 rounded-lg text-slate-400 hover:border-[#50bdeb] hover:text-[#50bdeb] transition-all text-sm font-medium"
+            :class="{ 'cursor-not-allowed opacity-50 hover:border-slate-300 hover:text-slate-400': isFullDayLeave(day.date) }"
           >
-            + Agregar
+            {{ isFullDayLeave(day.date) ? "Día bloqueado" : "+ Agregar" }}
           </button>
         </div>
       </div>
@@ -702,12 +716,23 @@ import { ReportedTimeService } from "../services/reportedTimeService";
 import { SessionStorageService } from "../services/SessionStorageService";
 import { TicketsService } from "../services/ticketsService";
 import { NotesService } from "../services/notesService";
+import { NoveltiesService } from "../services/Novelties";
+import { LeaveTypesService } from "../services/LeaveTypes";
+import { WorkingHoursService } from "../services/WorkingHoursService";
+import type { Novelties } from "../models/Novelties";
+import type { LeaveType } from "../models/LeaveTypes";
+import type { WorkingHours } from "../models/WorkingHours";
+import { Holidays } from "../utils/holidays";
 const notification = useNotification();
 
 const reportedTimeService = new ReportedTimeService();
 const sessionStorage = new SessionStorageService();
 const ticketsService = new TicketsService();
 const notesService = new NotesService();
+const noveltiesService = new NoveltiesService();
+const leaveTypesService = new LeaveTypesService();
+const workingHoursService = new WorkingHoursService();
+const holidayServices = new Holidays();
 
 const isTracking = ref(false);
 const currentTime = ref(0);
@@ -732,6 +757,10 @@ interface TimeEntry {
 const timeEntries = ref<TimeEntry[]>([]);
 
 const availableTickets = ref<TicketShort[]>([]);
+const novelties = ref<Novelties[]>([]);
+const leaveTypes = ref<LeaveType[]>([]);
+const workingHours = ref<WorkingHours[]>([]);
+const holidays = ref<string[]>(holidayServices.getLocalStorage() || []);
 
 let draggedTicket: TicketShort | null = null;
 
@@ -816,17 +845,20 @@ const previousWeek = () => {
   currentWeekStart.value = new Date(currentWeekStart.value);
   currentWeekStart.value.setDate(currentWeekStart.value.getDate() - 7);
   loadReportedTimes();
+  loadNovelties();
 };
 
 const nextWeek = () => {
   currentWeekStart.value = new Date(currentWeekStart.value);
   currentWeekStart.value.setDate(currentWeekStart.value.getDate() + 7);
   loadReportedTimes();
+  loadNovelties();
 };
 
 const goToToday = () => {
   initializeWeek();
   loadReportedTimes();
+  loadNovelties();
 };
 
 const getDayTotal = (date: string) => {
@@ -838,9 +870,105 @@ const getDayTotal = (date: string) => {
   return minutes > 0 ? `${hours}h:${minutes}m` : `${hours}h`;
 };
 
-const getTotalExpected = (_date: string | undefined) => {
-  return "8";
+const normalizeWeekDay = (weekDay: string | undefined) =>
+  weekDay
+    ?.normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+
+const getScheduleForDate = (date: string | undefined) => {
+  if (!date) return undefined;
+  const weekDay = new Date(`${date}T00:00:00`).toLocaleDateString("es-ES", {
+    weekday: "long",
+  });
+  return workingHours.value.find(
+    (schedule) => normalizeWeekDay(schedule.week_day) === normalizeWeekDay(weekDay),
+  );
 };
+
+const getScheduleMinutes = (date: string | undefined) => {
+  const schedule = getScheduleForDate(date);
+  if (!schedule?.start_time || !schedule.end_time) return 0;
+
+  const [startHour = 0, startMinute = 0] = schedule.start_time
+    .split(":")
+    .map(Number);
+  const [endHour = 0, endMinute = 0] = schedule.end_time
+    .split(":")
+    .map(Number);
+  const duration = endHour * 60 + endMinute - (startHour * 60 + startMinute);
+
+  return Math.max(0, duration - 90);
+};
+
+const getPermissionMinutes = (date: string | undefined, scheduleMinutes: number) => {
+  const novelty = getNoveltyForDate(date);
+  if (!novelty) return 0;
+  if (novelty.leave_type_full_day === true || isFullDayLeave(date)) {
+    return scheduleMinutes;
+  }
+
+  const leaveType = leaveTypes.value.find(
+    (type) => type.leave_type === novelty.leave_type,
+  );
+  const configuredTime = novelty.leave_type_time || leaveType?.leave_type_time;
+  if (configuredTime) {
+    const [hours = 0, minutes = 0] = configuredTime.split(":").map(Number);
+    return Math.min(scheduleMinutes, hours * 60 + minutes);
+  }
+
+  return novelty.leave_type_half_day === true || leaveType?.leave_type_half_day === true
+    ? Math.ceil(scheduleMinutes / 2)
+    : 0;
+};
+
+const getTotalExpected = (date: string | undefined) => {
+  const scheduleMinutes = getScheduleMinutes(date);
+  const expectedMinutes = Math.max(
+    0,
+    scheduleMinutes - getPermissionMinutes(date, scheduleMinutes),
+  );
+  const hours = Math.floor(expectedMinutes / 60);
+  const minutes = expectedMinutes % 60;
+  return minutes > 0 ? `${hours}h:${minutes}m` : `${hours}h`;
+};
+
+const getNoveltyForDate = (date: string | undefined) => {
+  if (!date) return undefined;
+  return novelties.value.find(
+    (novelty) => novelty.start_date <= date && date <= novelty.end_date,
+  );
+};
+
+const isFullDayLeave = (date: string | undefined) => {
+  const novelty = getNoveltyForDate(date);
+  if (!novelty) return false;
+  if (novelty.leave_type_full_day === true) return true;
+
+  return leaveTypes.value.some(
+    (leaveType) =>
+      leaveType.leave_type === novelty.leave_type &&
+      leaveType.leave_type_full_day === true,
+  );
+};
+
+const getDayLeaveTitle = (date: string | undefined) => {
+  const novelty = getNoveltyForDate(date);
+  return isFullDayLeave(date)
+    ? `Día bloqueado por ${novelty?.leave_type_name || novelty?.leave_type || "permiso"}`
+    : "";
+};
+
+const isHoliday = (date: string | undefined) =>
+  !!date && holidays.value.includes(date);
+
+const getDayRestrictionTitle = (date: string | undefined) => {
+  if (isHoliday(date)) return "Día festivo: no se puede agregar tiempo";
+  return getDayLeaveTitle(date);
+};
+
+const isEntryReadOnly = (date: string) =>
+  isPastDate(date) || isFullDayLeave(date) || isHoliday(date);
 
 const getEntriesForDay = (date: string | undefined) => {
   if (!date) return [];
@@ -863,6 +991,18 @@ const handleDrop = (event: DragEvent, date: string | undefined) => {
       "Error",
       "No se pueden agregar registros en fechas pasadas",
     );
+    draggedTicket = null;
+    return;
+  }
+
+  if (isFullDayLeave(date)) {
+    notification.error("Día bloqueado", getDayLeaveTitle(date));
+    draggedTicket = null;
+    return;
+  }
+
+  if (isHoliday(date)) {
+    notification.error("Día festivo", "No se pueden agregar registros en días festivos");
     draggedTicket = null;
     return;
   }
@@ -899,6 +1039,16 @@ const removeEntry = async (entryId: string, date: string) => {
       "Error",
       "No se pueden eliminar registros de fechas pasadas",
     );
+    return;
+  }
+
+  if (isFullDayLeave(date)) {
+    notification.error("Día bloqueado", getDayLeaveTitle(date));
+    return;
+  }
+
+  if (isHoliday(date)) {
+    notification.error("Día festivo", "No se pueden agregar registros en días festivos");
     return;
   }
 
@@ -1007,6 +1157,18 @@ const closeModal = () => {
 
 const saveModalEntry = async () => {
   if (!isModalValid.value) return;
+
+  if (isFullDayLeave(modalData.value.date)) {
+    notification.error("Día bloqueado", getDayLeaveTitle(modalData.value.date));
+    closeModal();
+    return;
+  }
+
+  if (isHoliday(modalData.value.date)) {
+    notification.error("Día festivo", "No se pueden agregar registros en días festivos");
+    closeModal();
+    return;
+  }
 
   const ticketId =
     modalData.value.ticketId || Number(modalData.value.selectedTicketId);
@@ -1199,7 +1361,7 @@ const saveEntry = async (entry: TimeEntry) => {
 };
 
 const onTimeChange = (entry: TimeEntry) => {
-  if (!isPastDate(entry.date)) {
+  if (!isEntryReadOnly(entry.date)) {
     autoSaveEntry(entry);
   }
 };
@@ -1316,9 +1478,66 @@ const loadAssignedTickets = async () => {
   }
 };
 
+const loadLeaveTypes = async () => {
+  try {
+    const response = await leaveTypesService.getAll();
+    if (response.success && response.data) {
+      leaveTypes.value = response.data.results;
+    }
+  } catch (error) {
+    console.error("Error al cargar los tipos de permiso:", error);
+  }
+};
+
+const loadWorkingHours = async () => {
+  try {
+    const response = await workingHoursService.getAll();
+    if (response.success && response.data) {
+      workingHours.value = response.data.results;
+    }
+  } catch (error) {
+    console.error("Error al cargar los horarios de trabajo:", error);
+  }
+};
+
+const loadHolidays = async () => {
+  holidays.value = holidayServices.getLocalStorage() || [];
+  try {
+    await holidayServices.setHolidays();
+    holidays.value = holidayServices.getHolidays();
+  } catch (error) {
+    console.error("Error al cargar los días festivos:", error);
+  }
+};
+
+const loadNovelties = async () => {
+  const userInfo = sessionStorage.getUserInfo();
+  const days = weekDays.value;
+  if (!userInfo?.username || days.length === 0) return;
+
+  try {
+    const response = await noveltiesService.getAllFiltered(1, 100, {
+      e_user: userInfo.username,
+      status: "Aprobado",
+      start_date: days[0]?.date,
+      end_date: days[days.length - 1]?.date,
+    });
+    novelties.value = response.success && response.data
+      ? response.data.results
+      : [];
+  } catch (error) {
+    console.error("Error al cargar las novedades:", error);
+    novelties.value = [];
+  }
+};
+
 onMounted(async () => {
+  await loadHolidays();
+  await loadLeaveTypes();
+  await loadWorkingHours();
   await loadAssignedTickets();
   await loadReportedTimes();
+  await loadNovelties();
 });
 
 interface TicketWithTracking extends TicketShort {

@@ -8,6 +8,9 @@ export interface Novelties {
   status:string,
   leave_type_name?: string,
   leave_type_color?: string,
+  leave_type_time?: string | null,
+  leave_type_full_day?: boolean | null,
+  leave_type_half_day?: boolean | null,
   user_name?: string,
   user_last_name?: string
 }

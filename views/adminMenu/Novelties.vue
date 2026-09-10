@@ -129,7 +129,7 @@
                     </button>
                     <button @click="openModal(novelty)"
                       class="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition- cursor-pointer"
-                      title="Eliminar">
+                      title="Detalles">
                       <MessageSquareText class="w-4 h-4" />
                     </button>
                   </div>
