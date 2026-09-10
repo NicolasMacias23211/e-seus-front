@@ -31,6 +31,7 @@
               <th class="px-6 py-4 text-left text-sm font-bold">Teléfono</th>
               <th class="px-6 py-4 text-left text-sm font-bold">Cliente</th>
               <th class="px-6 py-4 text-left text-sm font-bold">Rol</th>
+              <th class="px-6 py-4 text-center text-sm font-bold">Activate</th>
               <th class="px-6 py-4 text-center text-sm font-bold">Acciones</th>
             </tr>
           </thead>
@@ -58,6 +59,23 @@
                 </span>
               </td>
               <td class="px-6 py-4">
+                <button
+                  type="button"
+                  role="switch"
+                  :aria-checked="user.activate"
+                  :aria-label="`${user.activate ? 'Desactivar' : 'Activar'} usuario ${user.network_user}`"
+                  :disabled="updatingUser === user.network_user"
+                  @click="toggleUserActivation(user)"
+                  class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:cursor-pointer"
+                  :class="user.activate ? 'bg-emerald-500' : 'bg-slate-300'"
+                >
+                  <span
+                    class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform"
+                    :class="user.activate ? 'translate-x-6' : 'translate-x-1'"
+                  />
+                </button>
+              </td>
+              <td class="px-6 py-4">
                 <div class="flex items-center justify-center gap-2">
                   <button @click="openEditModal(user)"
                     class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all" title="Editar">
@@ -71,7 +89,7 @@
               </td>
             </tr>
             <tr v-if="eusers.length === 0">
-              <td colspan="7" class="px-6 py-8 text-center text-slate-500">
+              <td colspan="8" class="px-6 py-8 text-center text-slate-500">
                 No hay usuarios registrados
               </td>
             </tr>
@@ -282,7 +300,10 @@ const form = reactive<EUser>({
   user_client_name: null,
   id_services: null,
   rol_name: "",
+  activate: true,
 });
+
+const updatingUser = ref<string | null>(null);
 
 const getFullName = (user: EUser) => {
   const parts = [
@@ -311,6 +332,7 @@ const openCreateModal = () => {
   form.user_client_name = null;
   form.id_services = null;
   form.rol_name = "";
+  form.activate = true;
   showModal.value = true;
 };
 
@@ -329,6 +351,7 @@ const openEditModal = (user: EUser) => {
   form.user_client_name = typeof user.user_client_name === 'string' ? user.user_client_name : null;
   form.id_services = typeof user.id_services === 'number' ? user.id_services : null;
   form.rol_name = user.rol_name;
+  form.activate = user.activate;
   showModal.value = true;
 };
 
@@ -344,6 +367,7 @@ const closeModal = () => {
   form.user_client_name = null;
   form.id_services = null;
   form.rol_name = "";
+  form.activate = true;
   isEditing.value = false;
   editingIndex.value = -1;
 };
@@ -370,6 +394,7 @@ const create = async () => {
       user_client_name: form.user_client_name || "",
       id_services: form.id_services || null,
       rol_name: form.rol_name || "",
+      activate: form.activate,
     })
 
     let response = await eusersService.create(dataCreate);
@@ -408,6 +433,7 @@ const update = async () => {
       user_client_name: form.user_client_name || "",
       id_services: form.id_services,
       rol_name: form.rol_name,
+      activate: form.activate,
     })
 
     let response = await eusersService.update(data, form.network_user);
@@ -429,6 +455,30 @@ const update = async () => {
     closeModal();
   }
 }
+
+const toggleUserActivation = async (user: EUser) => {
+  const activate = !user.activate;
+  updatingUser.value = user.network_user;
+
+  try {
+    const response = await eusersService.update({ ...user, activate }, user.network_user);
+    if (response.success) {
+      user.activate = activate;
+      notification.success(
+        activate ? "Usuario activado" : "Usuario desactivado",
+        `El usuario ${user.network_user} fue actualizado correctamente`,
+      );
+      return;
+    }
+
+    notification.error("Error", "No se logró actualizar el estado del usuario");
+  } catch (error) {
+    console.error("Error al actualizar el estado del usuario:", error);
+    notification.error("Error", "No se logró actualizar el estado del usuario");
+  } finally {
+    updatingUser.value = null;
+  }
+};
 
 const confirmDelete = (user: EUser) => {
   clientToDelete.value = user;

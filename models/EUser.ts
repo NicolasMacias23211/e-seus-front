@@ -8,6 +8,7 @@ export interface EUser {
   email: string | null;
   phone: string | null;
   rol_name: string;
+  activate: boolean;
   user_client_name?: string | null;
   id_services?: number | null;
 }

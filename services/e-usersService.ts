@@ -23,6 +23,31 @@ export class eUsersService {
     );
   }
 
+  async getActivePaginated(
+    page: number,
+    pageSize: number,
+    search?: string,
+    rolName?: string,
+  ): Promise<ApiResponse<PaginatedResponse<EUser>>> {
+    const params = new URLSearchParams({
+      page: String(page),
+      page_size: String(pageSize),
+      activate: "true",
+    });
+
+    if (search?.trim()) {
+      params.append("search", search.trim());
+    }
+
+    if (rolName) {
+      params.append("rol_name", rolName);
+    }
+
+    return await http.get<PaginatedResponse<EUser>>(
+      `${this.endPoint}?${params.toString()}`,
+    );
+  }
+
   async getAll(): Promise<ApiResponse<PaginatedResponse<EUser>>> {
     return await http.get<PaginatedResponse<EUser>>(this.endPoint);
   }

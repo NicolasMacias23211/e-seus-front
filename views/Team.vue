@@ -76,7 +76,7 @@
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <div
-        v-for="member in filteredMembers"
+          v-for="member in teamMembers"
         :key="member.network_user"
         class="bg-white rounded-xl border-2 shadow-sm hover:shadow-lg transition-all duration-200 overflow-hidden"
       >
@@ -121,16 +121,31 @@
         </div>
       </div>
     </div>
-    <Pagination 
+    <!-- Div de mensaje cuando no hay miembros -->
+    <div
+      v-if="teamMembers.length === 0"
+      class="rounded-xl border-2 border-dashed border-slate-200 bg-white px-6 py-10 text-center shadow-sm"
+    >
+      <Users class="mx-auto mb-3 h-10 w-10 text-slate-300" />
+      <h2 class="text-base font-semibold text-slate-700">
+        No hay miembros para mostrar
+      </h2>
+      <p class="mt-1 text-sm text-slate-500">
+        No se encontraron usuarios que coincidan con los criterios de búsqueda y filtrado.
+      </p>
+    </div>
+    <Pagination
+      v-if="teamMembers.length > 0"
+      :key="paginationKey"
       :total-registers="total"
-      :items-count="itemsCount" 
-      @change="loadTeamMembers" 
+      :items-count="itemsCount"
+      @change="loadTeamMembers"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { Users, Search, Mail, PhoneCall } from "lucide-vue-next";
 import type { EUser, Role } from "../models";
 import { eUsersService } from "../services/e-usersService";
@@ -152,13 +167,21 @@ const availableRoles = ref<Role[]>([]);
 
 const total = ref(0)
 const itemsCount = ref(0)
+const paginationKey = ref(0)
+const totalMembers = ref(0)
+const memberCountsByRole = ref<Record<string, number>>({})
 
 
 const loadTeamMembers = async (pagination?: PaginationState) => {
   try {
     const page = pagination?.currentPage ?? 1
     const perPage = pagination?.perPage ?? 10
-    const response = await eUsers.getAllPaginated(page, perPage)
+    const response = await eUsers.getActivePaginated(
+      page,
+      perPage,
+      searchQuery.value,
+      filterRole.value,
+    )
     if (response.data && response.data.results) {
       teamMembers.value = response.data.results.flat().map((member: EUser) => ({
         ...member,
@@ -172,22 +195,7 @@ const loadTeamMembers = async (pagination?: PaginationState) => {
     notification.error("Error", "No se pudieron cargar los usuarios")
   }
 }
-// const loadTeamMembers = async () => {
-//   try {
-//     const response = await eUsers.getAll();
-//     if (response.data && response.data.results) {
-//       teamMembers.value = response.data.results.flat().map((member: EUser) => ({
-//         ...member,
-//         initials: getInitials(member.name, member.last_name),
-//       }));
-//     }
-//   } catch (error) {
-//     notification.error(
-//       "Error",
-//       "No se pudieron cargar los miembros del equipo."
-//     );
-//   }
-// };
+
 const getInitials = (name: string, lastName: string): string => {
   const firstInitial = name?.charAt(0).toUpperCase() || "";
   const lastInitial = lastName?.charAt(0).toUpperCase() || "";
@@ -199,9 +207,29 @@ const loadRoles = async () => {
     const response = await rolesService.getAll();
     if (response.data && response.data.results) {
       availableRoles.value = response.data.results;
+      await loadTeamStats();
     }
   } catch (error) {
     notification.error("Error", "No se pudieron cargar los roles.");
+  }
+};
+
+const loadTeamStats = async () => {
+  try {
+    const totalResponse = await eUsers.getActivePaginated(1, 1);
+    totalMembers.value = totalResponse.data?.count ?? 0;
+
+    const roleCounts = await Promise.all(
+      availableRoles.value.map(async (role) => {
+        const response = await eUsers.getActivePaginated(1, 1, undefined, role.rol_name);
+        return [role.rol_name, response.data?.count ?? 0] as const;
+      }),
+    );
+
+    memberCountsByRole.value = Object.fromEntries(roleCounts);
+  } catch (error) {
+    console.error("Error al cargar los totales del equipo:", error);
+    notification.error("Error", "No se pudieron cargar los totales del equipo");
   }
 };
 
@@ -213,31 +241,17 @@ onMounted(() => {
 const searchQuery = ref("");
 const filterRole = ref("");
 
-const filteredMembers = computed(() => {
-  return teamMembers.value.filter((member) => {
-    const fullName = `${member.name} ${member.middle_name || ""} ${
-      member.last_name
-    } ${member.second_last_name || ""}`.toLowerCase();
-    const matchesSearch =
-      fullName.includes(searchQuery.value.toLowerCase()) ||
-      (member.email?.toLowerCase().includes(searchQuery.value.toLowerCase()) ??
-        false);
-
-    const matchesRole =
-      filterRole.value === "" || member.rol_name === filterRole.value;
-
-    return matchesSearch && matchesRole;
-  });
-});
-
-const totalMembers = computed(() => teamMembers.value.length);
-
 const getMemberCountByRole = (roleName: string) => {
-  return teamMembers.value.filter((m) => m. rol_name === roleName).length;
+  return memberCountsByRole.value[roleName] ?? 0;
 };
 
 const getRoleIcon = (role: string) => {
   const roleFromDB = availableRoles.value.find((r) => r.rol_name === role);
   return roleFromDB?.icon || "👤";
 };
+
+watch([searchQuery, filterRole], () => {
+  paginationKey.value += 1;
+  loadTeamMembers({ currentPage: 1, perPage: 10 } as PaginationState);
+});
 </script>
