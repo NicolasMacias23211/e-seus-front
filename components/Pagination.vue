@@ -85,7 +85,7 @@
             @click="goToPage(pagination.firstPage)"
             :value="pagination.firstPage"
             :class="{
-              'bg-[#50bdeb] text-white cursor-not-allowed': pagination.currentPage == pagination.firstPage,
+              'bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white cursor-not-allowed': pagination.currentPage == pagination.firstPage,
               'cursor-pointer hover:bg-[#021c7d] ': pagination.currentPage != pagination.firstPage,
             }"
             class="relative z-10 inline-flex items-center rounded-lg px-4 py-2 text-sm hover:text-white transition-colors"
@@ -106,7 +106,7 @@
             "
             @click="goToPage(pagination.previous!)"
             :class="{
-              'bg-[#50bdeb] text-white cursor-not-allowed': pagination.currentPage == pagination.previous,
+              'bg-gradient-to-r from-[#021C7D] to-[#50bdeb] text-white cursor-not-allowed': pagination.currentPage == pagination.previous,
               'cursor-pointer hover:bg-[#021c7d] ': pagination.currentPage != pagination.previous,
             }"
             class="relative z-10 inline-flex items-center rounded-lg px-4 py-2 text-sm hover:text-white transition-colors"

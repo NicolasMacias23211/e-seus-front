@@ -32,7 +32,7 @@
     <nav class="flex-1 overflow-y-auto p-2">
       <div class="space-y-1">
         <router-link
-          v-for="item in navigation"
+          v-for="item in visibleNavigation"
           :key="item.name"
           :to="item.href"
           :class="[
@@ -58,6 +58,7 @@
     <!-- Footer -->
     <div class="border-t border-[#0829a3] p-2">
       <router-link
+        v-if="isAdmin"
         to="/settings"
         :class="[
           'flex items-center rounded-lg px-3 py-2.5 text-sm font-medium text-white/80 hover:bg-[#0829a3] hover:text-white transition-colors',
@@ -73,7 +74,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
+import { computed, ref, onMounted, onUnmounted } from "vue";
+import { SessionStorageService } from "../services/SessionStorageService";
 import {
   TrendingUp,
   Kanban,
@@ -90,6 +92,10 @@ import {
 } from "lucide-vue-next";
 
 const isCollapsed = ref(false);
+const sessionStorageService = new SessionStorageService();
+const isAdmin = computed(
+  () => sessionStorageService.getUserInfo()?.isAdmin === true,
+);
 
 const COLLAPSE_BREAKPOINT = 1280; // px — laptops típicos < 1280
 
@@ -124,4 +130,10 @@ const navigation = [
   { name: "Novedades", href: "/novelties", icon: MessageSquareWarning },
   { name: "Programación", href: "/schedule", icon: CalendarDays },
 ];
+
+const visibleNavigation = computed(() =>
+  isAdmin.value
+    ? navigation
+    : navigation.filter((item) => item.href !== "/reports"),
+);
 </script>

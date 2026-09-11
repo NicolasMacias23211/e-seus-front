@@ -404,6 +404,16 @@
               placeholder="Describe el trabajo realizado..."
               class="w-full px-4 py-2.5 border-2 border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-none focus:border-[#50bdeb] transition-colors resize-none"
             ></textarea>
+            <label
+              class="flex items-center gap-3 mt-3 text-sm font-bold text-slate-700"
+            >
+              <input
+                v-model="modalData.visibleToClient"
+                type="checkbox"
+                class="h-4 w-4 rounded border-slate-300 text-[#021C7D] focus:ring-[#50bdeb]"
+              />
+              Visible para el cliente
+            </label>
           </div>
         </div>
 
@@ -746,6 +756,7 @@ const modalData = ref({
   hours: 0,
   minutes: 0,
   comment: "" as string,
+  visibleToClient: false,
 });
 
 const showDeleteModal = ref(false);
@@ -875,6 +886,7 @@ const handleDrop = (event: DragEvent, date: string | undefined) => {
     hours: 0,
     minutes: 0,
     comment: "",
+    visibleToClient: false,
   };
   showModal.value = true;
   draggedTicket = null;
@@ -988,6 +1000,7 @@ const showAddModal = (date: string | undefined) => {
     hours: 0,
     minutes: 0,
     comment: "",
+    visibleToClient: false,
   };
   showModal.value = true;
 };
@@ -1002,6 +1015,7 @@ const closeModal = () => {
     hours: 0,
     minutes: 0,
     comment: "",
+    visibleToClient: false,
   };
 };
 
@@ -1060,7 +1074,7 @@ const saveModalEntry = async () => {
     if (modalData.value.comment && modalData.value.comment.trim()) {
       const noteResponse = await notesService.createNote({
         note: modalData.value.comment.trim(),
-        visible_to_client: false,
+        visible_to_client: modalData.value.visibleToClient,
         id_ticket: ticketId,
         network_user: userInfo.username,
       });
@@ -1304,12 +1318,12 @@ const loadAssignedTickets = async () => {
     notification.error("Error", "No se pudo obtener el usuario de la sesión");
     return;
   }
-  //TODO: ajustar este llamado pues esta trayendo todos mis ticket includo los del backlog, se debe liminar solo a quellos en progreso
   try {
     const response = await ticketsService.GetTicketsByPerson(userInfo.username);
 
     if (response.success && response.data) {
-      availableTickets.value = response.data.results.flat();
+      const fetched = response.data.results.flat();
+      availableTickets.value = fetched.filter((t) => !t.closing_date);
     }
   } catch (error) {
     notification.error("Error", "No se pudieron cargar los tickets asignados");
@@ -1320,72 +1334,4 @@ onMounted(async () => {
   await loadAssignedTickets();
   await loadReportedTimes();
 });
-
-// interface TicketWithTracking extends TicketShort {
-//   tracked: number;
-//   estimated: number;
-// }
-
-// const activeTickets = ref<TicketWithTracking[]>([
-//   {
-//     id_ticket: 101,
-//     ticket_title: "Error en el login",
-//     assigned_to: "user2",
-//     create_at: "2025-11-20",
-//     estimated_closing_date: "2025-11-30",
-//     ticket_description: "Corregir error de autenticación",
-//     ticket_attachments: null,
-//     ticket_closing_code: null,
-//     ticket_ans: 2,
-//     update_at: "",
-//     closing_date: null,
-//     sub_program_name: "Cliente Principal A",
-//     reporter_user_name: "pepito",
-//     service_name: "servico X",
-//     priority_name: "alta",
-//     status_name: "progreso",
-//     tracked: 2,
-//     estimated: 12,
-//   },
-//   {
-//     id_ticket: 102,
-//     ticket_title: "Implementar dark mode",
-//     service_name: "Desarrollo",
-//     priority_name: "Media",
-//     status_name: "En Progreso",
-//     reporter_user_name: "user3",
-//     assigned_to: "user2",
-//     create_at: "2025-11-21",
-//     estimated_closing_date: "2025-12-05",
-//     ticket_description: "Añadir tema oscuro",
-//     ticket_attachments: null,
-//     ticket_closing_code: null,
-//     ticket_ans: null,
-//     update_at: null,
-//     closing_date: null,
-//     sub_program_name: "Cliente Principal A",
-//     tracked: 8,
-//     estimated: 16,
-//   },
-//   {
-//     id_ticket: 103,
-//     ticket_title: "Optimizar queries",
-//     service_name: "Base de Datos",
-//     priority_name: "Alta",
-//     status_name: "En Progreso",
-//     reporter_user_name: "user4",
-//     assigned_to: "user2",
-//     create_at: "2025-11-22",
-//     estimated_closing_date: "2025-12-01",
-//     ticket_description: "Mejorar rendimiento",
-//     ticket_attachments: null,
-//     ticket_closing_code: null,
-//     ticket_ans: null,
-//     update_at: null,
-//     closing_date: null,
-//     sub_program_name: "Cliente Principal B",
-//     tracked: 15,
-//     estimated: 24,
-//   },
-// ]);
 </script>

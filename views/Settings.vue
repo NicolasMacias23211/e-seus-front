@@ -286,6 +286,24 @@
           </div>
         </div>
       </router-link>
+      <router-link
+        to="/settings/carga-masiva"
+        class="group bg-white rounded-xl border-2 border-slate-200 p-6 hover:border-[#50bdeb] hover:shadow-lg transition-all duration-200"
+      >
+        <div class="flex items-start gap-4">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-teal-50 to-teal-100 group-hover:from-[#021C7D] group-hover:to-[#50bdeb] transition-all"
+          >
+          <FileSpreadsheet class="w-6 h-6 text-teal-600 group-hover:text-white" />
+          </div>
+          <div class="flex-1">
+            <h3 class="text-lg font-bold text-[#021C7D] mb-1">Carga Masiva</h3>
+            <p class="text-xs text-slate-600">
+              Importa tickets desde un archivo.
+            </p>
+          </div>
+        </div>
+      </router-link>
     </div>
   </div>
 </template>
@@ -304,7 +322,8 @@ import {
   Users, 
   List,
   CalendarClock,
-  MessageSquareWarning
+  MessageSquareWarning,
+  FileSpreadsheet
 } from "lucide-vue-next";
 
 </script>

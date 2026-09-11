@@ -3,10 +3,12 @@ import { HttpService } from "./http";
 import { env } from "../config/env";
 import { SessionStorageService } from "./SessionStorageService";
 import { eUsersService } from "./e-usersService";
+import { RolesService } from "./rolesService";
 
 export class LoginService extends HttpService {
   private sessionStorageService = new SessionStorageService();
   private eUsersService = new eUsersService();
+  private rolesService = new RolesService();
 
   public async login(user: string, password: string): Promise<Login> {
     try {
@@ -18,10 +20,14 @@ export class LoginService extends HttpService {
             "authTokens",
             eldapResponse.tokens
           );
-          const isEUser = await this.checkEUserStatus(
+          const eUser = await this.eUsersService.GetEUsersByNetworkUser(
             eldapResponse.user.username
           );
+          const isEUser = eUser.success && eUser.data != null;
           eldapResponse.user.isEUser = isEUser;
+          eldapResponse.user.isAdmin = isEUser
+            ? await this.resolveAdminStatus(eUser.data?.rol_name)
+            : false;
           this.sessionStorageService.setItem(
             "userInfo",
             eldapResponse.user
@@ -72,14 +78,16 @@ export class LoginService extends HttpService {
     }
   }
 
-  private async checkEUserStatus(username: string): Promise<boolean> {
+  private async resolveAdminStatus(roleName?: string): Promise<boolean> {
+    if (!roleName) {
+      return false;
+    }
+
     try {
-      const response = await this.eUsersService.GetEUsersByNetworkUser(
-        username
-      );
-      return response.success && response.data !== null;
+      const response = await this.rolesService.getByName(roleName);
+      return response.success && response.data?.is_admin === true;
     } catch (error) {
-      console.error("Error al verificar estado de EUser:", error);
+      console.error("Error al verificar permisos del rol:", error);
       return false;
     }
   }

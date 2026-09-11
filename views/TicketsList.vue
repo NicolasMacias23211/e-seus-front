@@ -222,18 +222,18 @@ import {
 import { ref, onMounted } from "vue";
 import { TicketsService } from "../services/ticketsService";
 import { AnsService } from "../services/ansService";
-import type { TicketList } from "../models/Ticket";
+import type { TicketList, TicketUpdate } from "../models/Ticket";
 import type { ANS } from "../models/ANS";
 import type { EUser } from "../models/EUser";
 import type { PaginationState } from "../components/Pagination.vue";
 import Pagination from "../components/Pagination.vue";
-import { parseBackendDate, formatDateISOS } from "../utils/Date";
+import { formatDateISOS } from "../utils/Date";
 import { Holidays } from "../utils/holidays";
 import { eUsersService } from "../services/e-usersService";
-import type { TicketUpdate } from '../models/Ticket';
 import { useNotification } from "../utils/useNotification";
 import type { WorkingHours } from "../models/WorkingHours";
 import { WorkingHoursService } from "../services/WorkingHoursService";
+import { AnsTimeCalculator } from "../utils/ticketAns";
 
 interface loadDataParams {
   search?: string;
@@ -316,15 +316,20 @@ const searchEUsers = async () => {
   try {
     if (!form.value.search) {
       eUsersFiltered.value = eUsers.value;
+      showDropdown.value = true;
       return;
     }
-    eUsersFiltered.value = eUsers.value.filter(user =>
-      matchText(form.value.search, user.full_name)
-    )
+
+    const response = await e_UsersService.getAll(form.value.search);
+    if (response.data && response.data.results) {
+      eUsersFiltered.value = response.data.results;
+    } else {
+      eUsersFiltered.value = [];
+    }
     showDropdown.value = true;
 
   } catch (error) {
-    console.error("Error al cargar los EUsers:", error);
+    console.error("Error al buscar los EUsers:", error);
   }
 };
 
@@ -335,109 +340,6 @@ const selectUser = (user: EUser) => {
   updateTicket.value.assigned_to = user.network_user;
 };
 
-class calculateTimeInElapsed {
-  private dateCurrent = new Date();
-
-  public setTimes(date: Date, initial: boolean): Date | null {
-    try {
-      const dayOfWeek = holidaysServices.daysWeek[date.getDay()];
-      const workingDay = workingHours.value?.find(element => element.week_day === dayOfWeek);
-      if (workingDay && workingDay.start_time && initial) {
-        return this.combineDateAndTime(date, workingDay.start_time);
-      }
-      if (workingDay && workingDay.end_time && !initial) {
-        return this.combineDateAndTime(date, workingDay.end_time);
-      }
-      return date; // Retorna la fecha sin modificar si no se encuentra un horario específico
-    } catch (error) {
-      console.error("Error setting times: ", error);
-      return null; // Retorna la fecha sin modificar en caso de error
-    }
-
-  }
-
-  public combineDateAndTime(date: Date, end_time: string): Date {
-    const [hours, minutes, seconds] = end_time.split(':').map(Number);
-    const newDate = new Date(date);
-    newDate.setHours(hours ?? 0, minutes ?? 0, seconds || 0, 0);
-    return newDate;
-  }
-
-  public Main(dateCreation: string | null): number[] | null[] {
-    if (!dateCreation) {
-      return [null, null];
-    }
-    let workingHoursInElapsed = 0;
-    let dateInitial: Date | null = new Date(dateCreation);
-    while (dateInitial.getTime() < this.dateCurrent.getTime()) {
-      const dateEnd = this.setTimes(dateInitial, false);
-      if (dateEnd && dateEnd.getTime() < this.dateCurrent.getTime()) {
-        workingHoursInElapsed += (dateEnd.getTime() - dateInitial.getTime()) / (1000 * 60 * 60);
-        dateInitial = this.setTimes(this.nextWorkingDay(dateInitial), true);
-        if (!dateInitial) {
-          return [null, null];
-        }
-        continue;
-      }
-      workingHoursInElapsed += (this.dateCurrent.getTime() - dateInitial.getTime()) / (1000 * 60 * 60);
-      break;
-    }
-    const hours = Math.floor(workingHoursInElapsed);
-    const minutes = Math.round((workingHoursInElapsed - hours) * 60);
-    return [hours, minutes];
-  }
-
-  public isWorkingDay(date: Date): boolean {
-    if (holidays.value.includes(date.toISOString().split('T')[0] ?? '')) {
-      return false;
-    }
-    const response = workingHours.value?.some(element => {
-      if (element.week_day === holidaysServices.daysWeek[date.getDay()]) {
-        return true;
-      }
-    }) ?? false;
-    return response;
-  }
-
-  public nextWorkingDay(date: Date): Date {
-    do {
-      date.setDate(date.getDate() + 1);
-    } while (!this.isWorkingDay(date));
-    return date;
-  }
-}
-
-function isCriticalTime(ans: number, hour: number, minutes: number): boolean {
-  //lógica crítica basada en ANS y tiempo transcurrido
-  const criticalTimeLimit = ans * 0.7; // ejemplo: crítico si se ha pasado el 70% del ANS
-  const elapsedTime = hour + (minutes / 60);
-  return elapsedTime >= criticalTimeLimit;
-}
-
-function isExpiredTime(ticket: TicketList, hour: number, minutes: number): boolean {
-  if (!ticket.create_at) {
-    notification.error("Error", `No se pudo calcular el tiempo transcurrido del ticket #${ticket.id_ticket}. Fecha de creación no disponible`)
-    return true;
-  }
-  if (ticket.estimated_closing_date) {
-    const estimatedDate = new Date(parseBackendDate(ticket.estimated_closing_date));
-    const now = new Date();
-    if (now >= estimatedDate) {
-      ticket.isCritical = false; // Si ya está vencido, no se considera crítico
-      return true;
-    }
-  }
-  const elapsedTime = hour + (minutes / 60);
-  if (ticket.ans && ticket.ans !== "Programado") {
-    const ansTime = parseInt(ticket.ans);
-    if (elapsedTime >= ansTime) {
-      ticket.isCritical = false; // Si ya está vencido, no se considera crítico
-      return true;
-    }
-  }
-  return false;
-}
-
 function setTicketInformationValidate(ticket: TicketList) {
   filterAns.value.some(ans => {
     if (ans.id_ans === ticket.ticket_ans) {
@@ -445,20 +347,14 @@ function setTicketInformationValidate(ticket: TicketList) {
       return true;
     }
   })
-  const calculateTime = new calculateTimeInElapsed();
-  let time_elapsed: number[] | null[] = calculateTime.Main(ticket.create_at);
-  if (!time_elapsed) {
-    time_elapsed = [null, null];
-  }
-  if (ticket.ans && ticket.ans !== "programado") {
-    ticket.isCritical = isCriticalTime(parseInt(ticket.ans), time_elapsed[0] || 0, time_elapsed[1] || 0);
-  }
-  if (ticket.ans === "Programado" && (time_elapsed[0] || 0) > 5) {
-    ticket.isCritical = true;
-  }
-  ticket.hour_elapsed = time_elapsed[0] || 0;
-  ticket.minute_elapsed = time_elapsed[1] || 0;
-  ticket.isExpired = isExpiredTime(ticket, time_elapsed[0] || 0, time_elapsed[1] || 0);
+  
+  const calculator = new AnsTimeCalculator(workingHours.value, holidays.value);
+  const status = calculator.getDetailedStatus(ticket, ticket.ans || "");
+  
+  ticket.hour_elapsed = status.hours;
+  ticket.minute_elapsed = status.minutes;
+  ticket.isCritical = status.isCritical;
+  ticket.isExpired = status.isExpired;
 }
 
 const loadAllTickets = async () => {

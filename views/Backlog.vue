@@ -320,6 +320,7 @@
               <div
                 v-for="(ticket, index) in sortedTickets"
                 :key="ticket.id_ticket"
+                @click="openTicketDetail(ticket.id_ticket)"
                 :class="[
                   'grid grid-cols-12 gap-4 px-4 py-3 items-center hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-100',
                   index === sortedTickets.length - 1 ? 'border-b-0' : '',
@@ -403,6 +404,7 @@
               v-for="ticket in sortedTicketsAsShort"
               :key="ticket.id_ticket"
               :ticket="ticket"
+              @open="openTicketDetail($event.id_ticket)"
             />
           </div>
 
@@ -455,6 +457,13 @@
       @ticketCreated="handleTicketCreated"
       :backlog=true
     />
+
+    <!-- Modal de Detalle de Ticket -->
+    <TicketDetailModal
+      v-model="showDetailModal"
+      :ticket-id="selectedTicketId"
+      @ticket-updated="loadBacklogTickets"
+    />
   </div>
 </template>
 
@@ -462,6 +471,7 @@
 import { ref, computed, onMounted, watch } from "vue";
 import TicketCard from "../components/TicketCard.vue";
 import CreateTicketModal from "../components/CreateTicketModal.vue";
+import TicketDetailModal from "../components/TicketDetailModal.vue";
 import ExportToExcel from "../components/ExportToExcel.vue";
 import ExportToPDF from "../components/ExportToPDF.vue";
 import {
@@ -504,6 +514,14 @@ const isLoading = ref(false);
 const error = ref<string | null>(null);
 const showExportMenu = ref(false);
 const showCreateModal = ref(false);
+const showDetailModal = ref(false);
+const selectedTicketId = ref<number | null>(null);
+
+// Abrir el modal de detalle de un ticket
+const openTicketDetail = (ticketId: number) => {
+  selectedTicketId.value = ticketId;
+  showDetailModal.value = true;
+};
 
 const sortLabels = {
   priority: "Prioridad",

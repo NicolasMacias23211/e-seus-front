@@ -1543,8 +1543,108 @@
                         </div>
                       </div>
                     </div>
+                    <div class="space-y-4">
+                      <h3
+                        class="text-xs font-bold text-slate-500 uppercase tracking-wide flex items-center gap-2"
+                      >
+                        <svg
+                          class="w-4 h-4"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                        Archivos Adjuntos
+                        <span
+                          v-if="selectedTicketAttachments.length > 0"
+                          class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-bold"
+                        >
+                          {{ selectedTicketAttachments.length }}
+                        </span>
+                      </h3>
+                      <div
+                        v-if="selectedTicketAttachments.length === 0"
+                        class="bg-slate-50 rounded-xl p-4 border border-slate-200 text-center"
+                      >
+                        <p class="text-sm text-slate-500">
+                          Este ticket no tiene archivos adjuntos
+                        </p>
+                      </div>
+                      <div v-else class="space-y-2">
+                        <div
+                          v-for="(attachment, index) in selectedTicketAttachments"
+                          :key="index"
+                          class="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-slate-50 rounded-xl border-2 border-blue-100 hover:border-blue-300 transition-all"
+                        >
+                          <div class="flex items-center gap-3 min-w-0">
+                            <div
+                              class="p-2 bg-blue-500 rounded-lg flex-shrink-0"
+                            >
+                              <svg
+                                class="w-5 h-5 text-white"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
+                                  clip-rule="evenodd"
+                                />
+                              </svg>
+                            </div>
+                            <p
+                              class="text-sm font-semibold text-slate-700 truncate"
+                            >
+                              {{ cleanFileName(attachment) }}
+                            </p>
+                          </div>
+                          <button
+                            @click="downloadAttachment(attachment)"
+                            class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all flex-shrink-0"
+                            title="Descargar archivo"
+                          >
+                            <svg
+                              class="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   <div v-show="detailTab === 'comments'" class="p-6">
+                    <button
+                      @click="openCommentModal"
+                      class="w-full mb-6 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl font-bold hover:shadow-lg hover:shadow-blue-500/30 hover:scale-[1.02] transition-all duration-200"
+                    >
+                      <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                      Agregar Comentario
+                    </button>
                     <div
                       v-if="
                         getTicketComments(selectedTicket.id_ticket).length === 0
@@ -1658,6 +1758,205 @@
         </div>
       </div>
     </div>
+    <Teleport to="body">
+      <div
+        v-if="showCommentModal && selectedTicket"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+        @click.self="closeCommentModal"
+      >
+        <div
+          class="bg-white rounded-2xl shadow-2xl max-w-lg w-full animate-fade-in overflow-hidden"
+        >
+          <div
+            class="bg-gradient-to-r from-blue-800 to-blue-900 px-6 py-4 text-white flex items-center justify-between"
+          >
+            <div>
+              <h2 class="text-lg font-bold">Agregar Comentario</h2>
+              <p class="text-blue-200 text-xs mt-0.5">
+                Ticket #{{ selectedTicket.id_ticket }} —
+                {{ selectedTicket.ticket_title }}
+              </p>
+            </div>
+            <button
+              @click="closeCommentModal"
+              class="p-2 hover:bg-white/10 rounded-lg transition-all"
+              title="Cerrar"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <div class="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+            <div
+              v-if="commentError"
+              class="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 font-medium"
+            >
+              {{ commentError }}
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">
+                Comentario
+              </label>
+              <textarea
+                v-model="newCommentText"
+                rows="4"
+                placeholder="Escribe tu comentario aquí..."
+                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl text-slate-700 focus:outline-none focus:border-blue-400 transition-colors resize-none"
+              ></textarea>
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">
+                Archivos Adjuntos (Opcional)
+              </label>
+              <div
+                class="border-2 border-dashed border-blue-300 rounded-xl p-6 text-center hover:border-blue-500 hover:bg-blue-50/30 transition-all bg-slate-50"
+              >
+                <input
+                  id="comment-file-upload"
+                  type="file"
+                  multiple
+                  @change="handleCommentFileUpload"
+                  class="hidden"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.txt,.zip"
+                />
+                <label
+                  for="comment-file-upload"
+                  class="cursor-pointer flex flex-col items-center"
+                >
+                  <svg
+                    class="w-10 h-10 text-blue-400 mb-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    />
+                  </svg>
+                  <span class="text-sm text-slate-700 font-bold"
+                    >Haga clic para seleccionar archivos</span
+                  >
+                  <span class="text-xs text-slate-400 mt-1"
+                    >PDF, DOC, XLS, IMG, TXT, ZIP (Máx. 10MB)</span
+                  >
+                </label>
+              </div>
+
+              <div v-if="commentFiles.length > 0" class="mt-3 space-y-2">
+                <div
+                  v-for="(file, index) in commentFiles"
+                  :key="index"
+                  class="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-slate-50 rounded-xl border-2 border-blue-100"
+                >
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="p-2 bg-blue-500 rounded-lg flex-shrink-0">
+                      <svg
+                        class="w-5 h-5 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div class="min-w-0">
+                      <p class="text-sm font-bold text-slate-800 truncate">
+                        {{ file.name }}
+                      </p>
+                      <p class="text-xs text-slate-500">
+                        {{ formatFileSize(file.size) }}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    @click="removeCommentFile(index)"
+                    class="p-2 text-red-500 hover:text-white hover:bg-red-500 rounded-lg transition-all flex-shrink-0"
+                    title="Eliminar archivo"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <p class="mt-2 text-xs text-slate-400">
+                Los archivos se adjuntarán al ticket y serán visibles para el
+                equipo de soporte.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-3 px-6 pb-6">
+            <button
+              @click="closeCommentModal"
+              :disabled="isSubmittingComment"
+              class="flex-1 px-4 py-2.5 border-2 border-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+            <button
+              @click="submitComment"
+              :disabled="!canSubmitComment || isSubmittingComment"
+              class="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl font-bold hover:shadow-lg hover:shadow-blue-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              <svg
+                v-if="isSubmittingComment"
+                class="animate-spin w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              {{ isSubmittingComment ? "Enviando..." : "Enviar" }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -1723,6 +2022,7 @@ const subPrograms = ref<SubProgram[]>([]);
 const programs = ref<Program[]>([]);
 const currentStep = ref(1);
 const totalSteps = 4;
+const initialStatusId = ref(0);
 const selectedTicket = ref<Ticket | null>(null);
 const isLoading = ref(false);
 const ticketsService = new TicketsService();
@@ -1735,6 +2035,11 @@ const ticketSearchQuery = ref("");
 const selectedStatusFilter = ref<number | null>(null);
 const selectedPriorityFilter = ref<string | null>(null);
 const detailTab = ref<"info" | "comments">("info");
+const showCommentModal = ref(false);
+const newCommentText = ref("");
+const commentFiles = ref<File[]>([]);
+const isSubmittingComment = ref(false);
+const commentError = ref("");
 let statusMap: Record<number, string>;
 
 const loadMyTickets = async () => {
@@ -1794,7 +2099,9 @@ const selectTicket = async (ticket: Ticket) => {
 };
 
 const getTicketComments = (ticketId: number) => {
-  return notes.value.filter((note) => note.id_ticket === ticketId);
+  return notes.value.filter(
+    (note) => note.id_ticket === ticketId && note.visible_to_client === true,
+  );
 };
 
 const getStatusName = (statusId: number) => {
@@ -1921,6 +2228,7 @@ const loadFormData = async () => {
     if (statuses.value.length > 0) {
       const initialStatus = statuses.value.find((s) => s.ordering === 1);
       if (initialStatus) {
+        initialStatusId.value = initialStatus.id_status;
         form.status_id = initialStatus.id_status;
       }
     }
@@ -2123,6 +2431,156 @@ const formatFileSize = (bytes: number): string => {
   const sizes = ["Bytes", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
+};
+
+const selectedTicketAttachments = computed(() => {
+  if (!selectedTicket.value || !selectedTicket.value.ticket_attachments)
+    return [];
+  return selectedTicket.value.ticket_attachments
+    .split(",")
+    .map((file) => file.trim())
+    .filter((file) => file.length > 0);
+});
+
+const cleanFileName = (filename: string): string => {
+  const parts = filename.split("_");
+  return parts.length >= 3 ? parts.slice(2).join("_") : filename;
+};
+
+const downloadAttachment = async (filename: string) => {
+  const result = await fileUploadService.downloadFile(filename);
+  if (!result.success) {
+    errorMessage.value = result.message || "No se pudo descargar el archivo";
+  }
+};
+
+const openCommentModal = () => {
+  newCommentText.value = "";
+  commentFiles.value = [];
+  commentError.value = "";
+  showCommentModal.value = true;
+};
+
+const closeCommentModal = () => {
+  showCommentModal.value = false;
+  newCommentText.value = "";
+  commentFiles.value = [];
+  commentError.value = "";
+};
+
+const handleCommentFileUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (target.files) {
+    const newFiles = Array.from(target.files);
+
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    const validFiles = newFiles.filter((file) => {
+      if (file.size > maxSize) {
+        commentError.value = `El archivo ${file.name} excede el tamaño máximo de 10MB`;
+        return false;
+      }
+      return true;
+    });
+
+    commentFiles.value = [...commentFiles.value, ...validFiles];
+    target.value = "";
+  }
+};
+
+const removeCommentFile = (index: number) => {
+  commentFiles.value.splice(index, 1);
+};
+
+const canSubmitComment = computed(() => {
+  return newCommentText.value.trim().length > 0 || commentFiles.value.length > 0;
+});
+
+const submitComment = async () => {
+  if (!selectedTicket.value || !canSubmitComment.value) return;
+
+  const text = newCommentText.value.trim();
+  const hasFiles = commentFiles.value.length > 0;
+
+  const currentUser = sessionStorageService.getUserInfo();
+  if (!currentUser || !currentUser.username) {
+    commentError.value = "No se pudo obtener el usuario actual";
+    return;
+  }
+
+  isSubmittingComment.value = true;
+  commentError.value = "";
+
+  const ticketId = selectedTicket.value.id_ticket;
+
+  try {
+    if (text) {
+      const noteResponse = await notesService.createNote({
+        note: text,
+        visible_to_client: true,
+        id_ticket: ticketId,
+        network_user: currentUser.username,
+      });
+
+      if (!noteResponse.success) {
+        commentError.value =
+          "No se pudo guardar el comentario. Intenta nuevamente.";
+        return;
+      }
+    }
+
+    let filesWarning = "";
+    if (hasFiles) {
+      const uploadResponse = await fileUploadService.uploadFiles(
+        commentFiles.value,
+        ticketId,
+      );
+
+      if (uploadResponse.success && uploadResponse.data) {
+        const existing = selectedTicket.value.ticket_attachments
+          ? selectedTicket.value.ticket_attachments
+              .split(",")
+              .map((f) => f.trim())
+              .filter((f) => f.length > 0)
+          : [];
+        const updatedAttachments = [...existing, ...uploadResponse.data].join(
+          ", ",
+        );
+
+        const updateResponse = await ticketsService.updateTicket(ticketId, {
+          ticket_attachments: updatedAttachments,
+        });
+
+        if (updateResponse.success) {
+          selectedTicket.value.ticket_attachments = updatedAttachments;
+          const ticketInList = tickets.value.find(
+            (t) => t.id_ticket === ticketId,
+          );
+          if (ticketInList) {
+            ticketInList.ticket_attachments = updatedAttachments;
+          }
+        } else {
+          filesWarning =
+            "Los archivos se subieron pero no se pudieron asociar al ticket";
+        }
+      } else {
+        filesWarning =
+          uploadResponse.message || "No se pudieron subir los archivos";
+      }
+    }
+
+    await loadTicketNotes(ticketId);
+    closeCommentModal();
+
+    if (filesWarning) {
+      errorMessage.value = text
+        ? `El comentario se guardó, pero: ${filesWarning}`
+        : filesWarning;
+    }
+  } catch (error) {
+    commentError.value = "Ocurrió un error al enviar. Intenta nuevamente.";
+  } finally {
+    isSubmittingComment.value = false;
+  }
 };
 
 const nextStep = () => {
@@ -2426,7 +2884,7 @@ const resetForm = () => {
   form.client_name = "";
   form.program_name = "";
   form.sub_program_name = "";
-  form.status_id = 0;
+  form.status_id = initialStatusId.value;
   clientSearch.value = "";
   programSearch.value = "";
   subProgramSearch.value = "";

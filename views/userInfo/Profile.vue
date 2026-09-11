@@ -83,7 +83,7 @@
                 <div
                   class="w-full px-4 py-3 bg-slate-100 border-2 border-slate-200 rounded-xl text-slate-600 font-medium cursor-not-allowed"
                 >
-                  {{ userProfile.middle_name || "N/A" }}
+                  {{ userProfile.second_last_name || "N/A" }}
                 </div>
               </div>
 
@@ -94,7 +94,7 @@
                 <div
                   class="w-full px-4 py-3 bg-slate-100 border-2 border-slate-200 rounded-xl text-slate-600 font-medium cursor-not-allowed"
                 >
-                  {{ userProfile.last_name }}
+                  {{ userProfile.middle_name }}
                 </div>
               </div>
 
@@ -105,7 +105,7 @@
                 <div
                   class="w-full px-4 py-3 bg-slate-100 border-2 border-slate-200 rounded-xl text-slate-600 font-medium cursor-not-allowed"
                 >
-                  {{ userProfile.second_last_name || "N/A" }}
+                  {{ userProfile.last_name || "N/A" }}
                 </div>
               </div>
 
@@ -234,7 +234,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import {
   User,
   Mail,
@@ -248,8 +248,12 @@ import {
   Check,
 } from "lucide-vue-next";
 import type { EUser } from "../../models";
+import { SessionStorageService } from "../../services/SessionStorageService";
+import { eUsersService } from "../../services/e-usersService";
 
 const showSuccess = ref(false);
+const sessionStorageService = new SessionStorageService();
+const eUsersServices = new eUsersService();
 
 const userProfile = reactive<EUser>({
   network_user: "jperez",
@@ -292,21 +296,69 @@ const resetChanges = () => {
   showSuccess.value = false;
 };
 
-const handleSubmit = () => {
-  userProfile.email = editableProfile.email;
-  userProfile.phone = editableProfile.phone;
+const loadUserProfile = async () => {
+  const sessionUser = sessionStorageService.getUserInfo();
+  if (!sessionUser?.username) {
+    return;
+  }
 
-  showSuccess.value = true;
-
-  setTimeout(() => {
-    showSuccess.value = false;
-  }, 3000);
-
-  console.log("Información actualizada:", {
-    email: userProfile.email,
-    phone: userProfile.phone,
-  });
+  try {
+    const response = await eUsersServices.GetEUsersByNetworkUser(
+      sessionUser.username,
+    );
+    if (response.success && response.data) {
+      const profile = response.data;
+      Object.assign(userProfile, profile);
+      editableProfile.email = profile.email || "";
+      editableProfile.phone = profile.phone || "";
+    }
+  } catch (error) {
+    console.error("Error al cargar perfil de usuario:", error);
+  }
 };
+
+const handleSubmit = async () => {
+  const updatePayload: EUser = {
+    ...userProfile,
+    email: editableProfile.email,
+    phone: editableProfile.phone,
+  };
+
+  try {
+    const response = await eUsersServices.update(
+      updatePayload,
+      userProfile.network_user,
+    );
+
+    if (response.success && response.data) {
+      Object.assign(userProfile, response.data);
+      editableProfile.email = response.data.email || "";
+      editableProfile.phone = response.data.phone || "";
+      showSuccess.value = true;
+
+      const storedInfo = sessionStorageService.getUserInfo();
+      if (storedInfo) {
+        sessionStorageService.setItem("userInfo", {
+          ...storedInfo,
+          email: response.data.email,
+          phone: response.data.phone,
+        });
+      }
+
+      setTimeout(() => {
+        showSuccess.value = false;
+      }, 3000);
+    } else {
+      console.error("Error al guardar perfil:", response.error || response.message);
+    }
+  } catch (error) {
+    console.error("Error al guardar perfil de usuario:", error);
+  }
+};
+
+onMounted(() => {
+  loadUserProfile();
+});
 </script>
 
 <style scoped>

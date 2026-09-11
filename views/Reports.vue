@@ -493,8 +493,8 @@
                 type="text"
                 placeholder="Buscar usuario..."
                 class="w-full pl-9 pr-4 py-2.5 border-2 border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#50bdeb] transition-colors bg-white text-sm"
-                @input="showTimeUserDropdown = true"
-                @focus="showTimeUserDropdown = true"
+                @input="showTimeUserDropdown = true; searchTimeUsers(timeUserSearchQuery)"
+                @focus="showTimeUserDropdown = true; searchTimeUsers(timeUserSearchQuery)"
               />
               <div
                 v-if="showTimeUserDropdown && filteredTimeUsers.length > 0"
@@ -721,6 +721,7 @@ const notification = useNotification();
 const searchQuery = ref("");
 const selectedUser = ref<EUser | null>(null);
 const allUsers = ref<EUser[]>([]);
+const filteredUsers = ref<EUser[]>([]);
 const isLoading = ref(false);
 const showDropdown = ref(false);
 const isLoadingMetrics = ref(false);
@@ -911,24 +912,24 @@ const handleGeneralExport = async (params: GeneralExportParams) => {
   }
 };
 
-const filteredUsers = computed(() => {
-  if (!searchQuery.value) return allUsers.value.slice(0, 10);
+const searchUsers = async (query: string) => {
+  const searchText = query.trim();
+  if (!searchText) {
+    filteredUsers.value = allUsers.value.slice(0, 10);
+    return;
+  }
 
-  const query = searchQuery.value.toLowerCase();
-  return allUsers.value
-    .filter((user) => {
-      const fullName = getFullName(user).toLowerCase();
-      const email = user.email?.toLowerCase() || "";
-      const networkUser = user.network_user.toLowerCase();
-
-      return (
-        fullName.includes(query) ||
-        email.includes(query) ||
-        networkUser.includes(query)
-      );
-    })
-    .slice(0, 10);
-});
+  isLoading.value = true;
+  try {
+    const response = await eUserService.getAll(searchText);
+    filteredUsers.value = response.data?.results || [];
+  } catch (error) {
+    console.error("Error al buscar usuarios:", error);
+    filteredUsers.value = [];
+  } finally {
+    isLoading.value = false;
+  }
+};
 
 const loadUsers = async () => {
   isLoading.value = true;
@@ -936,6 +937,8 @@ const loadUsers = async () => {
     const response = await eUserService.getAll();
     if (response.data && response.data.results) {
       allUsers.value = response.data.results || [];
+      filteredUsers.value = allUsers.value.slice(0, 10);
+      filteredTimeUsers.value = allUsers.value.slice(0, 8);
     }
   } catch (error) {
     notification.error("Error", "No se pudieron cargar los usuarios");
@@ -944,8 +947,9 @@ const loadUsers = async () => {
   }
 };
 
-const handleSearch = () => {
+const handleSearch = async () => {
   showDropdown.value = true;
+  await searchUsers(searchQuery.value);
 };
 
 const selectUser = async (user: EUser) => {
@@ -1015,10 +1019,25 @@ const loadWeeklyStats = async () => {
     const response = await ticketsService.getWeeklyStats();
 
     if (response.success && response.data) {
-      const stats = response.data.data;
-      timeCategories.value = stats.datos_diarios.map((d) => d.dia);
-      ticketsCreatedData.value = stats.datos_diarios.map((d) => d.creados);
-      ticketsClosedData.value = stats.datos_diarios.map((d) => d.cerrados);
+      const responseData = response.data as unknown as {
+        datos_diarios?: Array<{
+          dia: string;
+          creados: number | string;
+          cerrados: number | string;
+        }>;
+        data?: {
+          datos_diarios?: Array<{
+            dia: string;
+            creados: number | string;
+            cerrados: number | string;
+          }>;
+        };
+      };
+      const dailyStats = responseData.datos_diarios ?? responseData.data?.datos_diarios ?? [];
+
+      timeCategories.value = dailyStats.map((item) => item.dia);
+      ticketsCreatedData.value = dailyStats.map((item) => Number(item.creados) || 0);
+      ticketsClosedData.value = dailyStats.map((item) => Number(item.cerrados) || 0);
     }
   } catch (error) {
     notification.error("Error", "Error al cargar estadísticas semanales");
@@ -1147,6 +1166,7 @@ const applyTicketChanges = async () => {
 const timeUserSearchQuery = ref("");
 const showTimeUserDropdown = ref(false);
 const selectedTimeUser = ref<EUser | null>(null);
+const filteredTimeUsers = ref<EUser[]>([]);
 const retroDate = ref("");
 const retroHours = ref<number | null>(null);
 const retroMinutes = ref<number | null>(null);
@@ -1164,22 +1184,21 @@ const selectedRetroTicket = ref<Ticket | null>(null);
 
 const todayDate = computed(() => new Date().toISOString().split("T")[0]);
 
-const filteredTimeUsers = computed(() => {
-  if (!timeUserSearchQuery.value) return allUsers.value.slice(0, 8);
-  const query = timeUserSearchQuery.value.toLowerCase();
-  return allUsers.value
-    .filter((u) => {
-      const fullName = getFullName(u).toLowerCase();
-      const email = u.email?.toLowerCase() || "";
-      const networkUser = u.network_user.toLowerCase();
-      return (
-        fullName.includes(query) ||
-        email.includes(query) ||
-        networkUser.includes(query)
-      );
-    })
-    .slice(0, 8);
-});
+const searchTimeUsers = async (query: string) => {
+  const searchText = query.trim();
+  if (!searchText) {
+    filteredTimeUsers.value = allUsers.value.slice(0, 8);
+    return;
+  }
+
+  try {
+    const response = await eUserService.getAll(searchText);
+    filteredTimeUsers.value = response.data?.results || [];
+  } catch (error) {
+    console.error("Error al buscar usuarios de tiempo retroactivo:", error);
+    filteredTimeUsers.value = [];
+  }
+};
 
 const searchRetroTicketById = async () => {
   retroTicketSearchError.value = "";

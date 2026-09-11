@@ -17,14 +17,27 @@ export class eUsersService {
   async getAllPaginated(
     page: number,
     pageSize: number,
+    activo: boolean = true,
   ): Promise<ApiResponse<PaginatedResponse<EUser>>> {
     return await http.get<PaginatedResponse<EUser>>(
-      `${this.endPoint}?page=${page}&page_size=${pageSize}`,
+      `${this.endPoint}?page=${page}&page_size=${pageSize}&activo=${activo}`,
     );
   }
 
-  async getAll(): Promise<ApiResponse<PaginatedResponse<EUser>>> {
-    return await http.get<PaginatedResponse<EUser>>(this.endPoint);
+  async getAll(
+    search?: string,
+    activo: boolean = true,
+  ): Promise<ApiResponse<PaginatedResponse<EUser>>> {
+    const params = new URLSearchParams();
+    params.append("activo", activo.toString());
+    if (search && search.trim().length > 0) {
+      params.append("search", search.trim());
+    }
+
+    const queryString = params.toString();
+    const endpoint = queryString ? `${this.endPoint}?${queryString}` : this.endPoint;
+
+    return await http.get<PaginatedResponse<EUser>>(endpoint);
   }
 
   async create(eUser: EUser): Promise<ApiResponse<EUser>> {

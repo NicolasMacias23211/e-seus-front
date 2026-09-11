@@ -19,17 +19,22 @@
             #{{ ticket.id_ticket }}
           </span>
         </div>
-        <span
-          :class="[
-            'text-xs font-semibold px-2.5 py-1 rounded-md border-2',
-            priorityConfig[ticket.priority_name]?.color ||
-              'bg-slate-50 text-slate-700 border-slate-300',
-          ]"
-        >
-          {{
-            priorityConfig[ticket.priority_name]?.label || ticket.priority_name
-          }}
-        </span>
+        <div class="flex items-center gap-2">
+          <span
+            :class="[
+              'text-xs font-semibold px-2.5 py-1 rounded-md border-2 flex items-center gap-1',
+              priorityConfig[ticket.priority_name]?.color ||
+                'bg-slate-50 text-slate-700 border-slate-300',
+              ansStatus === 'expired' ? 'animate-pulse ring-2 ring-red-400' : '',
+              ansStatus === 'critical' ? 'animate-pulse ring-2 ring-orange-400' : '',
+            ]"
+          >
+            <AlarmClock v-if="ansStatus !== 'normal'" class="w-3 h-3" />
+            <span v-if="ansStatus === 'expired'">Vencido</span>
+            <span v-else-if="ansStatus === 'critical'">Próx. a vencer</span>
+            <span v-else>{{ priorityConfig[ticket.priority_name]?.label || ticket.priority_name }}</span>
+          </span>
+        </div>
       </div>
 
       <h4
@@ -108,14 +113,23 @@
 </template>
 
 <script setup lang="ts">
-import { AlertCircle, CheckCircle, Zap, Wrench, User } from "lucide-vue-next";
+import { AlarmClock, AlertCircle, CheckCircle, Zap, Wrench, User } from "lucide-vue-next";
 import type { TicketShort } from "../models";
+
+export type AnsStatus = "normal" | "critical" | "expired";
 
 interface Props {
   ticket: TicketShort;
+  ansStatus?: AnsStatus;
 }
 
-defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  ansStatus: "normal",
+});
+
+const emit = defineEmits<{
+  open: [ticket: TicketShort];
+}>();
 
 const priorityConfig: Record<string, { color: string; label: string }> = {
   Baja: {
@@ -169,6 +183,6 @@ const formatDate = (dateString: string | null) => {
 };
 
 function openTicket() {
-  console.log("Open ticket details");
+  emit("open", props.ticket);
 }
 </script>
