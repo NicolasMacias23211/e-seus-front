@@ -99,7 +99,7 @@
             <th class="text-left px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-wider">
               Tiempo en cola
             </th>
-            <th class="text-left px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-wider">
+            <th class="text-center px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-wider">
               Acciones
             </th>
           </tr>
@@ -110,7 +110,7 @@
             <td class="px-6 py-4">
               <span class="text-[#50bdeb] font-bold text-lg">#{{ ticket.id_ticket }}</span>
             </td>
-            <td class="px-6 py-4">
+            <td class="px-6 py-4 align-middle">
               <div class="max-w-md">
                 <p class="text-slate-900 font-bold text-sm mb-1">
                   {{ ticket.ticket_title }}
@@ -150,11 +150,17 @@
                 </span>
               </div>
             </td>
-            <td class="px-6 py-4">
-              <button @click="openModal(ticket)"
-                class="px-4 py-2 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] hover:shadow-lg text-white rounded-lg font-semibold text-xs cursor-pointer">
-                Asignar
-              </button>
+            <td class="px-6 py-4 align-middle">
+              <div class="flex items-center justify-center gap-2">
+                <button @click.stop="openModal(ticket)"
+                  class="w-24 px-4 py-2 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] hover:shadow-lg text-white rounded-lg font-semibold text-xs cursor-pointer">
+                  Asignar
+                </button>
+                <button @click.stop="blockTicket(ticket)"
+                  class="w-24 px-4 py-2 bg-gradient-to-r from-[#021C7D] to-[#50bdeb] hover:shadow-lg text-white rounded-lg font-semibold text-xs cursor-pointer">
+                  Bloquear
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -234,6 +240,7 @@ import { useNotification } from "../utils/useNotification";
 import type { WorkingHours } from "../models/WorkingHours";
 import { WorkingHoursService } from "../services/WorkingHoursService";
 import { AnsTimeCalculator } from "../utils/ticketAns";
+import { SessionStorageService } from "../services/SessionStorageService";
 
 interface loadDataParams {
   search?: string;
@@ -247,6 +254,7 @@ const ansService = new AnsService();
 const ticketService = new TicketsService();
 const holidaysServices = new Holidays();
 const workingHoursService = new WorkingHoursService();
+const sessionStorageService = new SessionStorageService();
 
 const updateTicket = ref<TicketUpdate>({
   assigned_to: "",
@@ -364,7 +372,6 @@ const loadAllTickets = async () => {
       allTickets.value = response.data.results;
       itemsCount.value = response.data.results.length;
     }
-    loadData();
     ticketsCritial.value = 0;
     ticketsExpired.value = 0;
     allTickets.value.forEach(ticket => {
@@ -376,6 +383,7 @@ const loadAllTickets = async () => {
         ticketsExpired.value += 1;
       }
     })
+    await loadData();
   } catch (error) {
     console.error("Error al cargar los tickets:", error);
   }
@@ -455,6 +463,36 @@ const assignTicket = async () => {
     closeModal();
   }
 }
+
+const blockTicket = async (ticket: TicketList) => {
+  const userInfo = sessionStorageService.getUserInfo();
+  if (!userInfo?.username) {
+    notification.error("Error", "No se pudo obtener el usuario de la sesión");
+    return;
+  }
+
+  try {
+    const response = await ticketService.patchTicket(
+      { assigned_to: userInfo.username },
+      ticket.id_ticket,
+    );
+
+    if (!response.success) {
+      notification.error("Error", "No se logró bloquear el ticket");
+      return;
+    }
+
+    notification.success(
+      "¡Ticket asignado!",
+      `Se te asigno el ticket #${ticket.id_ticket} `,
+    );
+    await loadAllTickets();
+    await loadData(undefined, loadDataParams.value);
+  } catch (error) {
+    console.error("Error al bloquear el ticket:", error);
+    notification.error("Error", "No se logró bloquear el ticket");
+  }
+};
 
 function getClass(ticket: TicketList): string[] {
   if (ticket.ans === "Programado") {
@@ -536,10 +574,9 @@ function hideDropdown() {
 
 onMounted(async () => {
   await loadWorkingHoursAndHolidays();
+  await loadAns();
+  await loadAllTickets();
   loadEUser();
-  loadAns();
-  loadAllTickets();
-  loadData();
 });
 
 </script>

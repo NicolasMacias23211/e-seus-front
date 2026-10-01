@@ -156,40 +156,41 @@ const exportToExcel = async () => {
     const keys = getAllKeys(props.data);
     const headers = keys.map((key) => formatFieldName(key));
 
-    worksheet.columns = headers.map((header, index) => ({
-      header,
-      key: keys[index],
-      width: Math.max(header.length + 5, 15),
+    worksheet.columns = keys.map((key, index) => ({
+      key,
+      width: Math.max((headers[index]?.length ?? 10) + 5, 15),
     }));
 
-    worksheet.getRow(1).font = { bold: true, size: 12 };
-    worksheet.getRow(1).fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "FF4472C4" },
-    };
-    worksheet.getRow(1).font = { bold: true, color: { argb: "FFFFFFFF" } };
-    worksheet.getRow(1).alignment = {
-      vertical: "middle",
-      horizontal: "center",
-    };
-    worksheet.getRow(1).height = 25;
-
     if (props.title) {
-      worksheet.insertRow(1, [props.title]);
-      worksheet.mergeCells(1, 1, 1, headers.length);
-      worksheet.getRow(1).font = { bold: true, size: 16 };
-      worksheet.getRow(1).alignment = {
+      const titleRow = worksheet.addRow([props.title]);
+      if (headers.length > 0) {
+        worksheet.mergeCells(titleRow.number, 1, titleRow.number, headers.length);
+      }
+      titleRow.font = { bold: true, size: 16 };
+      titleRow.alignment = {
         vertical: "middle",
         horizontal: "center",
       };
-      worksheet.getRow(1).height = 30;
-      worksheet.getRow(1).fill = {
+      titleRow.height = 30;
+      titleRow.fill = {
         type: "pattern",
         pattern: "solid",
         fgColor: { argb: "FFD9E1F2" },
       };
     }
+
+    const headerRow = worksheet.addRow(headers);
+    headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+    headerRow.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF4472C4" },
+    };
+    headerRow.alignment = {
+      vertical: "middle",
+      horizontal: "center",
+    };
+    headerRow.height = 25;
 
     props.data.forEach((item) => {
       const rowData: any = {};
@@ -200,11 +201,11 @@ const exportToExcel = async () => {
       worksheet.addRow(rowData);
     });
 
-    const dataStartRow = props.title ? 2 : 1;
+    const dataStartRow = headerRow.number + 1;
     const totalRows = worksheet.rowCount;
     const totalCols = headers.length;
 
-    for (let row = dataStartRow; row <= totalRows; row++) {
+    for (let row = headerRow.number; row <= totalRows; row++) {
       for (let col = 1; col <= totalCols; col++) {
         const cell = worksheet.getRow(row).getCell(col);
         cell.border = {
@@ -214,9 +215,9 @@ const exportToExcel = async () => {
           right: { style: "thin" },
         };
 
-        if (row > dataStartRow && typeof cell.value === "number") {
+        if (row >= dataStartRow && typeof cell.value === "number") {
           cell.alignment = { vertical: "middle", horizontal: "right" };
-        } else if (row > dataStartRow) {
+        } else if (row >= dataStartRow) {
           cell.alignment = { vertical: "middle", horizontal: "left" };
         }
 
@@ -227,10 +228,10 @@ const exportToExcel = async () => {
     }
 
     worksheet.columns.forEach((column, index) => {
-      let maxLength = column.header?.toString().length || 10;
+      let maxLength = headers[index]?.length || 10;
 
       worksheet.eachRow((row, rowNumber) => {
-        if (rowNumber > dataStartRow) {
+        if (rowNumber >= dataStartRow) {
           const cell = row.getCell(index + 1);
           const cellValue = cell.value?.toString() || "";
           maxLength = Math.max(maxLength, cellValue.length);

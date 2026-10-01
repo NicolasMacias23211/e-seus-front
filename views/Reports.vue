@@ -335,7 +335,7 @@
                   {{ selectedTicket.ticket_title }}
                 </p>
                 <p class="text-xs text-slate-500 mt-0.5">
-                  Cerrado: {{ selectedTicket.closing_date ?? 'Sin cerrar' }} · Asignado:
+                  Cerrado: {{ formatTicketClosingDate(selectedTicket.closing_date) }} · Asignado:
                   {{ selectedTicket.assigned_to ?? 'Sin asignar' }}
                 </p>
               </div>
@@ -1100,6 +1100,22 @@ const ticketCompletionStatus = ref(false);
 const selectedStatus = ref<number | null>(null);
 const originalStatusId = ref<number | null>(null);
 const estimatedClosingDate = ref<string>("");
+
+const formatTicketClosingDate = (date: string | null): string => {
+  if (!date) return "Sin cerrar";
+
+  const parsedDate = new Date(date);
+  if (Number.isNaN(parsedDate.getTime())) return "Fecha inválida";
+
+  return parsedDate.toLocaleString("es-CO", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  });
+};
 
 const searchTicketById = async () => {
   ticketSearchError.value = "";
