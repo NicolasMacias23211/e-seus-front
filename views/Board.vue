@@ -171,17 +171,10 @@
                 </div>
               </div>
             </div>
-            <button
-              class="p-2.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all text-slate-600"
-              title="Configuración"
-            >
-              <SlidersHorizontal class="h-4 w-4" />
-            </button>
           </div>
         </div>
       </div>
     </div>
-
     <div class="px-6 py-2">
       <div class="flex gap-1">
         <div
@@ -312,7 +305,7 @@
                   @click="openTicketModal(ticket)"
                   class="cursor-move"
                 >
-                  <TicketCard :ticket="ticket" />
+                  <TicketCard :ticket="ticket" :ans-status="(ticket as any).ansStatus" />
                 </div>
 
                 <div
@@ -704,7 +697,7 @@
                           {{ subProgram.sub_program_name }}
                         </div>
                         <div class="text-xs opacity-75">
-                          {{ subProgram.program_name_display }}
+                          {{ subProgram.program_name }}
                         </div>
                       </div>
                     </div>
@@ -949,6 +942,17 @@
                 placeholder="Escribe tu comentario aquí..."
                 helper-text="Este comentario será agregado al historial del ticket."
               />
+              <label
+                v-if="modalAction !== 'view'"
+                class="flex items-center gap-3 text-sm font-bold text-slate-700"
+              >
+                <input
+                  v-model="commentVisibleToClient"
+                  type="checkbox"
+                  class="h-4 w-4 rounded border-slate-300 text-[#021C7D] focus:ring-[#50bdeb]"
+                />
+                Visible para el cliente
+              </label>
             </div>
 
             <div v-show="activeTab === 'comments'" class="space-y-4">
@@ -1010,6 +1014,12 @@
                           }}
                         </span>
                       </div>
+                      <span
+                        v-if="comment.visible_to_client"
+                        class="inline-block text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-semibold mb-1"
+                      >
+                        Visible para el cliente
+                      </span>
                       <p class="text-slate-700 text-sm leading-relaxed">
                         {{ comment.note }}
                       </p>
@@ -1189,13 +1199,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from "vue";
+
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import TicketCard from "../components/TicketCard.vue";
 import CommentEditor from "../components/CommentEditor.vue";
 import {
   Search,
   Filter,
-  SlidersHorizontal,
   Inbox,
   LayoutGrid,
   Trash2,
@@ -1230,6 +1240,9 @@ import { eUsersService } from "../services/e-usersService";
 import { TicketPriorityService } from "../services/ticketPriorityService";
 import { ClosingCodeService } from "../services/closingCode";
 import { ProjectDateService } from "../services/projectDateService";
+import { WorkingHoursService } from "../services/WorkingHoursService";
+import { Holidays } from "../utils/holidays";
+import { AnsTimeCalculator, type AnsStatus } from "../utils/ticketAns";
 
 const notification = useNotification();
 const ansService = new AnsService();
@@ -1241,6 +1254,10 @@ const eUsersServices = new eUsersService();
 const ticketPriorityService = new TicketPriorityService();
 const closingCodeService = new ClosingCodeService();
 const projectDateService = new ProjectDateService();
+const workingHoursService = new WorkingHoursService();
+const holidaysService = new Holidays();
+const workingHours = ref<any[]>([]);
+const holidays = ref<string[]>([]);
 const searchQuery = ref("");
 const isDeletingZone = ref(false);
 const isCompletingZone = ref(false);
@@ -1294,6 +1311,7 @@ const assignedToSearch = ref("");
 const showAssignedToDropdown = ref(false);
 const filteredAssignedTo = ref<EUser[]>([]);
 const commentText = ref("");
+const commentVisibleToClient = ref(false);
 const reportedHours = ref(0);
 const reportedMinutes = ref(0);
 const activeTab = ref<"details" | "comments" | "time">("details");
@@ -1586,6 +1604,19 @@ const loadEUsers = async () => {
   }
 };
 
+const loadWorkingHoursAndHolidays = async () => {
+  try {
+    const response = await workingHoursService.getAll();
+    if (response.data && response.data.results) {
+      workingHours.value = response.data.results;
+    }
+    await holidaysService.setHolidays();
+    holidays.value = holidaysService.getHolidays();
+  } catch (error) {
+    console.error("Error al cargar horarios/festivos:", error);
+  }
+};
+
 const loadPriorities = async () => {
   try {
     const response = await ticketPriorityService.getAll();
@@ -1767,6 +1798,7 @@ onMounted(() => {
   loadColumsByStatus();
   loadTickets();
   loadAns();
+  loadWorkingHoursAndHolidays();
   document.addEventListener("click", handleDocumentClick);
 });
 
@@ -1790,13 +1822,17 @@ const ticketsByStatus = computed(() => {
     if (matchingStatus) {
       const columnKey = matchingStatus.id_status.toString();
       if (result[columnKey]) {
-        const enrichedTicket = { ...ticket };
+        const enrichedTicket = { ...ticket } as TicketShort & { ansStatus?: AnsStatus };
         const ans = ansList.value.find((a) => a.id_ans === ticket.ticket_ans);
         if (ans) {
           enrichedTicket.ticket_ans = ans.ans_name as any;
+          const calculator = new AnsTimeCalculator(workingHours.value, holidays.value);
+          enrichedTicket.ansStatus = calculator.getAnsStatus(ticket, ans.ans_name);
+        } else {
+          enrichedTicket.ansStatus = "normal";
         }
 
-        result[columnKey].push(enrichedTicket);
+        result[columnKey].push(enrichedTicket as TicketShort);
       }
     }
   });
@@ -2211,7 +2247,7 @@ const confirmAction = async () => {
         try {
           await notesService.createNote({
             note: commentText.value.trim(),
-            visible_to_client: false,
+            visible_to_client: commentVisibleToClient.value,
             id_ticket: draggedTicket.value.id_ticket,
             network_user: CurrentUserInfo.username || "",
           });
@@ -2311,7 +2347,7 @@ const confirmAction = async () => {
         try {
           await notesService.createNote({
             note: commentText.value.trim(),
-            visible_to_client: false,
+            visible_to_client: commentVisibleToClient.value,
             id_ticket: draggedTicket.value.id_ticket,
             network_user: CurrentUserInfo.username || "",
           });
@@ -2466,7 +2502,7 @@ const confirmAction = async () => {
           try {
             await notesService.createNote({
               note: commentText.value.trim(),
-              visible_to_client: false,
+              visible_to_client: commentVisibleToClient.value,
               id_ticket: draggedTicket.value.id_ticket,
               network_user: CurrentUserInfo.username || "",
             });
@@ -2539,6 +2575,7 @@ const closeModal = () => {
   showAssignedToDropdown.value = false;
   activeTab.value = "details";
   commentText.value = "";
+  commentVisibleToClient.value = false;
   reportedHours.value = 0;
   reportedMinutes.value = 0;
 };
@@ -2566,22 +2603,23 @@ const hideSubProgramDropdown = () => {
   }, 200);
 };
 
-const filterAssignedTo = () => {
-  const search = assignedToSearch.value.toLowerCase();
+const filterAssignedTo = async () => {
+  const search = assignedToSearch.value.trim();
   if (search.length === 0) {
     filteredAssignedTo.value = eUsersList.value;
-  } else {
-    filteredAssignedTo.value = eUsersList.value.filter((eUser) => {
-      const fullName =
-        `${eUser.name} ${eUser.middle_name || ""} ${eUser.last_name} ${eUser.second_last_name || ""}`.toLowerCase();
-      const networkUser = eUser.network_user.toLowerCase();
-      const email = (eUser.email || "").toLowerCase();
-      return (
-        fullName.includes(search) ||
-        networkUser.includes(search) ||
-        email.includes(search)
-      );
-    });
+    return;
+  }
+
+  try {
+    const response = await eUsersServices.getAll(search);
+    if (response.success && response.data?.results) {
+      filteredAssignedTo.value = response.data.results;
+    } else {
+      filteredAssignedTo.value = [];
+    }
+  } catch (error) {
+    console.error("Error al buscar usuarios asignados:", error);
+    filteredAssignedTo.value = [];
   }
 };
 
@@ -2720,9 +2758,19 @@ const openTicketModal = async (ticket: TicketShort) => {
         editedTicket.value.sub_program_name || "No encontrado";
 
       if (fullTicket.value && fullTicket.value.assigned_to) {
-        const assignedUser = eUsersList.value.find(
+        let assignedUser = eUsersList.value.find(
           (u) => u.network_user === fullTicket.value!.assigned_to,
         );
+
+        if (!assignedUser) {
+          const userResponse = await eUsersServices.GetEUsersByNetworkUser(
+            fullTicket.value.assigned_to,
+          );
+          if (userResponse.success && userResponse.data) {
+            assignedUser = userResponse.data;
+          }
+        }
+
         if (assignedUser) {
           assignedToSearch.value =
             `${assignedUser.name} ${assignedUser.middle_name || ""} ${assignedUser.last_name} ${assignedUser.second_last_name || ""}`

@@ -17,6 +17,10 @@ export class RolesService {
     );
   }
 
+  async getByName(roleName: string): Promise<ApiResponse<Role>> {
+    return await http.get<Role>(`${this.endPoint}${encodeURIComponent(roleName)}/`);
+  }
+
   async create(rol: Role): Promise<ApiResponse<Role>> {
     return await http.post<Role>(this.endPoint, rol);
   }

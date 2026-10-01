@@ -12,6 +12,7 @@ export interface UserInfo {
   position: string;
   document: number;
   isEUser?: boolean;
+  isAdmin?: boolean;
 }
 
 export interface Tokens {

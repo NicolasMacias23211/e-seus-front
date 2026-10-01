@@ -35,6 +35,7 @@
               </th>
               <th class="px-6 py-4 text-left text-sm font-bold">Descripción</th>
               <th class="px-6 py-4 text-left text-sm font-bold">Icono</th>
+              <th class="px-6 py-4 text-center text-sm font-bold">Administrador</th>
               <th class="px-6 py-4 text-center text-sm font-bold">Acciones</th>
             </tr>
           </thead>
@@ -53,6 +54,9 @@
               <td class="px-6 py-4 text-sm text-slate-600">
                 {{ role.icon }}
               </td>
+              <td class="px-6 py-4 text-center text-sm text-slate-600">
+                {{ role.is_admin ? "Sí" : "No" }}
+              </td>
               <td class="px-6 py-4">
                 <div class="flex items-center justify-center gap-2">
                   <button
@@ -66,7 +70,7 @@
               </td>
             </tr>
             <tr v-if="roles.length === 0">
-              <td colspan="3" class="px-6 py-8 text-center text-slate-500">
+              <td colspan="5" class="px-6 py-8 text-center text-slate-500">
                 No hay roles registrados
               </td>
             </tr>
@@ -149,6 +153,15 @@
               />
             </div>
 
+            <label class="flex items-center gap-3 text-sm font-bold text-slate-700">
+              <input
+                v-model="form.isAdmin"
+                type="checkbox"
+                class="h-4 w-4 rounded border-slate-300 text-[#021C7D] focus:ring-[#50bdeb]"
+              />
+              Es administrador
+            </label>
+
             <div class="flex gap-3 pt-4">
               <button
                 type="button"
@@ -202,6 +215,7 @@ const form = reactive({
   rolName: "",
   description: "",
   icon: "",
+  isAdmin: false,
 });
 
 const openCreateModal = () => {
@@ -209,6 +223,7 @@ const openCreateModal = () => {
   form.rolName = "";
   form.description = "";
   form.icon = "";
+  form.isAdmin = false;
   showModal.value = true;
 };
 
@@ -218,6 +233,7 @@ const openEditModal = (role: Role) => {
   form.rolName = role.rol_name;
   form.description = role.description || "";
   form.icon = role.icon || "";
+  form.isAdmin = role.is_admin;
   showModal.value = true;
 };
 
@@ -226,6 +242,7 @@ const closeModal = () => {
   form.rolName = "";
   form.description = "";
   form.icon = "";
+  form.isAdmin = false;
   isEditing.value = false;
   editingIndex.value = -1;
 };
@@ -235,7 +252,8 @@ const create = async () => {
     let dataCreate: Role = ({
       rol_name: form.rolName,
       description: form.description,
-      icon : form.icon
+      icon: form.icon,
+      is_admin: form.isAdmin,
     })
 
     let response = await rolesService.create(dataCreate);

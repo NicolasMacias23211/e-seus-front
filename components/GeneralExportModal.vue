@@ -256,10 +256,29 @@
             </button>
           </div>
         </div>
+        <!-- Cumple filter -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">
+            Cumplimiento (Opcional)
+          </label>
+          <div class="flex gap-2">
+            <button
+              v-for="opt in cumpleOptions"
+              :key="String(opt.value)"
+              @click="cumpleFilter = opt.value"
+              :class="[
+                'flex-1 py-2 px-3 rounded-xl border-2 text-sm font-semibold transition-all',
+                cumpleFilter === opt.value
+                  ? 'border-transparent text-white ' + opt.activeClass
+                  : 'border-slate-200 text-slate-600 bg-white hover:border-slate-300',
+              ]"
+            >
+              {{ opt.label }}
+            </button>
+          </div>
+        </div>
       </div>
-      <div
-        class="flex items-center justify-end gap-3 p-6 border-t-2 border-slate-100 bg-slate-50"
-      >
+      <div class="flex items-center justify-end gap-3 p-6 border-t-2 border-slate-100">
         <button
           @click="closeModal"
           class="px-6 py-2.5 rounded-xl border-2 border-slate-300 text-slate-700 font-semibold hover:bg-slate-100 transition-colors"
@@ -320,6 +339,7 @@ export interface GeneralExportParams {
   client?: Client;
   service?: Service;
   eUser?: EUser;
+  cumple?: boolean | null;
 }
 
 const eUserService = new eUsersService();
@@ -328,6 +348,14 @@ const serviceTypeService = new RequestTypeService();
 
 const dateFrom = ref("");
 const dateTo = ref("");
+
+const cumpleFilter = ref<boolean | null>(null);
+
+const cumpleOptions: { label: string; value: boolean | null; activeClass: string }[] = [
+  { label: "Todos",     value: null,  activeClass: "bg-slate-500" },
+  { label: "Cumple",    value: true,  activeClass: "bg-green-500" },
+  { label: "No Cumple", value: false, activeClass: "bg-red-500" },
+];
 
 const clientSearchQuery = ref("");
 const selectedClient = ref<Client | null>(null);
@@ -511,6 +539,7 @@ const generateReport = () => {
     client: selectedClient.value || undefined,
     service: selectedService.value || undefined,
     eUser: selectedUser.value || undefined,
+    cumple: cumpleFilter.value,
   };
 
   emit("export", params);
@@ -520,6 +549,7 @@ const generateReport = () => {
 const resetForm = () => {
   dateFrom.value = "";
   dateTo.value = "";
+  cumpleFilter.value = null;
   selectedClient.value = null;
   clientSearchQuery.value = "";
   selectedService.value = null;
